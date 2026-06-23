@@ -10,7 +10,14 @@ const NAV_HTML = `
       <a href="dashboard.html" class="tc-nav-link" data-page="dashboard">Dashboard</a>
       <a href="verify.html" class="tc-nav-link" data-page="verify">Verify</a>
     </div>
-    <a href="certificate.html" class="tc-nav-cta">Get Certificate →</a>
+    <div class="tc-nav-right">
+      <a href="certificate.html" class="tc-nav-cta">Get Certificate →</a>
+      <div class="tc-user-menu" id="tcUserMenu" style="display:none">
+        <span class="tc-username" id="tcUsername"></span>
+        <button class="tc-logout-btn" id="tcLogoutBtn">Logout</button>
+      </div>
+      <a href="auth.html" class="tc-login-btn" id="tcLoginBtn">Log In</a>
+    </div>
     <button class="tc-hamburger" onclick="toggleMobileNav()" id="hamburger">☰</button>
   </div>
   <div class="tc-mobile-nav" id="mobileNav">
@@ -20,6 +27,13 @@ const NAV_HTML = `
     <a href="dashboard.html" class="tc-mobile-link">📊 Dashboard</a>
     <a href="certificate.html" class="tc-mobile-link">🏆 Get Certificate</a>
     <a href="verify.html" class="tc-mobile-link">🔍 Verify Certificate</a>
+    <div class="tc-mobile-auth" id="tcMobileAuth">
+      <a href="auth.html" class="tc-mobile-link tc-mobile-login" id="tcMobileLogin">👤 Log In / Sign Up</a>
+      <div class="tc-mobile-user" id="tcMobileUser" style="display:none">
+        <span class="tc-mobile-link" id="tcMobileUsername" style="color:#7c6dfa"></span>
+        <a class="tc-mobile-link" id="tcMobileLogout" style="cursor:pointer;color:#fa6d8a">🚪 Logout</a>
+      </div>
+    </div>
   </div>
 </nav>`;
 
@@ -72,6 +86,12 @@ const NAV_CSS = `
 }
 .tc-nav-link:hover { color: #f0f0fa; background: rgba(255,255,255,0.05); }
 .tc-nav-link.active { color: #7c6dfa; background: rgba(124,109,250,0.1); }
+.tc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
 .tc-nav-cta {
   background: #7c6dfa;
   color: white;
@@ -85,9 +105,41 @@ const NAV_CSS = `
   font-family: 'Inter', sans-serif;
   text-decoration: none;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 .tc-nav-cta:hover { background: #6b5cf0; transform: translateY(-1px); }
+.tc-login-btn {
+  font-size: 13px;
+  color: #8888aa;
+  text-decoration: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tc-login-btn:hover { color: #f0f0fa; border-color: rgba(255,255,255,0.25); }
+.tc-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tc-username {
+  font-size: 13px;
+  color: #7c6dfa;
+  font-weight: 500;
+}
+.tc-logout-btn {
+  font-size: 12px;
+  color: #8888aa;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.tc-logout-btn:hover { color: #fa6d8a; border-color: rgba(250,109,138,0.3); }
 .tc-hamburger {
   display: none;
   background: transparent;
@@ -113,11 +165,12 @@ const NAV_CSS = `
   padding: 12px 16px;
   border-radius: 10px;
   transition: all 0.15s;
+  display: block;
 }
 .tc-mobile-link:hover { color: #f0f0fa; background: rgba(255,255,255,0.05); }
 @media (max-width: 768px) {
   .tc-nav-links { display: none; }
-  .tc-nav-cta { display: none; }
+  .tc-nav-right { display: none; }
   .tc-hamburger { display: block; }
 }
 `;
@@ -128,20 +181,67 @@ function toggleMobileNav() {
   document.getElementById('hamburger').textContent = nav.classList.contains('open') ? '✕' : '☰';
 }
 
+async function updateNavAuthState() {
+  // Dynamically import supabase so nav.js stays a plain script (not a module)
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const loginBtn    = document.getElementById('tcLoginBtn');
+    const userMenu    = document.getElementById('tcUserMenu');
+    const usernameEl  = document.getElementById('tcUsername');
+    const logoutBtn   = document.getElementById('tcLogoutBtn');
+    const mobileLogin = document.getElementById('tcMobileLogin');
+    const mobileUser  = document.getElementById('tcMobileUser');
+    const mobileUname = document.getElementById('tcMobileUsername');
+    const mobileLogout= document.getElementById('tcMobileLogout');
+
+    if (user) {
+      // Logged in — show username + logout
+      const displayName = user.user_metadata?.full_name?.split(' ')[0]
+        || user.email.split('@')[0];
+
+      loginBtn.style.display  = 'none';
+      userMenu.style.display  = 'flex';
+      usernameEl.textContent  = '👤 ' + displayName;
+
+      mobileLogin.style.display = 'none';
+      mobileUser.style.display  = 'block';
+      mobileUname.textContent   = '👤 ' + displayName;
+
+      const doLogout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+      };
+      logoutBtn.addEventListener('click', doLogout);
+      mobileLogout.addEventListener('click', doLogout);
+    } else {
+      // Logged out — show login button
+      loginBtn.style.display  = 'inline-flex';
+      userMenu.style.display  = 'none';
+      mobileLogin.style.display = 'block';
+      mobileUser.style.display  = 'none';
+    }
+  } catch(e) {
+    // supabase.js not configured yet — silently skip auth state
+  }
+}
+
 function injectNav() {
-  // Inject CSS
   const style = document.createElement('style');
   style.textContent = NAV_CSS;
   document.head.appendChild(style);
 
-  // Inject HTML
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
 
-  // Set active link based on current page
+  // Set active link
   const page = window.location.pathname.split('/').pop().replace('.html','') || 'index';
   document.querySelectorAll('.tc-nav-link').forEach(link => {
     if (link.dataset.page === page) link.classList.add('active');
   });
+
+  // Update auth state after injecting HTML
+  updateNavAuthState();
 }
 
 document.addEventListener('DOMContentLoaded', injectNav);

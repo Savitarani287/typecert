@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeCert — Login / Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="nav.js" defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--surface2:#16162a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --accent:#7c6dfa;--accent-hover:#6b5cf0;
+  --text:#f0f0fa;--muted:#8888aa;--dimmed:#4a4a6a;
+  --green:#00e5a0;--red:#fa6d8a;
+  --font-display:'Syne',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;-webkit-font-smoothing:antialiased}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.12}
+.orb1{width:500px;height:500px;background:#7c6dfa;top:-150px;right:-100px}
+.orb2{width:400px;height:400px;background:#fa6d8a;bottom:-100px;left:-150px}
+
+/* ── Card ── */
+.auth-wrap{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:40px 20px;position:relative;z-index:1}
+.auth-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:44px 40px;width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,0.4)}
+
+.auth-logo{font-family:var(--font-display);font-size:26px;font-weight:800;text-align:center;margin-bottom:8px}
+.auth-logo .t{color:var(--accent)}
+.auth-tagline{text-align:center;color:var(--muted);font-size:14px;margin-bottom:32px}
+
+/* ── Tabs ── */
+.auth-tabs{display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:28px}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:8px;font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--muted)}
+.auth-tab.active{background:var(--accent);color:white}
+
+/* ── Form ── */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px;font-weight:500}
+.field input{
+  width:100%;padding:12px 16px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:10px;
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:14px;
+  transition:border 0.2s,box-shadow 0.2s;
+  outline:none;
+}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,0.15)}
+.field input::placeholder{color:var(--dimmed)}
+
+.btn-primary{
+  width:100%;padding:13px;
+  background:var(--accent);color:white;
+  border:none;border-radius:10px;
+  font-family:var(--font-body);font-size:15px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;margin-top:8px;
+}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+.auth-msg{margin-top:16px;padding:12px 16px;border-radius:10px;font-size:14px;text-align:center;display:none}
+.auth-msg.success{background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);color:var(--green);display:block}
+.auth-msg.error{background:rgba(250,109,138,0.1);border:1px solid rgba(250,109,138,0.25);color:var(--red);display:block}
+
+.forgot-link{text-align:right;margin-top:-10px;margin-bottom:18px}
+.forgot-link a{font-size:13px;color:var(--muted);text-decoration:none;transition:color 0.2s}
+.forgot-link a:hover{color:var(--accent)}
+
+.divider{text-align:center;color:var(--dimmed);font-size:13px;margin:20px 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border2)}
+.divider::before{left:0}.divider::after{right:0}
+
+.guest-btn{
+  width:100%;padding:11px;
+  background:transparent;
+  border:1px solid var(--border2);
+  border-radius:10px;
+  color:var(--muted);
+  font-family:var(--font-body);font-size:14px;
+  cursor:pointer;transition:all 0.2s;
+}
+.guest-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* ── Forgot password panel ── */
+.forgot-panel{display:none}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:24px;transition:color 0.2s}
+.back-link:hover{color:var(--text)}
+
+@media(max-width:480px){
+  .auth-card{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo"><span class="t">Type</span>Cert</div>
+    <div class="auth-tagline">Free typing tests for government job aspirants</div>
+
+    <!-- Main login/signup panel -->
+    <div id="mainPanel">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Log In</button>
+        <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login form -->
+      <div id="loginForm">
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" />
+        </div>
+        <div class="forgot-link"><a onclick="showForgot()">Forgot password?</a></div>
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Log In</button>
+      </div>
+
+      <!-- Signup form -->
+      <div id="signupForm" style="display:none">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="signupName" placeholder="Priya Sharma" />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label>Password <span style="color:var(--dimmed);font-weight:400">(min 6 characters)</span></label>
+          <input type="password" id="signupPassword" placeholder="••••••••" />
+        </div>
+        <button class="btn-primary" id="signupBtn" onclick="handleSignup()">Create Free Account</button>
+      </div>
+
+      <div id="authMsg" class="auth-msg"></div>
+
+      <div class="divider">or</div>
+      <button class="guest-btn" onclick="continueAsGuest()">Continue as Guest (no account)</button>
+    </div>
+
+    <!-- Forgot password panel -->
+    <div id="forgotPanel" class="forgot-panel">
+      <div class="back-link" onclick="showMain()">← Back to login</div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">Reset Password</div>
+        <div style="font-size:14px;color:var(--muted)">We'll send a reset link to your email.</div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="forgotEmail" placeholder="you@example.com" />
+      </div>
+      <button class="btn-primary" id="forgotBtn" onclick="handleForgot()">Send Reset Link</button>
+      <div id="forgotMsg" class="auth-msg"></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from './supabase.js';
+
+// ── Tab switching ─────────────────────────────────────────────
+window.switchTab = function(tab) {
+  const tabs = document.querySelectorAll('.auth-tab');
+  tabs[0].classList.toggle('active', tab === 'login');
+  tabs[1].classList.toggle('active', tab === 'signup');
+  document.getElementById('loginForm').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  clearMsg();
+}
+
+// ── Message helper ────────────────────────────────────────────
+function showMsg(text, type='error') {
+  const el = document.getElementById('authMsg');
+  el.textContent = text;
+  el.className = `auth-msg ${type}`;
+}
+function clearMsg() {
+  const el = document.getElementById('authMsg');
+  el.className = 'auth-msg';
+}
+
+// ── Where to go after login ───────────────────────────────────
+function redirectAfterAuth() {
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get('next') || 'dashboard.html';
+  window.location.href = next;
+}
+
+// ── If already logged in, redirect immediately ────────────────
+supabase.auth.getUser().then(({ data: { user } }) => {
+  if (user) redirectAfterAuth();
+});
+
+// ── Login ─────────────────────────────────────────────────────
+window.handleLogin = async function() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showMsg('Please fill in all fields'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Logging in…';
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    showMsg(error.message === 'Invalid login credentials'
+      ? 'Wrong email or password. Try again.'
+      : error.message);
+    btn.disabled = false; btn.textContent = 'Log In';
+  } else {
+    redirectAfterAuth();
+  }
+}
+
+// ── Signup ────────────────────────────────────────────────────
+window.handleSignup = async function() {
+  const name     = document.getElementById('signupName').value.trim();
+  const email    = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if (!name || !email || !password) { showMsg('Please fill in all fields'); return; }
+  if (password.length < 6) { showMsg('Password must be at least 6 characters'); return; }
+
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: name } }
+  });
+
+  if (error) {
+    showMsg(error.message);
+    btn.disabled = false; btn.textContent = 'Create Free Account';
+    return;
+  }
+
+  // Update the profile row with the full name
+  if (data.user) {
+    await supabase.from('profiles').update({ full_name: name }).eq('id', data.user.id);
+  }
+
+  // Supabase may auto-confirm or require email verification depending on project settings
+  if (data.session) {
+    // Auto-confirmed (email confirmation disabled) — go straight to dashboard
+    redirectAfterAuth();
+  } else {
+    showMsg('Account created! Check your email to confirm, then log in.', 'success');
+    btn.disabled = false; btn.textContent = 'Create Free Account';
+  }
+}
+
+// ── Forgot password ───────────────────────────────────────────
+window.showForgot = function() {
+  document.getElementById('mainPanel').style.display = 'none';
+  document.getElementById('forgotPanel').style.display = 'block';
+}
+window.showMain = function() {
+  document.getElementById('mainPanel').style.display = 'block';
+  document.getElementById('forgotPanel').style.display = 'none';
+}
+window.handleForgot = async function() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) { document.getElementById('forgotMsg').textContent = 'Enter your email'; return; }
+
+  const btn = document.getElementById('forgotBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/auth.html'
+  });
+
+  const msg = document.getElementById('forgotMsg');
+  if (error) {
+    msg.textContent = error.message;
+    msg.className = 'auth-msg error';
+  } else {
+    msg.textContent = 'Reset link sent! Check your email.';
+    msg.className = 'auth-msg success';
+  }
+  btn.disabled = false; btn.textContent = 'Send Reset Link';
+}
+
+// ── Guest mode ────────────────────────────────────────────────
+window.continueAsGuest = function() {
+  localStorage.setItem('guestMode', 'true');
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
