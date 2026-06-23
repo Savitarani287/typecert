@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeCert — Exam Patterns</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#080810;--surface:#0f0f1a;--surface2:#16162a;--surface3:#1e1e35;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#7c6dfa;--accent2:#fa6d8a;--green:#00e5a0;--yellow:#f5c518;--text:#f0f0fa;--muted:#8888aa;--dimmed:#4a4a6a;--font-display:'Syne',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.15}
+.orb1{width:500px;height:500px;background:#7c6dfa;top:-150px;left:-100px}
+.orb2{width:400px;height:400px;background:#00e5a0;bottom:-100px;right:-100px}
+.container{max-width:1100px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;background:rgba(8,8,16,0.85)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;color:inherit}
+.logo .t{color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-link{font-size:14px;color:var(--muted);text-decoration:none;cursor:pointer;transition:color .2s}
+.nav-link:hover{color:var(--text)}.nav-link.active{color:var(--accent)}
+.nav-cta{background:var(--accent);color:white;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body)}
+.page-header{padding:48px 0 40px;text-align:center}
+.page-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.25);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--green);font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.page-title{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-2px;margin-bottom:8px}
+.page-sub{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+.exams-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px}
+.exam-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.exam-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,109,250,0.05),transparent);opacity:0;transition:opacity .25s}
+.exam-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+.exam-card:hover::before{opacity:1}
+.exam-card.selected{border-color:var(--accent);background:rgba(124,109,250,0.06)}
+.exam-icon{font-size:32px;margin-bottom:16px}
+.exam-name{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:6px}
+.exam-full{font-size:12px;color:var(--dimmed);margin-bottom:16px}
+.exam-stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.exam-stat{background:var(--surface2);border-radius:6px;padding:5px 10px;font-size:12px;font-family:var(--font-mono)}
+.exam-stat.wpm{color:var(--accent)}.exam-stat.time{color:var(--accent2)}.exam-stat.lang{color:var(--green)}
+.exam-req{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px}
+.exam-start-btn{width:100%;padding:12px;border-radius:10px;background:var(--accent);border:none;color:white;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .2s}
+.exam-start-btn:hover{background:#6b5cf0}
+.exam-difficulty{position:absolute;top:16px;right:16px;font-size:11px;border-radius:6px;padding:3px 10px;font-family:var(--font-mono)}
+.diff-easy{background:rgba(0,229,160,0.1);color:var(--green)}.diff-medium{background:rgba(245,197,24,0.1);color:var(--yellow)}.diff-hard{background:rgba(250,109,138,0.1);color:var(--accent2)}
+
+/* EXAM INTERFACE */
+.exam-interface{display:none;margin-bottom:48px}
+.exam-interface.show{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* SSC STYLE EXAM UI */
+.ssc-wrapper{background:#f5f5f5;border-radius:16px;overflow:hidden;border:2px solid #1a3a6b}
+.ssc-topbar{background:#1a3a6b;color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.ssc-title{font-size:14px;font-weight:600;letter-spacing:0.5px}
+.ssc-timer-area{display:flex;align-items:center;gap:16px}
+.ssc-timer{background:rgba(255,255,255,0.15);border-radius:6px;padding:6px 16px;font-family:monospace;font-size:16px;font-weight:600}
+.ssc-timer.warning{background:rgba(255,100,100,0.3);animation:timerPulse 1s infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.7}}
+.ssc-body{padding:28px 32px}
+.ssc-instruction{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 16px;font-size:13px;color:#856404;margin-bottom:20px}
+.ssc-passage-label{font-size:12px;font-weight:600;color:#1a3a6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.ssc-passage{font-family:'Courier New',monospace;font-size:18px;line-height:2;color:#1a1a1a;background:white;border:1px solid #ddd;border-radius:8px;padding:20px;margin-bottom:20px;min-height:120px;user-select:none}
+.ssc-input-label{font-size:12px;font-weight:600;color:#1a3a6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.ssc-input{width:100%;font-family:'Courier New',monospace;font-size:16px;border:2px solid #1a3a6b;border-radius:8px;padding:14px 16px;outline:none;resize:none;background:white;color:#1a1a1a;line-height:1.6}
+.ssc-input:focus{border-color:#0d2454;box-shadow:0 0 0 3px rgba(26,58,107,0.1)}
+.ssc-bottom{background:#e8edf5;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #c5d0e0}
+.ssc-stats{display:flex;gap:24px}
+.ssc-stat{text-align:center}
+.ssc-stat-val{font-family:monospace;font-size:18px;font-weight:700;color:#1a3a6b}
+.ssc-stat-lbl{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px}
+.ssc-submit{background:#1a3a6b;color:white;border:none;padding:10px 28px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:500}
+
+/* COUNTDOWN */
+.countdown-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.countdown-modal.show{display:flex}
+.countdown-big{font-family:var(--font-display);font-size:120px;font-weight:800;color:var(--accent);line-height:1;animation:countScale 1s ease-out}
+.countdown-go{font-family:var(--font-display);font-size:80px;font-weight:800;color:var(--green)}
+.countdown-exam{font-size:16px;color:var(--muted);font-family:var(--font-mono);letter-spacing:2px;text-transform:uppercase}
+@keyframes countScale{from{transform:scale(2);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* RESULTS */
+.exam-results{display:none;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;text-align:center;margin-bottom:32px}
+.exam-results.show{display:block;animation:fadeUp .5s ease}
+.exam-result-title{font-family:var(--font-display);font-size:28px;font-weight:800;margin-bottom:8px}
+.result-status{display:inline-flex;align-items:center;gap:8px;border-radius:20px;padding:8px 20px;font-size:15px;font-weight:500;margin-bottom:28px}
+.status-pass{background:rgba(0,229,160,0.12);border:1px solid rgba(0,229,160,0.3);color:var(--green)}
+.status-fail{background:rgba(250,109,138,0.12);border:1px solid rgba(250,109,138,0.3);color:var(--accent2)}
+.exam-result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.er-item{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px}
+.er-val{font-family:var(--font-mono);font-size:36px;font-weight:700;margin-bottom:6px}
+.er-lbl{font-size:11px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px}
+.required-bar{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px;text-align:left}
+.rb-label{font-size:13px;color:var(--muted);margin-bottom:10px}
+.rb-track{height:8px;background:var(--surface3);border-radius:4px;margin-bottom:6px;position:relative}
+.rb-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.rb-fill.pass{background:var(--green)}.rb-fill.fail{background:var(--accent2)}
+.rb-markers{display:flex;justify-content:space-between;font-size:11px;color:var(--dimmed);font-family:var(--font-mono)}
+.btn-row{display:flex;gap:12px;justify-content:center}
+.btn{padding:12px 28px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border:none;font-family:var(--font-body)}
+.btn-accent{background:var(--accent);color:white}.btn-accent:hover{background:#6b5cf0}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border2)}.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-green{background:var(--green);color:#080810;font-weight:600}
+.notif{position:fixed;bottom:28px;right:28px;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px 22px;font-size:14px;z-index:2000;transform:translateY(80px);opacity:0;transition:all .3s;max-width:300px}
+.notif.show{transform:translateY(0);opacity:1}
+.notif.success{border-color:rgba(0,229,160,0.4);color:var(--green)}
+.ch{display:inline}.ch.correct{color:#1a6b3a}.ch.wrong{color:#c0392b;background:rgba(192,57,43,0.08);border-radius:2px}.ch.current{border-left:2.5px solid #1a3a6b;margin-left:-2.5px;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{border-color:#1a3a6b}50%{border-color:transparent}}
+@media(max-width:768px){.exams-grid{grid-template-columns:1fr}.exam-result-grid{grid-template-columns:1fr 1fr}.nav-links{display:none}}
+</style>
+<script src="nav.js" defer></script>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+
+
+
+<div class="container">
+  <div class="page-header">
+    <div class="page-tag">Exam simulation</div>
+    <h1 class="page-title">Real exam patterns</h1>
+    <p class="page-sub">Practice on exact replicas of SSC, Railway and State exam interfaces. Feel the real pressure before exam day.</p>
+  </div>
+
+  <div class="exams-grid" id="examsGrid"></div>
+
+  <!-- EXAM INTERFACE -->
+  <div class="exam-interface" id="examInterface">
+    <div class="ssc-wrapper" id="sscWrapper">
+      <div class="ssc-topbar">
+        <div class="ssc-title" id="examTitle">SSC CHSL — Typing Test</div>
+        <div class="ssc-timer-area">
+          <div style="font-size:13px;opacity:.7">Time Remaining</div>
+          <div class="ssc-timer" id="sscTimer">10:00</div>
+          <button onclick="submitExam()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 16px;border-radius:6px;font-size:13px;cursor:pointer">Submit</button>
+        </div>
+      </div>
+      <div class="ssc-body">
+        <div class="ssc-instruction" id="examInstruction">Type the passage below as accurately and as fast as possible. Errors will reduce your net speed. Do NOT use backspace in strict exam mode.</div>
+        <div class="ssc-passage-label">Passage to type:</div>
+        <div class="ssc-passage" id="sscPassage"></div>
+        <div class="ssc-input-label">Type here:</div>
+        <textarea class="ssc-input" id="sscInput" rows="4" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Start typing here..."></textarea>
+      </div>
+      <div class="ssc-bottom">
+        <div class="ssc-stats">
+          <div class="ssc-stat"><div class="ssc-stat-val" id="sscWpm">0</div><div class="ssc-stat-lbl">Gross WPM</div></div>
+          <div class="ssc-stat"><div class="ssc-stat-val" id="sscNet">0</div><div class="ssc-stat-lbl">Net WPM</div></div>
+          <div class="ssc-stat"><div class="ssc-stat-val" id="sscAcc">100%</div><div class="ssc-stat-lbl">Accuracy</div></div>
+          <div class="ssc-stat"><div class="ssc-stat-val" id="sscErr">0</div><div class="ssc-stat-lbl">Errors</div></div>
+        </div>
+        <button class="ssc-submit" onclick="submitExam()">Submit Test</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="exam-results" id="examResults">
+    <div class="exam-result-title">Exam Complete</div>
+    <div class="result-status" id="resultStatus"></div>
+    <div class="exam-result-grid">
+      <div class="er-item"><div class="er-val" style="color:var(--accent)" id="erWpm">0</div><div class="er-lbl">Gross WPM</div></div>
+      <div class="er-item"><div class="er-val" style="color:var(--yellow)" id="erNet">0</div><div class="er-lbl">Net WPM</div></div>
+      <div class="er-item"><div class="er-val" style="color:var(--green)" id="erAcc">0%</div><div class="er-lbl">Accuracy</div></div>
+      <div class="er-item"><div class="er-val" style="color:var(--accent2)" id="erErr">0</div><div class="er-lbl">Errors</div></div>
+    </div>
+    <div class="required-bar">
+      <div class="rb-label" id="rbLabel">Required: 35 WPM — Your score vs requirement</div>
+      <div class="rb-track">
+        <div class="rb-fill" id="rbFill" style="width:0%"></div>
+      </div>
+      <div class="rb-markers"><span>0 WPM</span><span id="rbReq">Required: 35</span><span>100 WPM</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="retryExam()">↺ Retry exam</button>
+      <button class="btn btn-accent" onclick="window.location.href='index.html#certSection'">Get certificate →</button>
+    </div>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown-modal" id="countdownModal">
+  <div class="countdown-exam" id="cdExamName">SSC CHSL EXAM</div>
+  <div class="countdown-big" id="cdNum">3</div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+window.onerror = function(msg, url, line, col, error) {
+  console.error('PAGE ERROR:', msg, 'at line', line);
+  alert('Error detected: ' + msg + ' (line ' + line + ')');
+  return false;
+};
+const exams=[
+  {id:'ssc_chsl',icon:'🏛️',name:'SSC CHSL',full:'Combined Higher Secondary Level',wpm:35,duration:600,lang:'English',difficulty:'medium',diffClass:'diff-medium',req:'35 WPM English or 30 WPM Hindi',instruction:'This test simulates the SSC CHSL typing test. Type the passage as accurately as possible. Net WPM = Gross WPM minus error deduction. Minimum required: 35 WPM net speed.'},
+  {id:'ssc_cgl',icon:'⚖️',name:'SSC CGL',full:'Combined Graduate Level',wpm:35,duration:600,lang:'English',difficulty:'medium',diffClass:'diff-medium',req:'35 WPM English',instruction:'SSC CGL typing test simulation. Court transcription pattern. Type accurately — errors are penalized heavily in this examination.'},
+  {id:'rrb_ntpc',icon:'🚂',name:'RRB NTPC',full:'Railway Non-Technical Popular Categories',wpm:30,duration:600,lang:'English',difficulty:'easy',diffClass:'diff-easy',req:'30 WPM English or 25 WPM Hindi',instruction:'Railway NTPC typing test. Type the given passage within the time limit. Minimum speed required is 30 WPM with reasonable accuracy.'},
+  {id:'rpsc_ldc',icon:'📋',name:'RPSC LDC',full:'Rajasthan Lower Division Clerk',wpm:30,duration:600,lang:'Hindi',difficulty:'medium',diffClass:'diff-medium',req:'30 WPM Hindi (Mangal/Kruti Dev)',instruction:'Rajasthan State typing test in Hindi. Mangal font Unicode typing. Special characters and matras must be typed accurately.'},
+  {id:'ssc_data',icon:'💻',name:'Data Entry',full:'SSC Data Entry Operator',wpm:8000,duration:600,lang:'Numbers',difficulty:'hard',diffClass:'diff-hard',req:'8000 Key Depressions/Hour',instruction:'Data entry operator test. Focus on number accuracy and speed. Key Depression speed is measured — every key press counts.'},
+  {id:'custom_exam',icon:'⚙️',name:'Custom Exam',full:'Set your own requirements',wpm:40,duration:300,lang:'English',difficulty:'easy',diffClass:'diff-easy',req:'Set your own WPM target',instruction:'Configure your own exam parameters. Great for practicing specific speed targets.'}
+];
+
+const passages={
+  english:["The Government of India has launched several initiatives to improve the typing skills of candidates appearing for various competitive examinations. Regular practice on official exam interfaces helps aspirants understand the actual test environment and reduce anxiety on the day of examination.","India's railway network is one of the largest in the world carrying millions of passengers every day across thousands of kilometers of track. The Indian Railways employs a large number of people in various technical and non-technical positions requiring different skill sets.","The Staff Selection Commission conducts examinations for recruitment to various posts in different Ministries and Departments of the Government of India. Typing speed and accuracy are essential requirements for several posts in the clerical category."],
+  hindi:["भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं में उपस्थित होने वाले उम्मीदवारों की टाइपिंग कौशल में सुधार के लिए कई पहल शुरू की हैं। आधिकारिक परीक्षा इंटरफेस पर नियमित अभ्यास से उम्मीदवारों को वास्तविक परीक्षा वातावरण को समझने में मदद मिलती है।"],
+  numbers:["12345 67890 11111 22222 33333 44444 55555 66666 77777 88888 99999 00000 12345 67890 98765 43210 11223 34455 66778 89900 12121 34343 56565 78787 90909"]
+};
+
+let selectedExam=null,currentText='',typed=0,correct=0,errors=0;
+let timeLeft=600,timer=null,started=false,finished=false;
+let finalWpm=0,finalNet=0,finalAcc=0;
+
+function buildCards(){
+  const grid=document.getElementById('examsGrid');
+  exams.forEach(e=>{
+    const card=document.createElement('div');
+    card.className='exam-card';
+    card.innerHTML=`
+      <div class="exam-difficulty ${e.diffClass}">${e.difficulty}</div>
+      <div class="exam-icon">${e.icon}</div>
+      <div class="exam-name">${e.name}</div>
+      <div class="exam-full">${e.full}</div>
+      <div class="exam-stats">
+        <div class="exam-stat wpm">${e.wpm} WPM</div>
+        <div class="exam-stat time">${e.duration/60} min</div>
+        <div class="exam-stat lang">${e.lang}</div>
+      </div>
+      <div class="exam-req">${e.req}</div>
+      <button class="exam-start-btn" onclick="startExam('${e.id}', this)">Start ${e.name} exam →</button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function startExam(id, btnEl){
+  console.log('startExam called with id:', id, 'btnEl:', btnEl);
+  selectedExam=exams.find(e=>e.id===id);
+  if(!selectedExam){console.error('Exam not found for id:', id);return;}
+  document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
+  if(btnEl) btnEl.closest('.exam-card').classList.add('selected');
+  document.getElementById('examResults').classList.remove('show');
+  showCountdown(selectedExam);
+}
+
+function showCountdown(exam){
+  const modal=document.getElementById('countdownModal');
+  const num=document.getElementById('cdNum');
+  document.getElementById('cdExamName').textContent=exam.name.toUpperCase()+' EXAM';
+  modal.classList.add('show');
+  let c=3;num.textContent=c;num.className='countdown-big';
+  const iv=setInterval(()=>{
+    c--;
+    if(c>0){num.textContent=c;num.className='countdown-big';}
+    else if(c===0){num.textContent='GO!';num.className='countdown-go';}
+    else{clearInterval(iv);modal.classList.remove('show');initExam(exam);}
+  },1000);
+}
+
+function initExam(exam){
+  const langKey=exam.lang==='Hindi'?'hindi':exam.lang==='Numbers'?'numbers':'english';
+  const bank=passages[langKey]||passages.english;
+  currentText=bank[Math.floor(Math.random()*bank.length)];
+  typed=0;correct=0;errors=0;timeLeft=exam.duration;started=false;finished=false;
+  if(timer)clearInterval(timer);
+  document.getElementById('examTitle').textContent=exam.name+' — Typing Test';
+  document.getElementById('examInstruction').textContent=exam.instruction;
+  document.getElementById('sscInput').value='';
+  document.getElementById('sscInput').disabled=false;
+  ['sscWpm','sscNet','sscErr'].forEach(id=>document.getElementById(id).textContent='0');
+  document.getElementById('sscAcc').textContent='100%';
+  updateExamTimer(timeLeft);
+  renderPassage();
+  document.getElementById('examInterface').classList.add('show');
+  document.getElementById('examInterface').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>document.getElementById('sscInput').focus(),300);
+  timer=setInterval(()=>{timeLeft--;updateExamTimer(timeLeft);if(timeLeft<=0)submitExam();},1000);
+}
+
+function renderPassage(){
+  const el=document.getElementById('sscPassage');
+  el.innerHTML='';
+  for(let i=0;i<currentText.length;i++){
+    const s=document.createElement('span');
+    s.className='ch'+(i===0?' current':'');s.id='p'+i;
+    s.textContent=currentText[i]===' '?'\u00a0':currentText[i];
+    el.appendChild(s);
+  }
+}
+
+document.getElementById('sscInput').addEventListener('input',function(){
+  if(finished)return;
+  if(!started)started=true;
+  const val=this.value;
+  typed=val.length;correct=0;errors=0;
+  for(let i=0;i<currentText.length;i++){
+    const el=document.getElementById('p'+i);if(!el)continue;
+    el.className='ch';
+    if(i<val.length){if(val[i]===currentText[i]){correct++;el.classList.add('correct');}else{errors++;el.classList.add('wrong');}}
+    else if(i===val.length)el.classList.add('current');
+  }
+  const elapsed=(selectedExam.duration-timeLeft)/60;
+  const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;
+  const net=Math.max(0,Math.round(wpm-(errors/(elapsed||0.01))));
+  const acc=typed>0?Math.round((correct/typed)*100):100;
+  document.getElementById('sscWpm').textContent=wpm;
+  document.getElementById('sscNet').textContent=net;
+  document.getElementById('sscAcc').textContent=acc+'%';
+  document.getElementById('sscErr').textContent=errors;
+});
+
+function updateExamTimer(t){
+  const m=Math.floor(t/60),s=t%60;
+  const str=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  const el=document.getElementById('sscTimer');
+  el.textContent=str;
+  el.classList.toggle('warning',t<=60);
+}
+
+function submitExam(){
+  if(finished)return;
+  finished=true;clearInterval(timer);
+  document.getElementById('sscInput').disabled=true;
+  const elapsed=(selectedExam.duration-timeLeft)/60;
+  finalWpm=elapsed>0?Math.round((correct/5)/elapsed):parseInt(document.getElementById('sscWpm').textContent)||0;
+  finalNet=Math.max(0,Math.round(finalWpm-(errors/(elapsed||0.01))));
+  finalAcc=typed>0?Math.round((correct/typed)*100):100;
+  showResults();
+}
+
+function showResults(){
+  const req=selectedExam.wpm;
+  const passed=finalNet>=req;
+  document.getElementById('erWpm').textContent=finalWpm;
+  document.getElementById('erNet').textContent=finalNet;
+  document.getElementById('erAcc').textContent=finalAcc+'%';
+  document.getElementById('erErr').textContent=errors;
+  const status=document.getElementById('resultStatus');
+  status.className='result-status '+(passed?'status-pass':'status-fail');
+  status.textContent=passed?'✓ PASSED — You met the required speed':'✗ NOT QUALIFIED — Keep practicing';
+  const pct=Math.min(100,(finalNet/100)*100);
+  const reqPct=Math.min(100,(req/100)*100);
+  document.getElementById('rbFill').style.width=pct+'%';
+  document.getElementById('rbFill').className='rb-fill '+(passed?'pass':'fail');
+  document.getElementById('rbLabel').textContent=`Your net WPM: ${finalNet} | Required: ${req} WPM`;
+  document.getElementById('rbReq').textContent='Required: '+req;
+  document.getElementById('examResults').classList.add('show');
+  document.getElementById('examResults').scrollIntoView({behavior:'smooth',block:'center'});
+  if(passed)showNotif('🎉 Excellent! You passed the '+selectedExam.name+' typing requirement!','success');
+  else showNotif('Keep practicing! You need '+req+' WPM, you got '+finalNet+' WPM','success');
+}
+
+function retryExam(){if(selectedExam)startExam(selectedExam.id);}
+function showNotif(msg,type){const n=document.getElementById('notif');n.textContent=msg;n.className='notif show '+(type||'');setTimeout(()=>n.classList.remove('show'),4000);}
+buildCards();
+</script>
+</body>
+</html>

@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeCert — Type Fast. Get Certified.</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --surface2: #16162a;
+      --surface3: #1e1e35;
+      --border: rgba(255, 255, 255, 0.07);
+      --border2: rgba(255, 255, 255, 0.12);
+      --accent: #7c6dfa;
+      --accent2: #fa6d8a;
+      --green: #00e5a0;
+      --yellow: #f5c518;
+      --text: #f0f0fa;
+      --muted: #8888aa;
+      --dimmed: #4a4a6a;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: .4;
+      pointer-events: none;
+      z-index: 0
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: .18
+    }
+
+    .orb1 {
+      width: 600px;
+      height: 600px;
+      background: #7c6dfa;
+      top: -200px;
+      right: -100px
+    }
+
+    .orb2 {
+      width: 500px;
+      height: 500px;
+      background: #fa6d8a;
+      bottom: -200px;
+      left: -100px
+    }
+
+    .orb3 {
+      width: 300px;
+      height: 300px;
+      background: #00e5a0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%)
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 28px;
+      position: relative;
+      z-index: 1
+    }
+
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 8, 16, 0.8)
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      cursor: pointer
+    }
+
+    .logo .t {
+      color: var(--accent)
+    }
+
+    .logo .c {
+      color: var(--text)
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--dimmed);
+      font-family: var(--font-mono);
+      letter-spacing: 2px;
+      text-transform: uppercase
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px
+    }
+
+    .nav-link {
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+      cursor: pointer
+    }
+
+    .nav-link:hover {
+      color: var(--text)
+    }
+
+    .nav-cta {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: var(--font-body)
+    }
+
+    .nav-cta:hover {
+      background: #6b5cf0;
+      transform: translateY(-1px)
+    }
+
+    .nav-badge {
+      background: rgba(124, 109, 250, 0.15);
+      border: 1px solid rgba(124, 109, 250, 0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--accent);
+      font-family: var(--font-mono)
+    }
+
+    .hero {
+      padding: 100px 0 60px;
+      text-align: center
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124, 109, 250, 0.1);
+      border: 1px solid rgba(124, 109, 250, 0.25);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 12px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 28px
+    }
+
+    .hero-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      display: block;
+      animation: pulse 2s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(0.8)
+      }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 7vw, 88px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -3px;
+      margin-bottom: 24px
+    }
+
+    .hero h1 .line2 {
+      display: block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+      font-weight: 300
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .btn-hero {
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+      font-family: var(--font-body)
+    }
+
+    .btn-primary-hero {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 0 40px rgba(124, 109, 250, 0.3)
+    }
+
+    .btn-primary-hero:hover {
+      background: #6b5cf0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(124, 109, 250, 0.4)
+    }
+
+    .btn-ghost-hero {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-ghost-hero:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .stats-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 60px 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--surface)
+    }
+
+    .stat-item {
+      flex: 1;
+      padding: 24px 20px;
+      text-align: center;
+      border-right: 1px solid var(--border)
+    }
+
+    .stat-item:last-child {
+      border-right: none
+    }
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 4px
+    }
+
+    .stat-num.purple {
+      color: var(--accent)
+    }
+
+    .stat-num.pink {
+      color: var(--accent2)
+    }
+
+    .stat-num.green {
+      color: var(--green)
+    }
+
+    .stat-num.yellow {
+      color: var(--yellow)
+    }
+
+    .stat-lbl {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .mode-section {
+      margin-bottom: 40px
+    }
+
+    .section-label {
+      font-size: 11px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: var(--font-mono);
+      margin-bottom: 16px;
+      text-align: center
+    }
+
+    .mode-tabs {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px;
+      gap: 4px;
+      max-width: 420px;
+      margin: 0 auto
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: var(--font-body)
+    }
+
+    .mode-tab.active {
+      background: var(--accent);
+      color: white
+    }
+
+    .mode-tab:not(.active):hover {
+      background: var(--surface3);
+      color: var(--text)
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px
+    }
+
+    .ctrl-group {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden
+    }
+
+    .ctrl-btn {
+      padding: 9px 18px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+      border-right: 1px solid var(--border)
+    }
+
+    .ctrl-btn:last-child {
+      border-right: none
+    }
+
+    .ctrl-btn:hover {
+      color: var(--text);
+      background: var(--surface3)
+    }
+
+    .ctrl-btn.active {
+      color: var(--accent);
+      background: rgba(124, 109, 250, 0.12)
+    }
+
+    .typing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .typing-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--green));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s;
+      border-radius: 2px 2px 0 0
+    }
+
+    .typing-card.active::before {
+      transform: scaleX(1)
+    }
+
+    .strict-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(250, 109, 138, 0.12);
+      border: 1px solid rgba(250, 109, 138, 0.3);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--accent2);
+      font-family: var(--font-mono);
+      display: none
+    }
+
+    .strict-badge.show {
+      display: block
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px
+    }
+
+    .stat-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px
+    }
+
+    .stat-val.wpm {
+      color: var(--accent)
+    }
+
+    .stat-val.acc {
+      color: var(--green)
+    }
+
+    .stat-val.time {
+      color: var(--accent2)
+    }
+
+    .stat-val.net {
+      color: var(--yellow)
+    }
+
+    .stat-lbl2 {
+      font-size: 10px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .progress-wrap {
+      margin-bottom: 24px
+    }
+
+    .progress-track {
+      height: 3px;
+      background: var(--surface3);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0%;
+      transition: width .1s;
+      border-radius: 2px
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: var(--dimmed);
+      font-family: var(--font-mono)
+    }
+
+    .exam-wrapper {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 20px;
+      display: none
+    }
+
+    .exam-wrapper.show {
+      display: block
+    }
+
+    .exam-header {
+      background: #1a3a6b;
+      color: white;
+      border-radius: 8px 8px 0 0;
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: -28px -28px 20px
+    }
+
+    .exam-timer-badge {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: monospace;
+      font-size: 14px
+    }
+
+    .text-display {
+      font-family: var(--font-mono);
+      font-size: 19px;
+      line-height: 2;
+      letter-spacing: 0.2px;
+      margin-bottom: 20px;
+      min-height: 130px;
+      user-select: none;
+      word-break: break-word
+    }
+
+    .exam-wrapper .text-display {
+      font-family: 'Courier New', monospace;
+      color: #1a1a1a;
+      font-size: 18px;
+      line-height: 2
+    }
+
+    .ch {
+      display: inline
+    }
+
+    .ch.correct {
+      color: var(--green)
+    }
+
+    .ch.wrong {
+      color: var(--accent2);
+      background: rgba(250, 109, 138, 0.12);
+      border-radius: 2px
+    }
+
+    .ch.current {
+      border-left: 2.5px solid var(--accent);
+      margin-left: -2.5px;
+      animation: blink 1s step-end infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        border-color: var(--accent)
+      }
+
+      50% {
+        border-color: transparent
+      }
+    }
+
+    .exam-wrapper .ch.correct {
+      color: #1a6b3a
+    }
+
+    .exam-wrapper .ch.wrong {
+      color: #c0392b;
+      background: rgba(192, 57, 43, 0.1)
+    }
+
+    .exam-wrapper .ch.current {
+      border-left-color: #1a3a6b
+    }
+
+    .type-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--text);
+      outline: none;
+      resize: none;
+      transition: border-color .2s;
+      line-height: 1.5
+    }
+
+    .type-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124, 109, 250, 0.08)
+    }
+
+    .type-input::placeholder {
+      color: var(--dimmed)
+    }
+
+    .exam-wrapper .type-input {
+      background: #f5f5f5;
+      color: #1a1a1a;
+      border-color: #ddd
+    }
+
+    .countdown-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 8, 16, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      z-index: 10;
+      backdrop-filter: blur(4px)
+    }
+
+    .countdown-num {
+      font-family: var(--font-display);
+      font-size: 96px;
+      font-weight: 800;
+      color: var(--accent);
+      animation: countAnim 1s ease-out
+    }
+
+    @keyframes countAnim {
+      from {
+        transform: scale(1.5);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .countdown-go {
+      font-family: var(--font-display);
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--green)
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+      font-family: var(--font-body)
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white
+    }
+
+    .btn-accent:hover {
+      background: #6b5cf0;
+      transform: translateY(-1px)
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .results-section {
+      display: none;
+      animation: fadeUp .4s ease
+    }
+
+    .results-section.show {
+      display: block
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .results-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 20px
+    }
+
+    .results-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 28px;
+      text-align: center
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px
+    }
+
+    .result-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center
+    }
+
+    .result-num {
+      font-family: var(--font-mono);
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px
+    }
+
+    .result-lbl {
+      font-size: 11px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .personality-tag {
+      text-align: center;
+      margin-bottom: 24px
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124, 109, 250, 0.1);
+      border: 1px solid rgba(124, 109, 250, 0.25);
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: 15px;
+      font-weight: 500
+    }
+
+    .percentile-section {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px
+    }
+
+    .percentile-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px
+    }
+
+    .percentile-bar {
+      height: 8px;
+      background: var(--surface3);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px
+    }
+
+    .percentile-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 4px;
+      transition: width 1s ease
+    }
+
+    .percentile-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green)
+    }
+
+    .share-section {
+      background: linear-gradient(135deg, rgba(124, 109, 250, 0.08), rgba(250, 109, 138, 0.08));
+      border: 1px solid rgba(124, 109, 250, 0.2);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center
+    }
+
+    .share-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 6px
+    }
+
+    .share-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.6
+    }
+
+    .share-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .share-btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      transition: all .2s;
+      font-family: var(--font-body)
+    }
+
+    .share-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .cert-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 28px;
+      text-align: center
+    }
+
+    .cert-section-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .cert-section-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6
+    }
+
+    .cert-preview-wrap {
+      position: relative;
+      max-width: 520px;
+      margin: 0 auto 24px;
+      border-radius: 16px;
+      overflow: hidden
+    }
+
+    .cert-blurred {
+      background: white;
+      border-radius: 16px;
+      padding: 36px 32px;
+      text-align: center;
+      filter: blur(5px);
+      user-select: none;
+      pointer-events: none
+    }
+
+    .cert-watermark-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px
+    }
+
+    .cert-watermark-text {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      color: rgba(124, 109, 250, 0.3);
+      transform: rotate(-25deg);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      pointer-events: none
+    }
+
+    .cert-unlock-badge {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      padding: 12px 28px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body);
+      box-shadow: 0 8px 32px rgba(124, 109, 250, 0.35);
+      transition: all .2s
+    }
+
+    .cert-unlock-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(124, 109, 250, 0.45)
+    }
+
+    .cert-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      max-width: 440px;
+      margin: 0 auto
+    }
+
+    .cert-feature {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .cert-feature-icon {
+      color: var(--green);
+      font-size: 16px
+    }
+
+    .cert-mock-logo {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #7c6dfa;
+      text-transform: uppercase;
+      margin-bottom: 4px
+    }
+
+    .cert-mock-headline {
+      font-size: 10px;
+      color: #aaa;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px
+    }
+
+    .cert-mock-name {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 16px
+    }
+
+    .cert-mock-stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 16px
+    }
+
+    .cert-mock-stat-val {
+      font-size: 24px;
+      font-weight: 700;
+      color: #7c6dfa
+    }
+
+    .cert-mock-stat-lbl {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase
+    }
+
+    .cert-mock-id {
+      font-size: 10px;
+      color: #ccc;
+      font-family: monospace
+    }
+
+    .leaderboard-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 28px
+    }
+
+    .lb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px
+    }
+
+    .lb-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700
+    }
+
+    .lb-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--green);
+      font-family: var(--font-mono)
+    }
+
+    .lb-live::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      transition: background .15s;
+      margin-bottom: 4px
+    }
+
+    .lb-row:hover {
+      background: var(--surface2)
+    }
+
+    .lb-rank {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--dimmed);
+      width: 28px;
+      text-align: center;
+      font-weight: 700
+    }
+
+    .lb-rank.r1 {
+      color: #ffd700
+    }
+
+    .lb-rank.r2 {
+      color: #c0c0c0
+    }
+
+    .lb-rank.r3 {
+      color: #cd7f32
+    }
+
+    .lb-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0
+    }
+
+    .lb-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500
+    }
+
+    .lb-tag {
+      font-size: 11px;
+      color: var(--dimmed);
+      font-family: var(--font-mono)
+    }
+
+    .lb-wpm {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent)
+    }
+
+    .lb-acc {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      margin-left: 4px
+    }
+
+    .lb-cert {
+      font-size: 11px;
+      background: rgba(0, 229, 160, 0.1);
+      color: var(--green);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: var(--font-mono)
+    }
+
+    .testimonials {
+      margin-bottom: 60px
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      text-align: center;
+      margin-bottom: 8px
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 40px
+    }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px
+    }
+
+    .testi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color .2s
+    }
+
+    .testi-card:hover {
+      border-color: var(--accent)
+    }
+
+    .testi-stars {
+      color: var(--yellow);
+      font-size: 14px;
+      margin-bottom: 12px;
+      letter-spacing: 2px
+    }
+
+    .testi-text {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 20px
+    }
+
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .testi-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .testi-name {
+      font-size: 14px;
+      font-weight: 500
+    }
+
+    .testi-role {
+      font-size: 12px;
+      color: var(--dimmed)
+    }
+
+    .faq-section {
+      margin-bottom: 80px
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+      cursor: pointer
+    }
+
+    .faq-q {
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .faq-icon {
+      color: var(--muted);
+      font-size: 20px;
+      transition: transform .25s
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg)
+    }
+
+    .faq-a {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease, padding .3s
+    }
+
+    .faq-item.open .faq-a {
+      padding-top: 12px;
+      max-height: 200px
+    }
+
+    .modal-wrap {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-wrap.show {
+      display: flex
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 460px;
+      width: 90%;
+      animation: modalIn .3s ease
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.92)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .modal h3 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .modal p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.6
+    }
+
+    .form-group {
+      margin-bottom: 16px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: var(--font-mono);
+      margin-bottom: 8px
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      font-family: var(--font-body);
+      transition: border-color .2s
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(124, 109, 250, 0.08)
+    }
+
+    .modal-price {
+      background: rgba(0, 229, 160, 0.08);
+      border: 1px solid rgba(0, 229, 160, 0.2);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .modal-price-val {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green)
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px
+    }
+
+    .notif {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 16px 22px;
+      font-size: 14px;
+      z-index: 2000;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .3s;
+      max-width: 320px;
+      backdrop-filter: blur(20px)
+    }
+
+    .notif.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    .notif.success {
+      border-color: rgba(0, 229, 160, 0.4);
+      color: var(--green)
+    }
+
+    .notif.error {
+      border-color: rgba(250, 109, 138, 0.4);
+      color: var(--accent2)
+    }
+
+    .cert-final {
+      display: none;
+      background: white;
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 580px;
+      margin: 0 auto 28px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .cert-final.show {
+      display: block;
+      animation: fadeUp .5s ease
+    }
+
+    .cert-final-border {
+      position: absolute;
+      inset: 10px;
+      border: 1.5px solid rgba(124, 109, 250, 0.2);
+      border-radius: 14px;
+      pointer-events: none
+    }
+
+    .cert-final-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #f8f7ff, #fff5f8);
+      pointer-events: none
+    }
+
+    .cert-final * {
+      position: relative;
+      z-index: 1
+    }
+
+    .cf-logo {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      color: #7c6dfa;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 4px
+    }
+
+    .cf-headline {
+      font-size: 10px;
+      color: #aaa;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 28px
+    }
+
+    .cf-issued {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 8px
+    }
+
+    .cf-name {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      line-height: 1
+    }
+
+    .cf-achieved {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px
+    }
+
+    .cf-test-type {
+      display: inline-block;
+      background: rgba(124, 109, 250, 0.08);
+      border: 1px solid rgba(124, 109, 250, 0.15);
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 13px;
+      color: #5a52d5;
+      margin-bottom: 24px
+    }
+
+    .cf-stats {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      margin-bottom: 28px;
+      padding: 24px;
+      background: rgba(124, 109, 250, 0.04);
+      border-radius: 16px;
+      border: 1px solid rgba(124, 109, 250, 0.1)
+    }
+
+    .cf-stat-val {
+      font-family: var(--font-mono);
+      font-size: 36px;
+      font-weight: 700;
+      color: #7c6dfa;
+      line-height: 1;
+      margin-bottom: 4px
+    }
+
+    .cf-stat-lbl {
+      font-size: 10px;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .cf-seal {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c6dfa, #fa6d8a);
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px
+    }
+
+    .cf-id {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #bbb;
+      margin-bottom: 4px
+    }
+
+    .cf-date {
+      font-size: 12px;
+      color: #ccc;
+      margin-bottom: 24px
+    }
+
+    .cf-verify {
+      font-size: 12px;
+      color: #7c6dfa;
+      font-family: var(--font-mono)
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px
+    }
+
+    .footer-sub {
+      font-size: 13px;
+      color: var(--dimmed);
+      margin-bottom: 24px
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap
+    }
+
+    .footer-link {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      cursor: pointer
+    }
+
+    .footer-link:hover {
+      color: var(--text)
+    }
+
+    @media(max-width:768px) {
+      .stats-strip {
+        flex-direction: column
+      }
+
+      .stat-item {
+        border-right: none;
+        border-bottom: 1px solid var(--border)
+      }
+
+      .stat-item:last-child {
+        border-bottom: none
+      }
+
+      .testi-grid {
+        grid-template-columns: 1fr
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .stats-bar {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .nav-links {
+        display: none
+      }
+
+      .cert-features {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+  <script src="nav.js" defer></script>
+</head>
+
+<body>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-tag">Live — 10,000+ tests taken today</div>
+      <h1>Type Fast.<br><span class="line2">Get Certified.</span></h1>
+      <p class="hero-sub">India's most realistic typing test platform. Practice for government exams or test your speed
+        for fun. Download your verified certificate for just ₹11.</p>
+      <div class="hero-actions">
+        <button class="btn-hero btn-primary-hero"
+          onclick="document.getElementById('typingSection').scrollIntoView({behavior:'smooth'});setTimeout(()=>startCountdown(),600)">Start
+          free test →</button>
+        <button class="btn-hero btn-ghost-hero"
+          onclick="document.getElementById('leaderboardSection').scrollIntoView({behavior:'smooth'})">View
+          leaderboard</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-num purple" id="liveTests">12,847</div>
+        <div class="stat-lbl">Tests taken</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num pink">4,291</div>
+        <div class="stat-lbl">Certificates issued</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num green">98.4%</div>
+        <div class="stat-lbl">Satisfaction rate</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num yellow">47 WPM</div>
+        <div class="stat-lbl">Average speed</div>
+      </div>
+    </div>
+  </div>
+
+  <section id="typingSection" style="padding:60px 0">
+    <div class="container">
+      <div class="mode-section">
+        <div class="section-label">Choose your mode</div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" onclick="setMode('speed',this)">⚡ Speed Mode</button>
+          <button class="mode-tab" onclick="setMode('exam',this)">🏛️ Exam Mode</button>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <button class="ctrl-btn active" onclick="setDuration(60,this)" data-dur="60">1 min</button>
+          <button class="ctrl-btn" onclick="setDuration(120,this)" data-dur="120">2 min</button>
+          <button class="ctrl-btn" onclick="setDuration(300,this)" data-dur="300">5 min</button>
+          <button class="ctrl-btn" onclick="setDuration(600,this)" data-dur="600">10 min</button>
+        </div>
+        <div class="ctrl-group">
+          <button class="ctrl-btn active" onclick="setLang('english',this)" data-lang="english">English</button>
+          <button class="ctrl-btn" onclick="setLang('hindi',this)" data-lang="hindi">Hindi</button>
+          <button class="ctrl-btn" onclick="setLang('numbers',this)" data-lang="numbers">Numbers</button>
+        </div>
+        <div class="ctrl-group" id="examControls" style="display:none">
+          <button class="ctrl-btn active" onclick="setExam('ssc_chsl',this)">SSC CHSL</button>
+          <button class="ctrl-btn" onclick="setExam('ssc_cgl',this)">SSC CGL</button>
+          <button class="ctrl-btn" onclick="setExam('rrb',this)">Railway</button>
+          <button class="ctrl-btn" onclick="setExam('rpsc',this)">RPSC</button>
+        </div>
+        <div class="ctrl-group">
+          <button class="ctrl-btn" id="strictBtn" onclick="toggleStrict(this)">Strict OFF</button>
+        </div>
+      </div>
+
+      <div class="typing-card" id="typingCard">
+        <div class="strict-badge" id="strictBadge">NO BACKSPACE</div>
+        <div class="countdown-overlay" id="countdown" style="display:none">
+          <div class="countdown-num" id="countdownNum">3</div>
+        </div>
+        <div class="stats-bar">
+          <div class="stat-box">
+            <div class="stat-val wpm" id="wpmVal">0</div>
+            <div class="stat-lbl2">WPM</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val net" id="netVal">0</div>
+            <div class="stat-lbl2">Net WPM</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val acc" id="accVal">100%</div>
+            <div class="stat-lbl2">Accuracy</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val time" id="timerVal">60</div>
+            <div class="stat-lbl2">Seconds</div>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-labels"><span class="progress-label" id="charsTyped">0 chars</span><span
+              class="progress-label" id="errorsCount">0 errors</span></div>
+        </div>
+        <div class="exam-wrapper" id="examWrapper">
+          <div class="exam-header"><span>SSC CHSL — Typing Test Module</span><span class="exam-timer-badge"
+              id="examTimerBadge">00:60</span></div>
+          <div class="text-display" id="examTextDisplay"></div>
+        </div>
+        <div class="text-display" id="speedTextDisplay"></div>
+        <textarea class="type-input" id="typingInput" rows="3"
+          placeholder="Click here and start typing to begin the test..." autocomplete="off" autocorrect="off"
+          autocapitalize="off" spellcheck="false"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="resetTest()">↺ Restart</button>
+          <button class="btn btn-accent" onclick="resetTest()">New text</button>
+        </div>
+      </div>
+
+      <div class="results-section" id="resultsSection">
+        <div class="results-card">
+          <div class="results-title">Test complete</div>
+          <div class="results-grid">
+            <div class="result-item">
+              <div class="result-num" style="color:var(--accent)" id="rWpm">0</div>
+              <div class="result-lbl">WPM</div>
+            </div>
+            <div class="result-item">
+              <div class="result-num" style="color:var(--yellow)" id="rNet">0</div>
+              <div class="result-lbl">Net WPM</div>
+            </div>
+            <div class="result-item">
+              <div class="result-num" style="color:var(--green)" id="rAcc">0%</div>
+              <div class="result-lbl">Accuracy</div>
+            </div>
+            <div class="result-item">
+              <div class="result-num" style="color:var(--accent2)" id="rTime">0s</div>
+              <div class="result-lbl">Duration</div>
+            </div>
+          </div>
+          <div class="personality-tag">
+            <div class="tag-pill" id="personalityTag"><span id="tagText">⌨️ Steady Typist</span></div>
+          </div>
+          <div class="percentile-section">
+            <div class="percentile-label">You type faster than <strong id="percentileNum">0%</strong> of all TypeCert
+              users</div>
+            <div class="percentile-bar">
+              <div class="percentile-fill" id="percentileFill" style="width:0%"></div>
+            </div>
+            <div class="percentile-text" id="percentileText">Calculating...</div>
+          </div>
+        </div>
+        <div class="share-section">
+          <div class="share-title">Share your speed 🚀</div>
+          <div class="share-desc">Challenge your friends! Share your WPM card and see who types faster.</div>
+          <div class="share-btns">
+            <button class="share-btn" onclick="shareResult('whatsapp')">💬 WhatsApp</button>
+            <button class="share-btn" onclick="shareResult('linkedin')">💼 LinkedIn</button>
+            <button class="share-btn" onclick="shareResult('twitter')">🐦 Twitter/X</button>
+            <button class="share-btn" onclick="shareResult('instagram')">📸 Instagram</button>
+            <button class="share-btn" onclick="copyChallenge()">🔗 Copy challenge link</button>
+          </div>
+        </div>
+        <div class="cert-section">
+          <div class="cert-section-title">Get your verified certificate 🏆</div>
+          <div class="cert-section-desc">Download an official certificate with a unique verification ID. Perfect for
+            your resume, LinkedIn, and job applications.</div>
+          <div class="cert-preview-wrap">
+            <div class="cert-blurred">
+              <div class="cert-mock-logo">TypeCert</div>
+              <div class="cert-mock-headline">Certificate of Achievement</div>
+              <div class="cert-mock-name" id="previewName">Your Name</div>
+              <div style="font-size:13px;color:#888;margin-bottom:12px">has achieved</div>
+              <div class="cert-mock-stats">
+                <div>
+                  <div class="cert-mock-stat-val" id="previewWpm">0</div>
+                  <div class="cert-mock-stat-lbl">WPM</div>
+                </div>
+                <div>
+                  <div class="cert-mock-stat-val" id="previewAcc">0%</div>
+                  <div class="cert-mock-stat-lbl">Accuracy</div>
+                </div>
+              </div>
+              <div class="cert-mock-id">ID: ████████ • Verify at typecert.in/verify/████</div>
+            </div>
+            <div class="cert-watermark-overlay">
+              <div class="cert-watermark-text">SAMPLE</div>
+              <button class="cert-unlock-badge" onclick="window.location.href='certificate.html'">🔒 Pay ₹11 — Get full
+                certificate</button>
+            </div>
+          </div>
+          <div class="cert-features">
+            <div class="cert-feature"><span class="cert-feature-icon">✓</span>Unique verification ID — recruiters can
+              verify</div>
+            <div class="cert-feature"><span class="cert-feature-icon">✓</span>PDF format — attach to any job application
+            </div>
+            <div class="cert-feature"><span class="cert-feature-icon">✓</span>LinkedIn direct share — one click to add
+            </div>
+            <div class="cert-feature"><span class="cert-feature-icon">✓</span>Valid forever — never expires</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="resetTest()">Try again</button>
+          <button class="btn btn-accent" onclick="resetTest()">New test</button>
+        </div>
+      </div>
+
+      <div class="cert-final" id="certFinal">
+        <div class="cert-final-bg"></div>
+        <div class="cert-final-border"></div>
+        <div class="cf-logo">TypeCert</div>
+        <div class="cf-headline">Certificate of Achievement</div>
+        <div class="cf-issued">This is to certify that</div>
+        <div class="cf-name" id="cfName">—</div>
+        <div class="cf-achieved">has successfully completed the typing assessment</div>
+        <div class="cf-test-type" id="cfTestType">Speed Mode — 1 Minute English Test</div>
+        <div class="cf-stats">
+          <div>
+            <div class="cf-stat-val" id="cfWpm">0</div>
+            <div class="cf-stat-lbl">WPM</div>
+          </div>
+          <div>
+            <div class="cf-stat-val" id="cfAcc">0%</div>
+            <div class="cf-stat-lbl">Accuracy</div>
+          </div>
+          <div>
+            <div class="cf-stat-val" id="cfNet">0</div>
+            <div class="cf-stat-lbl">Net WPM</div>
+          </div>
+        </div>
+        <div class="cf-seal">🏆</div>
+        <div class="cf-id" id="cfId">ID: TCERT-2025-00000</div>
+        <div class="cf-date" id="cfDate">Issued on —</div>
+        <div class="cf-verify" id="cfVerify">Verify at typecert.in/verify/TCERT-2025-00000</div>
+        <div class="btn-row" style="margin-top:24px">
+          <button class="btn btn-accent" onclick="downloadCert()"
+            style="background:linear-gradient(135deg,#7c6dfa,#fa6d8a);border:none">⬇ Download PDF</button>
+          <button class="btn btn-outline" onclick="shareLinkedIn()" style="color:#0077b5;border-color:#0077b5">💼 Share
+            on LinkedIn</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="leaderboardSection" style="padding:40px 0">
+    <div class="container">
+      <div class="leaderboard-section">
+        <div class="lb-header">
+          <div class="lb-title">Today's leaderboard</div>
+          <div class="lb-live">Live</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank r1">#1</div>
+          <div class="lb-avatar" style="background:rgba(124,109,250,0.2);color:var(--accent)">RS</div>
+          <div>
+            <div class="lb-name">Rahul S.</div>
+            <div class="lb-tag">Keyboard Warrior 🔥</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <div class="lb-cert">certified</div>
+            <div class="lb-wpm">89</div>
+            <div class="lb-acc">98%</div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank r2">#2</div>
+          <div class="lb-avatar" style="background:rgba(250,109,138,0.2);color:var(--accent2)">PM</div>
+          <div>
+            <div class="lb-name">Priya M.</div>
+            <div class="lb-tag">Speed Demon ⚡</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <div class="lb-cert">certified</div>
+            <div class="lb-wpm">81</div>
+            <div class="lb-acc">97%</div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank r3">#3</div>
+          <div class="lb-avatar" style="background:rgba(0,229,160,0.15);color:var(--green)">AK</div>
+          <div>
+            <div class="lb-name">Amit K.</div>
+            <div class="lb-tag">Speed Demon ⚡</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <div class="lb-wpm">76</div>
+            <div class="lb-acc">99%</div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">#4</div>
+          <div class="lb-avatar" style="background:rgba(245,197,24,0.15);color:var(--yellow)">SR</div>
+          <div>
+            <div class="lb-name">Sunita R.</div>
+            <div class="lb-tag">Steady Typist ⌨️</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <div class="lb-wpm">72</div>
+            <div class="lb-acc">96%</div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">#5</div>
+          <div class="lb-avatar" style="background:rgba(124,109,250,0.15);color:var(--accent)">VT</div>
+          <div>
+            <div class="lb-name">Vikash T.</div>
+            <div class="lb-tag">Steady Typist ⌨️</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <div class="lb-cert">certified</div>
+            <div class="lb-wpm">69</div>
+            <div class="lb-acc">95%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:40px 0 60px">
+    <div class="container">
+      <div class="testimonials">
+        <div class="section-title">Loved by aspirants</div>
+        <div class="section-sub">Join thousands who practice and get certified on TypeCert</div>
+        <div class="testi-grid">
+          <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <div class="testi-text">"The exam mode is incredible — it feels exactly like the actual SSC hall. I improved
+              from 28 WPM to 42 WPM in 3 weeks. The certificate looks so professional, my coaching sir was impressed."
+            </div>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:rgba(124,109,250,0.2);color:var(--accent)">KS</div>
+              <div>
+                <div class="testi-name">Kavya Sharma</div>
+                <div class="testi-role">SSC CHSL Aspirant, Jaipur</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <div class="testi-text">"I shared my WPM card on LinkedIn and got 3 recruiter messages in one day! The
+              certificate has a verification link which made it look 100% legitimate. Worth every rupee of ₹11."</div>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:rgba(0,229,160,0.15);color:var(--green)">RP</div>
+              <div>
+                <div class="testi-name">Rohan Patel</div>
+                <div class="testi-role">Software Engineer, Pune</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <div class="testi-text">"Best free typing test in India. The no-backspace strict mode is brutal but it
+              trained me perfectly for the actual Railway exam. Cleared RRB NTPC typing test in first attempt!"</div>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:rgba(250,109,138,0.2);color:var(--accent2)">AM</div>
+              <div>
+                <div class="testi-name">Anjali Mishra</div>
+                <div class="testi-role">Railway RRB Qualifier, Lucknow</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="faq-section">
+        <div class="section-title" style="margin-bottom:8px">Questions?</div>
+        <div class="section-sub">Everything you need to know about TypeCert</div>
+        <div id="faqList"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-logo"><span style="color:var(--accent)">Type</span>Cert</div>
+      <div class="footer-sub">India's typing identity platform — Practice free. Get certified.</div>
+      <div class="footer-links">
+        <a href="index.html" class="footer-link">Home</a><a href="practice.html" class="footer-link">Practice</a>
+        <a href="exams.html" class="footer-link">Exam Patterns</a><a href="index.html#leaderboardSection"
+          class="footer-link">Leaderboard</a>
+        <a href="verify.html" class="footer-link">Verify Certificate</a><a href="#" class="footer-link">Privacy
+          Policy</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+      <div style="margin-top:24px;font-size:12px;color:var(--dimmed)">© 2025 TypeCert — Made with ❤️ in India</div>
+    </div>
+  </footer>
+
+  <div class="modal-wrap" id="certModal">
+    <div class="modal">
+      <h3>Get your certificate 🏆</h3>
+      <p>Enter your name as it should appear. Pay ₹11 via UPI or card and your verified certificate downloads instantly.
+      </p>
+      <div class="form-group"><label class="form-label">Full name</label><input class="form-input" id="certName"
+          placeholder="e.g. Savita Rani" maxlength="50"></div>
+      <div class="form-group"><label class="form-label">Email address</label><input class="form-input" id="certEmail"
+          placeholder="yourname@email.com" type="email"></div>
+      <div class="modal-price"><span>Certificate download</span>
+        <div class="modal-price-val">₹11 only</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" style="flex:1" onclick="closeCertModal()">Cancel</button>
+        <button class="btn btn-accent" style="flex:2;background:linear-gradient(135deg,#7c6dfa,#fa6d8a);border:none"
+          onclick="processCert()">Pay ₹11 & Download →</button>
+      </div>
+    </div>
+  </div>
+  <div class="notif" id="notif"></div>
+
+  <script>
+    const texts = { english: ["The quick brown fox jumps over the lazy dog. Government jobs require excellent typing skills and consistent practice is the key to improving speed and accuracy. Every aspirant should practice daily without fail.", "India is home to millions of government job aspirants who work tirelessly toward their dreams. Typing speed and accuracy are critical components of many competitive examinations held across the country each year.", "Success in the SSC examination requires dedication hard work and consistent effort over a long period. Candidates must practice typing every single day to achieve the required speed of thirty five words per minute.", "Technology has transformed the way we communicate and work in the modern world. Fast and accurate typing is now an essential skill for professionals in every sector from banking to information technology.", "The railway recruitment board conducts typing tests for various posts across India. Aspirants need to achieve a minimum speed to qualify. Regular practice on realistic test interfaces makes a significant difference."], hindi: ["भारत एक महान देश है जहाँ अनेक भाषाएँ और संस्कृतियाँ हैं। सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से गति और सटीकता में सुधार होता है।", "मेहनत और लगन से काम करने वाला व्यक्ति हमेशा सफल होता है। एसएससी परीक्षा में अच्छा प्रदर्शन करने के लिए नियमित टाइपिंग अभ्यास बहुत आवश्यक है।"], numbers: ["1234 5678 9012 3456 7890 2468 1357 9753 8642 0246 1357 2468 3579 4680 5791 6802 7913 8024 9135 0246", "The total amount is 12500 rupees and the invoice number is 987654321. Call 9876543210 for support. Reference code 456789 dated 15 March 2025."] };
+    const examData = { ssc_chsl: { name: "SSC CHSL", wpm: 35, duration: 600, lang: "english" }, ssc_cgl: { name: "SSC CGL", wpm: 35, duration: 600, lang: "english" }, rrb: { name: "Railway RRB", wpm: 30, duration: 600, lang: "english" }, rpsc: { name: "RPSC LDC", wpm: 30, duration: 600, lang: "hindi" } };
+    const faqs = [{ q: "Is the certificate valid for government job applications?", a: "TypeCert certificates are issued as skill verification documents. They are widely accepted as supplementary proof of typing proficiency by coaching centres and private employers. Always check specific exam requirements." }, { q: "Why should I pay ₹11 when I can screenshot the preview?", a: "The preview is intentionally blurred with a watermark. The paid certificate includes a unique verification ID recruiters can verify at typecert.in/verify. It's a PDF you can attach to applications, and includes a LinkedIn direct share feature. A screenshot has none of these." }, { q: "What is strict mode?", a: "In strict mode, you cannot use the backspace key — exactly like some government exam interfaces. This trains you to type carefully rather than relying on corrections, improving your net WPM score significantly." }, { q: "How do I share my speed on social media?", a: "After completing any test, you'll see share buttons for WhatsApp, LinkedIn, Instagram, and Twitter. Each generates a beautiful speed card with your WPM, accuracy, percentile rank, and a challenge link for friends." }, { q: "What is net WPM?", a: "Net WPM = Gross WPM minus error penalty. SSC and Railway exams often use net speed for scoring. A high gross WPM with many errors gives a low net WPM — accuracy matters as much as speed." }, { q: "Is TypeCert free?", a: "Yes — all practice features are completely free forever. You only pay ₹11 when you want to download a verified certificate. There is no subscription required for practice." }];
+    let currentText = '', typed = 0, correct = 0, errors = 0, timeLeft = 60, totalTime = 60, timer = null, started = false, finished = false, lang = 'english', mode = 'speed', exam = 'ssc_chsl', strictMode = false, finalWpm = 0, finalAcc = 0, finalNet = 0, finalTime = 0;
+    function init() { const bank = texts[lang] || texts.english; currentText = bank[Math.floor(Math.random() * bank.length)]; typed = 0; correct = 0; errors = 0; timeLeft = totalTime; started = false; finished = false; if (timer) clearInterval(timer); document.getElementById('typingInput').value = ''; document.getElementById('typingInput').disabled = false;['wpmVal', 'netVal'].forEach(id => document.getElementById(id).textContent = '0'); document.getElementById('accVal').textContent = '100%'; document.getElementById('timerVal').textContent = timeLeft; document.getElementById('progressFill').style.width = '0%'; document.getElementById('charsTyped').textContent = '0 chars'; document.getElementById('errorsCount').textContent = '0 errors'; document.getElementById('typingCard').classList.remove('active'); document.getElementById('resultsSection').classList.remove('show'); document.getElementById('certFinal').classList.remove('show'); document.getElementById('countdown').style.display = 'none'; renderText(); }
+    function renderText() { ['speedTextDisplay', 'examTextDisplay'].forEach(id => { const el = document.getElementById(id); el.innerHTML = ''; for (let i = 0; i < currentText.length; i++) { const s = document.createElement('span'); s.className = 'ch' + (i === 0 ? ' current' : ''); s.id = id[0] + i; s.textContent = currentText[i] === ' ' ? '\u00a0' : currentText[i]; el.appendChild(s); } }); document.getElementById('speedTextDisplay').style.display = mode === 'exam' ? 'none' : 'block'; document.getElementById('examWrapper').classList.toggle('show', mode === 'exam'); }
+    document.getElementById('typingInput').addEventListener('input', function () { if (finished) return; if (!started) { started = true; document.getElementById('typingCard').classList.add('active'); startTimer(); } const val = this.value; typed = val.length; correct = 0; errors = 0; for (let i = 0; i < currentText.length; i++) { ['s', 'e'].forEach(p => { const el = document.getElementById(p + i); if (!el) return; el.className = 'ch'; if (i < val.length) { if (val[i] === currentText[i]) { if (p === 's') correct++; el.classList.add('correct'); } else { if (p === 's') errors++; el.classList.add('wrong'); } } else if (i === val.length) el.classList.add('current'); }); } const elapsed = (totalTime - timeLeft) / 60; const wpm = elapsed > 0 ? Math.round((correct / 5) / elapsed) : 0; const netWpm = Math.max(0, Math.round(wpm - (errors / (elapsed || 0.01)))); const acc = typed > 0 ? Math.round((correct / typed) * 100) : 100; document.getElementById('wpmVal').textContent = wpm; document.getElementById('netVal').textContent = netWpm; document.getElementById('accVal').textContent = acc + '%'; document.getElementById('progressFill').style.width = Math.min((typed / currentText.length) * 100, 100) + '%'; document.getElementById('charsTyped').textContent = typed + ' chars'; document.getElementById('errorsCount').textContent = errors + ' errors'; if (typed >= currentText.length) endTest(); });
+    document.getElementById('typingInput').addEventListener('keydown', function (e) { if (strictMode && e.key === 'Backspace') e.preventDefault(); });
+    function startTimer() { timer = setInterval(() => { timeLeft--; document.getElementById('timerVal').textContent = timeLeft; document.getElementById('examTimerBadge').textContent = '00:' + (timeLeft < 10 ? '0' : '') + timeLeft; if (timeLeft <= 0) endTest(); }, 1000); }
+    function endTest() { if (finished) return; finished = true; clearInterval(timer); document.getElementById('typingInput').disabled = true; finalTime = totalTime - timeLeft; const min = finalTime / 60; finalWpm = finalTime > 0 ? Math.round((correct / 5) / min) : 0; finalNet = Math.max(0, Math.round(finalWpm - (errors / (min || 0.01)))); finalAcc = typed > 0 ? Math.round((correct / typed) * 100) : 100; document.getElementById('rWpm').textContent = finalWpm; document.getElementById('rNet').textContent = finalNet; document.getElementById('rAcc').textContent = finalAcc + '%'; document.getElementById('rTime').textContent = finalTime + 's'; document.getElementById('previewWpm').textContent = finalWpm; document.getElementById('previewAcc').textContent = finalAcc + '%'; setPersonality(finalWpm); setPercentile(finalWpm); document.getElementById('resultsSection').classList.add('show'); document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    function setPersonality(w) { let t; if (w < 20) t = '🐢 Tortoise — keep practicing!'; else if (w < 35) t = '🐌 Slow & steady typist'; else if (w < 50) t = '⌨️ Steady typist'; else if (w < 70) t = '⚡ Speed demon'; else t = '🔥 Keyboard warrior'; document.getElementById('tagText').textContent = t; }
+    function setPercentile(w) { const p = Math.min(99, Math.round((w / 90) * 100)); document.getElementById('percentileNum').textContent = p + '%'; document.getElementById('percentileFill').style.width = p + '%'; document.getElementById('percentileText').textContent = 'Top ' + (100 - p) + '% of all typists on TypeCert'; }
+    function setMode(m, btn) { mode = m; document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('examControls').style.display = m === 'exam' ? 'flex' : 'none'; if (m === 'exam') { totalTime = examData[exam].duration; lang = examData[exam].lang; } else totalTime = 60; resetTest(); }
+    function setExam(e, btn) { exam = e; lang = examData[e].lang; totalTime = examData[e].duration; document.querySelectorAll('#examControls .ctrl-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); resetTest(); }
+    function setDuration(d, btn) { totalTime = d; document.querySelectorAll('[data-dur]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); resetTest(); }
+    function setLang(l, btn) { lang = l; document.querySelectorAll('[data-lang]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); resetTest(); }
+    function toggleStrict(btn) { strictMode = !strictMode; btn.textContent = 'Strict ' + (strictMode ? 'ON' : 'OFF'); btn.classList.toggle('active', strictMode); document.getElementById('strictBadge').classList.toggle('show', strictMode); }
+    function startCountdown() { const o = document.getElementById('countdown'), n = document.getElementById('countdownNum'); o.style.display = 'flex'; let c = 3; n.textContent = c; n.className = 'countdown-num'; const iv = setInterval(() => { c--; if (c > 0) { n.textContent = c; n.className = 'countdown-num'; } else if (c === 0) { n.textContent = 'GO!'; n.className = 'countdown-go'; } else { clearInterval(iv); o.style.display = 'none'; document.getElementById('typingInput').focus(); } }, 1000); }
+    function resetTest() { init(); }
+    function openCertModal() { document.getElementById('certModal').classList.add('show'); }
+    function closeCertModal() { document.getElementById('certModal').classList.remove('show'); }
+    document.getElementById('certModal').addEventListener('click', e => { if (e.target === document.getElementById('certModal')) closeCertModal(); });
+    function processCert() { const name = document.getElementById('certName').value.trim(); const email = document.getElementById('certEmail').value.trim(); if (!name) { showNotif('Please enter your full name', 'error'); return; } if (!email || !email.includes('@')) { showNotif('Please enter a valid email', 'error'); return; } closeCertModal(); showCertFinal(name); }
+    function showCertFinal(name) { const modeNames = { speed: 'Speed Mode', exam: 'Exam Mode' }; const examNames = { ssc_chsl: 'SSC CHSL Pattern', ssc_cgl: 'SSC CGL Pattern', rrb: 'Railway RRB Pattern', rpsc: 'RPSC LDC Pattern' }; const durNames = { 60: '1 Minute', 120: '2 Minute', 300: '5 Minute', 600: '10 Minute' }; const certId = 'TCERT-2025-' + String(Math.floor(Math.random() * 99999)).padStart(5, '0'); const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }); document.getElementById('cfName').textContent = name; document.getElementById('cfTestType').textContent = (mode === 'exam' ? examNames[exam] : modeNames[mode]) + ' — ' + durNames[totalTime] + ' English Test'; document.getElementById('cfWpm').textContent = finalWpm; document.getElementById('cfAcc').textContent = finalAcc + '%'; document.getElementById('cfNet').textContent = finalNet; document.getElementById('cfId').textContent = 'ID: ' + certId; document.getElementById('cfDate').textContent = 'Issued on ' + today; document.getElementById('cfVerify').textContent = 'Verify at typecert.in/verify/' + certId; document.getElementById('certFinal').classList.add('show'); document.getElementById('certFinal').scrollIntoView({ behavior: 'smooth', block: 'center' }); showNotif('🎉 Certificate ready! Click Download to save.', 'success'); }
+    function downloadCert() { const w = window.open('', '_blank'); const c = document.getElementById('certFinal').cloneNode(true); c.querySelector('.btn-row').style.display = 'none'; w.document.write('<html><head><link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{padding:40px;background:linear-gradient(135deg,#f8f7ff,#fff5f8);font-family:Inter,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}.cert-final{background:white;border-radius:20px;padding:48px 40px;text-align:center;max-width:580px;position:relative}.cert-final-border{position:absolute;inset:10px;border:1.5px solid rgba(124,109,250,0.2);border-radius:14px}.cert-final-bg{display:none}.cf-logo{font-size:13px;font-weight:700;color:#7c6dfa;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;font-family:Syne,sans-serif}.cf-headline{font-size:10px;color:#aaa;letter-spacing:4px;text-transform:uppercase;margin-bottom:28px}.cf-issued{font-size:13px;color:#888;margin-bottom:8px}.cf-name{font-size:42px;font-weight:800;color:#1a1a2e;letter-spacing:-1px;margin-bottom:8px;line-height:1;font-family:Syne,sans-serif}.cf-achieved{font-size:14px;color:#666;margin-bottom:24px}.cf-test-type{display:inline-block;background:rgba(124,109,250,0.08);border:1px solid rgba(124,109,250,0.15);border-radius:20px;padding:6px 18px;font-size:13px;color:#5a52d5;margin-bottom:24px}.cf-stats{display:flex;justify-content:center;gap:36px;margin-bottom:28px;padding:24px;background:rgba(124,109,250,0.04);border-radius:16px;border:1px solid rgba(124,109,250,0.1)}.cf-stat-val{font-size:36px;font-weight:700;color:#7c6dfa;line-height:1;margin-bottom:4px;font-family:"JetBrains Mono",monospace}.cf-stat-lbl{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px}.cf-seal{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c6dfa,#fa6d8a);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:28px}.cf-id{font-size:11px;color:#bbb;margin-bottom:4px;font-family:"JetBrains Mono",monospace}.cf-date{font-size:12px;color:#ccc;margin-bottom:24px}.cf-verify{font-size:12px;color:#7c6dfa;font-family:"JetBrains Mono",monospace}.btn-row{display:none}</style></head><body>' + c.outerHTML + '</body></html>'); w.document.close(); setTimeout(() => { w.print(); }, 600); showNotif('Certificate downloading...', 'success'); }
+    function shareLinkedIn() { showNotif('Opening LinkedIn...', 'success'); window.open('https://www.linkedin.com/sharing/share-offsite/?url=https://typecert.in', '_blank'); }
+    function shareResult(p) { const t = `I just typed ${finalWpm} WPM with ${finalAcc}% accuracy on TypeCert! I'm faster than ${Math.min(99, Math.round((finalWpm / 90) * 100))}% of India. Can you beat me? → typecert.in`; const u = { whatsapp: `https://wa.me/?text=${encodeURIComponent(t)}`, linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=https://typecert.in`, twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(t)}`, instagram: `https://www.instagram.com/` }; window.open(u[p], '_blank'); showNotif('Opening ' + p + '...', 'success'); }
+    function copyChallenge() { const l = `typecert.in/challenge?score=${finalWpm}&acc=${finalAcc}`; navigator.clipboard.writeText(l).then(() => showNotif('Challenge link copied! 🔗', 'success')).catch(() => showNotif('Link: ' + l, 'success')); }
+    function showNotif(msg, type) { const n = document.getElementById('notif'); n.textContent = msg; n.className = 'notif show ' + (type || ''); setTimeout(() => n.classList.remove('show'), 3500); }
+    const faqList = document.getElementById('faqList');
+    faqs.forEach(f => { const item = document.createElement('div'); item.className = 'faq-item'; item.innerHTML = `<div class="faq-q">${f.q}<span class="faq-icon">+</span></div><div class="faq-a">${f.a}</div>`; item.querySelector('.faq-q').addEventListener('click', () => { const o = item.classList.contains('open'); document.querySelectorAll('.faq-item').forEach(x => x.classList.remove('open')); if (!o) item.classList.add('open'); }); faqList.appendChild(item); });
+    setInterval(() => { const el = document.getElementById('liveTests'); if (el) el.textContent = (parseInt(el.textContent.replace(/,/g, '')) + Math.floor(Math.random() * 3 + 1)).toLocaleString('en-IN'); }, 4000);
+    init();
+  </script>
+</body>
+
+</html>

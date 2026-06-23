@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeCert — Practice</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--surface2:#16162a;--surface3:#1e1e35;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --accent:#7c6dfa;--accent2:#fa6d8a;--green:#00e5a0;--yellow:#f5c518;
+  --text:#f0f0fa;--muted:#8888aa;--dimmed:#4a4a6a;
+  --font-display:'Syne',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.15}
+.orb1{width:500px;height:500px;background:#7c6dfa;top:-150px;right:-100px}
+.orb2{width:400px;height:400px;background:#fa6d8a;bottom:-150px;left:-100px}
+.container{max-width:1100px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* NAV */
+nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;background:rgba(8,8,16,0.85)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;color:inherit}
+.logo .t{color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-link{font-size:14px;color:var(--muted);text-decoration:none;cursor:pointer;transition:color .2s}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.nav-link.active{color:var(--accent)}
+.nav-cta{background:var(--accent);color:white;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;font-family:var(--font-body)}
+.nav-cta:hover{background:#6b5cf0}
+
+/* PAGE HEADER */
+.page-header{padding:48px 0 32px}
+.page-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(124,109,250,0.1);border:1px solid rgba(124,109,250,0.25);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--accent);font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.page-title{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-2px;margin-bottom:8px}
+.page-sub{font-size:15px;color:var(--muted);max-width:500px;line-height:1.6}
+
+/* LAYOUT */
+.practice-layout{display:grid;grid-template-columns:260px 1fr;gap:24px;padding-bottom:60px}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;overflow:hidden}
+.sidebar-title{font-size:11px;color:var(--dimmed);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin-bottom:14px}
+
+/* OPTION GROUPS */
+.opt-group{display:flex;flex-direction:column;gap:6px}
+.opt-btn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--font-body);display:flex;align-items:center;gap:10px}
+.opt-btn:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.opt-btn.active{background:rgba(124,109,250,0.12);border-color:rgba(124,109,250,0.4);color:var(--accent)}
+.opt-icon{font-size:16px;width:20px;text-align:center}
+.opt-label{flex:1}
+.opt-badge{font-size:10px;background:rgba(0,229,160,0.1);color:var(--green);border-radius:4px;padding:2px 7px;font-family:var(--font-mono)}
+
+/* DIFFICULTY SLIDER */
+.diff-row{display:flex;gap:6px;margin-top:4px}
+.diff-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .15s;font-family:var(--font-mono)}
+.diff-btn:hover{border-color:var(--border2);color:var(--text)}
+.diff-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(124,109,250,0.1)}
+
+/* CUSTOM TEXT */
+.custom-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:13px;font-family:var(--font-mono);resize:vertical;min-height:80px;outline:none;transition:border-color .2s;line-height:1.6}
+.custom-textarea:focus{border-color:var(--accent)}
+.custom-textarea::placeholder{color:var(--dimmed)}
+.apply-btn{width:100%;margin-top:8px;padding:10px;border-radius:8px;background:var(--accent);border:none;color:white;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .2s}
+.apply-btn:hover{background:#6b5cf0}
+
+/* PROGRESS TRACKER */
+.streak-display{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)}
+.streak-fire{font-size:28px}
+.streak-num{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--yellow);line-height:1}
+.streak-lbl{font-size:11px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px}
+.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.mini-stat{background:var(--surface2);border-radius:10px;padding:12px;text-align:center;border:1px solid var(--border)}
+.mini-stat-val{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.mini-stat-lbl{font-size:10px;color:var(--dimmed);text-transform:uppercase}
+
+/* MAIN AREA */
+.main-area{display:flex;flex-direction:column;gap:20px}
+
+/* TYPING CARD */
+.typing-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;position:relative;overflow:hidden}
+.typing-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--green));transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.typing-card.active::before{transform:scaleX(1)}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.wpm-display{display:flex;align-items:baseline;gap:6px}
+.wpm-num{font-family:var(--font-mono);font-size:48px;font-weight:700;color:var(--accent);line-height:1}
+.wpm-unit{font-size:14px;color:var(--muted)}
+.top-right{display:flex;gap:12px;align-items:center}
+.stat-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;text-align:center}
+.chip-val{font-family:var(--font-mono);font-size:18px;font-weight:700;line-height:1;margin-bottom:2px}
+.chip-lbl{font-size:10px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px}
+.timer-ring{position:relative;width:64px;height:64px}
+.timer-svg{transform:rotate(-90deg)}
+.timer-bg{fill:none;stroke:var(--surface3);stroke-width:4}
+.timer-fill{fill:none;stroke:var(--accent2);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.timer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent2)}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:20px}
+.prog-track{height:3px;background:var(--surface3);border-radius:2px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .1s;width:0%}
+
+/* TEXT */
+.text-display{font-family:var(--font-mono);font-size:20px;line-height:2;min-height:140px;user-select:none;margin-bottom:20px;word-break:break-word;position:relative}
+.word{display:inline-block;margin-right:4px}
+.ch{display:inline}
+.ch.correct{color:var(--green)}
+.ch.wrong{color:var(--accent2);background:rgba(250,109,138,0.12);border-radius:2px}
+.ch.current{border-left:2.5px solid var(--accent);margin-left:-2.5px;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{border-color:var(--accent)}50%{border-color:transparent}}
+
+/* INPUT */
+.type-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-family:var(--font-mono);font-size:16px;color:var(--text);outline:none;resize:none;transition:border-color .2s;line-height:1.5}
+.type-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,0.08)}
+.type-input::placeholder{color:var(--dimmed)}
+.type-input:disabled{opacity:.5}
+
+/* BOTTOM BAR */
+.bottom-bar{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+.errors-display{font-family:var(--font-mono);font-size:13px;color:var(--dimmed)}
+.errors-display span{color:var(--accent2)}
+.btn-row{display:flex;gap:10px}
+.btn{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border:none;font-family:var(--font-body)}
+.btn-accent{background:var(--accent);color:white}.btn-accent:hover{background:#6b5cf0}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border2)}.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* HEATMAP */
+.heatmap-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;display:none}
+.heatmap-card.show{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.heatmap-title{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:6px}
+.heatmap-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.keyboard{display:flex;flex-direction:column;gap:6px;align-items:center}
+.key-row{display:flex;gap:5px}
+.key{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:600;transition:all .3s;border:1px solid var(--border);background:var(--surface2);color:var(--muted);position:relative;cursor:default}
+.key.wide{width:56px}.key.wider{width:72px}.key.space{width:220px}
+.key.hot0{background:var(--surface2);color:var(--muted)}
+.key.hot1{background:rgba(0,229,160,0.15);border-color:rgba(0,229,160,0.4);color:var(--green)}
+.key.hot2{background:rgba(245,197,24,0.15);border-color:rgba(245,197,24,0.4);color:var(--yellow)}
+.key.hot3{background:rgba(250,109,138,0.2);border-color:rgba(250,109,138,0.5);color:var(--accent2)}
+.key.hot4{background:rgba(250,109,138,0.4);border-color:var(--accent2);color:white}
+.heatmap-legend{display:flex;align-items:center;gap:16px;margin-top:16px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+
+/* RESULTS */
+.results-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;display:none}
+.results-card.show{display:block;animation:fadeUp .4s ease}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.result-title{font-family:var(--font-display);font-size:20px;font-weight:700}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.result-num{font-family:var(--font-mono);font-size:32px;font-weight:700;margin-bottom:4px;line-height:1}
+.result-lbl{font-size:10px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px}
+.improve-section{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.improve-title{font-size:13px;font-weight:500;margin-bottom:10px;color:var(--text)}
+.improve-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted)}
+.improve-item:last-child{border-bottom:none}
+.improve-icon{font-size:16px;width:20px}
+
+/* NOTIF */
+.notif{position:fixed;bottom:28px;right:28px;background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px 22px;font-size:14px;z-index:2000;transform:translateY(80px);opacity:0;transition:all .3s;max-width:300px}
+.notif.show{transform:translateY(0);opacity:1}
+.notif.success{border-color:rgba(0,229,160,0.4);color:var(--green)}
+
+@media(max-width:900px){
+  .practice-layout{grid-template-columns:1fr}
+  .sidebar{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+}
+@media(max-width:600px){
+  .sidebar{grid-template-columns:1fr}
+  .result-grid{grid-template-columns:1fr 1fr}
+  .key{width:30px;height:30px;font-size:10px}
+  .key.space{width:160px}
+}
+</style>
+<script src="nav.js" defer></script>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div>
+
+
+
+<div class="container">
+  <div class="page-header">
+    <div class="page-tag">Practice Mode</div>
+    <h1 class="page-title">Practice & improve</h1>
+    <p class="page-sub">Choose your mode, difficulty and language. Track your weak keys and improve your speed every day.</p>
+  </div>
+
+  <div class="practice-layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Practice type</div>
+        <div class="opt-group">
+          <button class="opt-btn active" onclick="setType('paragraph',this)"><span class="opt-icon">📄</span><span class="opt-label">Paragraph</span><span class="opt-badge">popular</span></button>
+          <button class="opt-btn" onclick="setType('words',this)"><span class="opt-icon">📝</span><span class="opt-label">Word mode</span></button>
+          <button class="opt-btn" onclick="setType('sentences',this)"><span class="opt-icon">💬</span><span class="opt-label">Sentences</span></button>
+          <button class="opt-btn" onclick="setType('numbers',this)"><span class="opt-icon">🔢</span><span class="opt-label">Numbers</span></button>
+          <button class="opt-btn" onclick="setType('custom',this)"><span class="opt-icon">✏️</span><span class="opt-label">Custom text</span></button>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Language</div>
+        <div class="opt-group">
+          <button class="opt-btn active" onclick="setLang('english',this)"><span class="opt-icon">🇬🇧</span><span class="opt-label">English</span></button>
+          <button class="opt-btn" onclick="setLang('hindi',this)"><span class="opt-icon">🇮🇳</span><span class="opt-label">Hindi</span></button>
+          <button class="opt-btn" onclick="setLang('hinglish',this)"><span class="opt-icon">🔀</span><span class="opt-label">Hinglish</span></button>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Difficulty</div>
+        <div class="diff-row">
+          <button class="diff-btn active" onclick="setDiff('easy',this)">Easy</button>
+          <button class="diff-btn" onclick="setDiff('medium',this)">Medium</button>
+          <button class="diff-btn" onclick="setDiff('hard',this)">Hard</button>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--dimmed);line-height:1.5" id="diffDesc">Short common words. Great for building speed.</div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Duration</div>
+        <div class="diff-row">
+          <button class="diff-btn active" onclick="setDuration(60,this)">1m</button>
+          <button class="diff-btn" onclick="setDuration(120,this)">2m</button>
+          <button class="diff-btn" onclick="setDuration(300,this)">5m</button>
+          <button class="diff-btn" onclick="setDuration(600,this)">10m</button>
+        </div>
+      </div>
+
+      <div class="sidebar-card" id="customCard" style="display:none">
+        <div class="sidebar-title">Your text</div>
+        <textarea class="custom-textarea" id="customText" placeholder="Paste your own text here to practice..."></textarea>
+        <button class="apply-btn" onclick="applyCustomText()">Apply text →</button>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">Today's progress</div>
+        <div class="streak-display">
+          <div class="streak-fire">🔥</div>
+          <div><div class="streak-num" id="streakNum">0</div><div class="streak-lbl">day streak</div></div>
+        </div>
+        <div class="mini-stats">
+          <div class="mini-stat"><div class="mini-stat-val" id="bestWpm">0</div><div class="mini-stat-lbl">Best WPM</div></div>
+          <div class="mini-stat"><div class="mini-stat-val" id="testsToday">0</div><div class="mini-stat-lbl">Tests today</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-area">
+
+      <div class="typing-card" id="typingCard">
+        <div class="top-bar">
+          <div class="wpm-display">
+            <div class="wpm-num" id="wpmNum">0</div>
+            <div class="wpm-unit">WPM</div>
+          </div>
+          <div class="top-right">
+            <div class="stat-chip"><div class="chip-val" style="color:var(--yellow)" id="netNum">0</div><div class="chip-lbl">Net WPM</div></div>
+            <div class="stat-chip"><div class="chip-val" style="color:var(--green)" id="accNum">100%</div><div class="chip-lbl">Accuracy</div></div>
+            <div class="timer-ring">
+              <svg class="timer-svg" width="64" height="64" viewBox="0 0 64 64">
+                <circle class="timer-bg" cx="32" cy="32" r="28"/>
+                <circle class="timer-fill" id="timerCircle" cx="32" cy="32" r="28" stroke-dasharray="176" stroke-dashoffset="0"/>
+              </svg>
+              <div class="timer-text" id="timerNum">60</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-wrap">
+          <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+        </div>
+
+        <div class="text-display" id="textDisplay"></div>
+
+        <textarea class="type-input" id="typingInput" rows="3"
+          placeholder="Click here and start typing..."
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+
+        <div class="bottom-bar">
+          <div class="errors-display">Errors: <span id="errNum">0</span></div>
+          <div class="btn-row">
+            <button class="btn btn-outline" onclick="resetTest()">↺ Reset</button>
+            <button class="btn btn-accent" onclick="resetTest()">New text</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results-card" id="resultsCard">
+        <div class="results-header">
+          <div class="result-title">Session complete ✓</div>
+          <button class="btn btn-outline" style="padding:8px 16px;font-size:13px" onclick="resetTest()">Practice again</button>
+        </div>
+        <div class="result-grid">
+          <div class="result-box"><div class="result-num" style="color:var(--accent)" id="rWpm">0</div><div class="result-lbl">WPM</div></div>
+          <div class="result-box"><div class="result-num" style="color:var(--yellow)" id="rNet">0</div><div class="result-lbl">Net WPM</div></div>
+          <div class="result-box"><div class="result-num" style="color:var(--green)" id="rAcc">0%</div><div class="result-lbl">Accuracy</div></div>
+          <div class="result-box"><div class="result-num" style="color:var(--accent2)" id="rErr">0</div><div class="result-lbl">Errors</div></div>
+        </div>
+        <div class="improve-section">
+          <div class="improve-title">💡 Tips to improve</div>
+          <div id="improveTips"></div>
+        </div>
+        <div class="btn-row" style="justify-content:center">
+          <button class="btn btn-outline" onclick="window.location.href='index.html'">Take official test →</button>
+          <button class="btn btn-accent" onclick="resetTest()">Practice more</button>
+        </div>
+      </div>
+
+      <!-- HEATMAP -->
+      <div class="heatmap-card" id="heatmapCard">
+        <div class="heatmap-title">Weak key heatmap</div>
+        <div class="heatmap-sub">Keys highlighted in red are where you make the most mistakes. Focus your practice there.</div>
+        <div class="keyboard" id="keyboard"></div>
+        <div class="heatmap-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--surface3)"></div>No errors</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(0,229,160,0.3)"></div>Few errors</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(245,197,24,0.3)"></div>Some errors</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(250,109,138,0.3)"></div>Many errors</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(250,109,138,0.6)"></div>Weak key</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+const textBanks={
+  paragraph:{
+    easy:["the cat sat on the mat and looked at the dog the sun was hot and the day was long it was a good day to sit and rest in the shade near the old tree by the road","she went to the shop to buy some milk and bread and eggs she also got some fruit and some juice it was a short walk from her home to the shop on the corner","he liked to read books in the evening after work the lamp was on and the room was warm and quiet it was the best time of day for him to sit and read"],
+    medium:["Government jobs require candidates to have strong typing speed and accuracy. The SSC examination tests both speed and precision. Regular practice every day can help achieve the required target easily and effectively.","Technology has changed the way people work and communicate in the modern world. Computers and smartphones have made everything faster and more efficient. Students can now learn new skills from anywhere with just an internet connection.","India is a land of diverse cultures traditions and languages. Every state has its own unique food festivals and customs. Millions of tourists visit the historical monuments and natural landscapes every year from across the globe."],
+    hard:["The proliferation of artificial intelligence across various industries has necessitated a comprehensive reevaluation of workforce capabilities and organizational structures. Enterprises must strategically adapt their operational frameworks to accommodate technological advancements.","Contemporary governance frameworks increasingly emphasize transparency accountability and participatory democracy as fundamental prerequisites for sustainable institutional legitimacy. Administrative efficiency requires systematic implementation of evidence-based policy interventions.","Biochemical research consistently demonstrates the extraordinary complexity of cellular metabolism and its intricate regulatory mechanisms. Understanding enzymatic pathways requires sophisticated analytical methodologies and interdisciplinary scientific collaboration."]
+  },
+  words:{
+    easy:["the and for was that with this from have but not are you they all been has its about who more when make like him into two him her way could will"],
+    medium:["government examination practice accuracy improvement efficiency knowledge professional development technical requirement qualification certification achievement performance"],
+    hard:["photosynthesis simultaneously approximately consequently infrastructure substantially acknowledgement misrepresentation perpendicular circumstances nevertheless"]
+  },
+  sentences:{
+    easy:["Type the sentence carefully. Watch each letter. Do not make mistakes. Speed comes with practice. Keep your eyes on the screen.","Good typing is a skill. Practice every day. Start slow and then go fast. Accuracy is more important than speed."],
+    medium:["The candidate must achieve a minimum typing speed to qualify for the government examination held twice a year.","Regular daily practice of at least thirty minutes will significantly improve your typing speed and accuracy over time."],
+    hard:["The implementation of comprehensive administrative reforms requires meticulous planning and systematic execution across all organizational levels.","Sophisticated technological infrastructure necessitates continuous professional development and adaptive learning strategies for optimal performance outcomes."]
+  },
+  numbers:{
+    easy:["1234 5678 9012 3456 7890 1234 5678 9012 3456 7890 1234 5678 9012 3456 7890","0000 1111 2222 3333 4444 5555 6666 7777 8888 9999 0000 1111 2222 3333 4444"],
+    medium:["Phone: 9876543210 Amount: 12500 Date: 15-03-2025 Invoice: 987654 PAN: 456789 Code: 112233 Ref: 778899"],
+    hard:["Transaction ID: 9876543210123456 dated 15/03/2025 for amount Rs.125000.00 with reference number REF-2025-MARCH-987654321"]
+  },
+  hindi:{
+    easy:["भारत एक महान देश है यहाँ अनेक भाषाएँ हैं लोग मिलकर रहते हैं","हमारा देश सुंदर है यहाँ पहाड़ नदियाँ और जंगल हैं प्रकृति अद्भुत है"],
+    medium:["सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में सुधार होगा।"],
+    hard:["मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से कठिन लक्ष्य भी प्राप्त किए जा सकते हैं।"]
+  },
+  hinglish:{
+    easy:["yeh ek acha din hai aaj mausam bahut sundar hai bahar jaana chahiye"],
+    medium:["Government exam ke liye typing practice bahut important hai. Daily practice karo aur apni speed badhao."],
+    hard:["Professional development ke liye consistently new skills seekhna bahut zaroori hai modern workplace mein success ke liye."]
+  }
+};
+
+const keyRows=[
+  ['`','1','2','3','4','5','6','7','8','9','0','-','='],
+  ['Q','W','E','R','T','Y','U','I','O','P','[',']','\\'],
+  ['A','S','D','F','G','H','J','K','L',';',"'"],
+  ['Z','X','C','V','B','N','M',',','.','/']
+];
+
+let currentText='',typed=0,correct=0,errCount=0,timeLeft=60,totalTime=60;
+let timer=null,started=false,finished=false;
+let practiceType='paragraph',lang='english',difficulty='easy';
+let keyErrors={},keyTotal={};
+let bestWpm=parseInt(localStorage.getItem('bestWpm')||0);
+let testsToday=parseInt(localStorage.getItem('testsToday')||0);
+let streak=parseInt(localStorage.getItem('streak')||0);
+let finalWpm=0,finalNet=0,finalAcc=0;
+
+document.getElementById('bestWpm').textContent=bestWpm;
+document.getElementById('testsToday').textContent=testsToday;
+document.getElementById('streakNum').textContent=streak;
+
+function getText(){
+  const bank=textBanks[practiceType]?.[lang]?.[difficulty]||textBanks.paragraph.easy;
+  return bank[Math.floor(Math.random()*bank.length)];
+}
+
+function init(){
+  currentText=getText();
+  typed=0;correct=0;errCount=0;timeLeft=totalTime;
+  started=false;finished=false;keyErrors={};keyTotal={};
+  if(timer)clearInterval(timer);
+  document.getElementById('typingInput').value='';
+  document.getElementById('typingInput').disabled=false;
+  document.getElementById('wpmNum').textContent='0';
+  document.getElementById('netNum').textContent='0';
+  document.getElementById('accNum').textContent='100%';
+  document.getElementById('timerNum').textContent=timeLeft;
+  document.getElementById('errNum').textContent='0';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('typingCard').classList.remove('active');
+  document.getElementById('resultsCard').classList.remove('show');
+  document.getElementById('heatmapCard').classList.remove('show');
+  updateTimerRing(timeLeft);
+  renderText();
+}
+
+function renderText(){
+  const el=document.getElementById('textDisplay');
+  el.innerHTML='';
+  for(let i=0;i<currentText.length;i++){
+    const s=document.createElement('span');
+    s.className='ch'+(i===0?' current':'');
+    s.id='c'+i;
+    s.textContent=currentText[i]===' '?'\u00a0':currentText[i];
+    el.appendChild(s);
+  }
+}
+
+document.getElementById('typingInput').addEventListener('input',function(){
+  if(finished)return;
+  if(!started){started=true;document.getElementById('typingCard').classList.add('active');startTimer();}
+  const val=this.value;
+  typed=val.length;correct=0;errCount=0;
+  for(let i=0;i<currentText.length;i++){
+    const el=document.getElementById('c'+i);
+    if(!el)continue;
+    el.className='ch';
+    if(i<val.length){
+      const key=currentText[i].toUpperCase();
+      keyTotal[key]=(keyTotal[key]||0)+1;
+      if(val[i]===currentText[i]){correct++;el.classList.add('correct');}
+      else{errCount++;el.classList.add('wrong');keyErrors[key]=(keyErrors[key]||0)+1;}
+    }else if(i===val.length)el.classList.add('current');
+  }
+  const elapsed=(totalTime-timeLeft)/60;
+  const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;
+  const net=Math.max(0,Math.round(wpm-(errCount/(elapsed||0.01))));
+  const acc=typed>0?Math.round((correct/typed)*100):100;
+  document.getElementById('wpmNum').textContent=wpm;
+  document.getElementById('netNum').textContent=net;
+  document.getElementById('accNum').textContent=acc+'%';
+  document.getElementById('errNum').textContent=errCount;
+  document.getElementById('progFill').style.width=Math.min((typed/currentText.length)*100,100)+'%';
+  if(typed>=currentText.length)endTest();
+});
+
+document.getElementById('typingInput').addEventListener('keydown',e=>{
+  if(e.key==='Tab'){e.preventDefault();resetTest();}
+});
+
+function startTimer(){
+  timer=setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timerNum').textContent=timeLeft;
+    updateTimerRing(timeLeft);
+    if(timeLeft<=0)endTest();
+  },1000);
+}
+
+function updateTimerRing(t){
+  const circ=document.getElementById('timerCircle');
+  const pct=t/totalTime;
+  const offset=176*(1-pct);
+  circ.style.strokeDashoffset=offset;
+  circ.style.stroke=pct>0.5?'var(--accent2)':pct>0.25?'var(--yellow)':'var(--accent2)';
+}
+
+function endTest(){
+  if(finished)return;
+  finished=true;clearInterval(timer);
+  document.getElementById('typingInput').disabled=true;
+  const t=totalTime-timeLeft;
+  const min=t/60;
+  finalWpm=t>0?Math.round((correct/5)/min):0;
+  finalNet=Math.max(0,Math.round(finalWpm-(errCount/(min||0.01))));
+  finalAcc=typed>0?Math.round((correct/typed)*100):100;
+  document.getElementById('rWpm').textContent=finalWpm;
+  document.getElementById('rNet').textContent=finalNet;
+  document.getElementById('rAcc').textContent=finalAcc+'%';
+  document.getElementById('rErr').textContent=errCount;
+  if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);document.getElementById('bestWpm').textContent=bestWpm;showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
+  testsToday++;localStorage.setItem('testsToday',testsToday);document.getElementById('testsToday').textContent=testsToday;
+  generateTips();
+  document.getElementById('resultsCard').classList.add('show');
+  buildHeatmap();
+  document.getElementById('heatmapCard').classList.add('show');
+  document.getElementById('resultsCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function generateTips(){
+  const tips=[];
+  if(finalAcc<90)tips.push({icon:'🎯',text:'Focus on accuracy first. Type slower but make fewer errors — your net WPM will be higher.'});
+  if(finalWpm<30)tips.push({icon:'⌨️',text:'Practice home row keys (ASDF JKL;) every day. They form the foundation of fast typing.'});
+  if(errCount>10)tips.push({icon:'👀',text:'Look at the text, not your hands. Avoid peeking at the keyboard.'});
+  if(finalWpm>=50)tips.push({icon:'🔥',text:'Great speed! Now focus on consistency — try to maintain this across 5-minute tests.'});
+  if(tips.length===0)tips.push({icon:'✅',text:'Good session! Push for 5% more speed next time while maintaining accuracy.'});
+  const el=document.getElementById('improveTips');
+  el.innerHTML=tips.map(t=>`<div class="improve-item"><span class="improve-icon">${t.icon}</span>${t.text}</div>`).join('');
+}
+
+function buildHeatmap(){
+  const kb=document.getElementById('keyboard');
+  kb.innerHTML='';
+  keyRows.forEach((row,ri)=>{
+    const rowEl=document.createElement('div');rowEl.className='key-row';
+    if(ri===1)rowEl.style.paddingLeft='18px';
+    if(ri===2)rowEl.style.paddingLeft='24px';
+    if(ri===3)rowEl.style.paddingLeft='36px';
+    row.forEach(k=>{
+      const el=document.createElement('div');
+      el.className='key';
+      if(k==='\\')el.classList.add('wide');
+      el.textContent=k;
+      const errs=keyErrors[k]||0;
+      const total=keyTotal[k]||0;
+      const rate=total>0?(errs/total):0;
+      if(errs===0)el.classList.add('hot0');
+      else if(rate<0.1)el.classList.add('hot1');
+      else if(rate<0.3)el.classList.add('hot2');
+      else if(rate<0.5)el.classList.add('hot3');
+      else el.classList.add('hot4');
+      if(total>0)el.title=`${errs} errors / ${total} attempts`;
+      rowEl.appendChild(el);
+    });
+    kb.appendChild(rowEl);
+    if(ri===3){
+      const spaceRow=document.createElement('div');spaceRow.className='key-row';
+      const space=document.createElement('div');space.className='key space';space.textContent='SPACE';
+      const errs=keyErrors[' ']||0;const total=keyTotal[' ']||0;
+      const rate=total>0?(errs/total):0;
+      if(errs===0)space.classList.add('hot0');
+      else if(rate<0.1)space.classList.add('hot1');
+      else if(rate<0.3)space.classList.add('hot2');
+      else space.classList.add('hot3');
+      spaceRow.appendChild(space);kb.appendChild(spaceRow);
+    }
+  });
+}
+
+function setType(t,btn){
+  practiceType=t;
+  document.querySelectorAll('.opt-group .opt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('customCard').style.display=t==='custom'?'block':'none';
+  if(t!=='custom')resetTest();
+}
+
+function setLang(l,btn){
+  lang=l;
+  document.querySelectorAll('[onclick*="setLang"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetTest();
+}
+
+function setDiff(d,btn){
+  difficulty=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const descs={easy:'Short common words. Great for building speed.',medium:'Real sentences with varied vocabulary. Good for exam prep.',hard:'Complex technical language. For advanced typists only.'};
+  document.getElementById('diffDesc').textContent=descs[d];
+  resetTest();
+}
+
+function setDuration(d,btn){
+  totalTime=d;
+  document.querySelectorAll('[onclick*="setDuration"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  resetTest();
+}
+
+function applyCustomText(){
+  const t=document.getElementById('customText').value.trim();
+  if(!t){showNotif('Please enter some text first','success');return;}
+  currentText=t;typed=0;correct=0;errCount=0;timeLeft=totalTime;started=false;finished=false;
+  if(timer)clearInterval(timer);
+  document.getElementById('typingInput').value='';
+  document.getElementById('typingInput').disabled=false;
+  document.getElementById('resultsCard').classList.remove('show');
+  document.getElementById('heatmapCard').classList.remove('show');
+  document.getElementById('typingCard').classList.remove('active');
+  document.getElementById('wpmNum').textContent='0';document.getElementById('netNum').textContent='0';
+  document.getElementById('accNum').textContent='100%';document.getElementById('timerNum').textContent=timeLeft;
+  document.getElementById('errNum').textContent='0';document.getElementById('progFill').style.width='0%';
+  updateTimerRing(timeLeft);renderText();
+  showNotif('Custom text applied! Start typing →','success');
+  document.getElementById('typingInput').focus();
+}
+
+function resetTest(){init();document.getElementById('typingInput').focus();}
+
+function showNotif(msg,type){
+  const n=document.getElementById('notif');n.textContent=msg;n.className='notif show '+(type||'');
+  setTimeout(()=>n.classList.remove('show'),3500);
+}
+
+init();
+</script>
+</body>
+</html>
