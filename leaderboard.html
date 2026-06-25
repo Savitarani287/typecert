@@ -169,12 +169,12 @@ async function loadLeaderboard() {
   const wrap = document.getElementById('boardWrap');
   wrap.innerHTML = `<div class="loading-state">Loading scores…<div class="loading-dots"><span></span><span></span><span></span></div></div>`;
 
-  // Build query — get best result per user (highest net_wpm)
+  // Step 1: Get top results
   let query = supabase
     .from('test_results')
-    .select('user_id, wpm, net_wpm, accuracy, exam_type, created_at, profiles(username, full_name)')
+    .select('user_id, wpm, net_wpm, accuracy, exam_type, created_at')
     .order('net_wpm', { ascending: false })
-    .limit(50);
+    .limit(100);
 
   if (currentFilter !== 'all') {
     query = query.eq('exam_type', currentFilter);
@@ -198,7 +198,7 @@ async function loadLeaderboard() {
     return;
   }
 
-  // Deduplicate — keep only best score per user
+  // Step 2: Deduplicate — keep only best score per user
   const seen = new Set();
   const unique = [];
   for (const row of data) {
@@ -208,7 +208,17 @@ async function loadLeaderboard() {
     }
   }
 
-  // Find current user's rank & stats
+  // Step 3: Fetch profiles for all user_ids in one query
+  const userIds = unique.map(r => r.user_id);
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, username, full_name')
+    .in('id', userIds);
+
+  const profileMap = {};
+  (profiles || []).forEach(p => { profileMap[p.id] = p; });
+
+  // Step 4: Find current user's rank & stats
   if (currentUser) {
     const myRank = unique.findIndex(r => r.user_id === currentUser.id);
     if (myRank !== -1) {
@@ -218,7 +228,6 @@ async function loadLeaderboard() {
       document.getElementById('yourBestWpm').textContent = myRow.wpm;
       document.getElementById('yourBestAcc').textContent = myRow.accuracy + '%';
     }
-    // Total tests count
     const { count } = await supabase
       .from('test_results')
       .select('id', { count: 'exact', head: true })
@@ -226,11 +235,12 @@ async function loadLeaderboard() {
     document.getElementById('yourTotalTests').textContent = count || 0;
   }
 
-  // Render table
+  // Step 5: Render table
   const medals = ['🥇', '🥈', '🥉'];
   const rows = unique.slice(0, 20).map((row, i) => {
     const isMe = currentUser && row.user_id === currentUser.id;
-    const name = row.profiles?.full_name || row.profiles?.username || 'Anonymous';
+    const profile = profileMap[row.user_id];
+    const name = profile?.full_name || profile?.username || 'Anonymous';
     const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
     const date = new Date(row.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
     const examLabel = row.exam_type ? row.exam_type.replace(/_/g,' ').toUpperCase() : '—';

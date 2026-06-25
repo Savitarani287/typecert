@@ -510,14 +510,16 @@ function endTest(){
 async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, language, duration_seconds) {
   try {
     const { supabase } = await import('./supabase.js');
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return; // Guest — don't save
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { console.log('Not logged in — skipping save'); return; }
+    const user_id = session.user.id;
     const { error } = await supabase.from('test_results').insert({
-      user_id: user.id, wpm, net_wpm, accuracy, errors,
+      user_id, wpm, net_wpm, accuracy, errors,
       exam_type, language, duration_seconds
     });
-    if (error) console.warn('Could not save result:', error.message);
-  } catch(e) { /* supabase not configured yet */ }
+    if (error) console.error('Save failed:', error.message, error.details);
+    else console.log('Result saved ✓', wpm, 'WPM');
+  } catch(e) { console.error('saveTestResult error:', e); }
 }
 
 function generateTips(){
