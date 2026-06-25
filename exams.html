@@ -348,6 +348,21 @@ function showResults(){
   document.getElementById('examResults').scrollIntoView({behavior:'smooth',block:'center'});
   if(passed)showNotif('🎉 Excellent! You passed the '+selectedExam.name+' typing requirement!','success');
   else showNotif('Keep practicing! You need '+req+' WPM, you got '+finalNet+' WPM','success');
+  // Save result to Supabase (silently — don't block the UI)
+  saveTestResult(finalWpm, finalNet, finalAcc, errors, selectedExam.id, selectedExam.lang.toLowerCase(), selectedExam.duration);
+}
+
+async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, language, duration_seconds) {
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return; // Guest — don't save
+    const { error } = await supabase.from('test_results').insert({
+      user_id: user.id, wpm, net_wpm, accuracy, errors,
+      exam_type, language, duration_seconds
+    });
+    if (error) console.warn('Could not save result:', error.message);
+  } catch(e) { /* supabase not configured yet */ }
 }
 
 function retryExam(){if(selectedExam)startExam(selectedExam.id);}

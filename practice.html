@@ -503,6 +503,21 @@ function endTest(){
   buildHeatmap();
   document.getElementById('heatmapCard').classList.add('show');
   document.getElementById('resultsCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Save result to Supabase (silently — don't block the UI)
+  saveTestResult(finalWpm, finalNet, finalAcc, errCount, 'practice', 'english', totalTime);
+}
+
+async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, language, duration_seconds) {
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return; // Guest — don't save
+    const { error } = await supabase.from('test_results').insert({
+      user_id: user.id, wpm, net_wpm, accuracy, errors,
+      exam_type, language, duration_seconds
+    });
+    if (error) console.warn('Could not save result:', error.message);
+  } catch(e) { /* supabase not configured yet */ }
 }
 
 function generateTips(){

@@ -8,6 +8,7 @@ const NAV_HTML = `
       <a href="practice.html" class="tc-nav-link" data-page="practice">Practice</a>
       <a href="exams.html" class="tc-nav-link" data-page="exams">Exam Patterns</a>
       <a href="dashboard.html" class="tc-nav-link" data-page="dashboard">Dashboard</a>
+      <a href="leaderboard.html" class="tc-nav-link" data-page="leaderboard">Leaderboard</a>
       <a href="verify.html" class="tc-nav-link" data-page="verify">Verify</a>
     </div>
     <div class="tc-nav-right">
@@ -25,7 +26,8 @@ const NAV_HTML = `
     <a href="practice.html" class="tc-mobile-link">⌨️ Practice</a>
     <a href="exams.html" class="tc-mobile-link">🏛️ Exam Patterns</a>
     <a href="dashboard.html" class="tc-mobile-link">📊 Dashboard</a>
-    <a href="certificate.html" class="tc-mobile-link">🏆 Get Certificate</a>
+    <a href="leaderboard.html" class="tc-mobile-link">🏆 Leaderboard</a>
+    <a href="certificate.html" class="tc-mobile-link">🎓 Get Certificate</a>
     <a href="verify.html" class="tc-mobile-link">🔍 Verify Certificate</a>
     <div class="tc-mobile-auth" id="tcMobileAuth">
       <a href="auth.html" class="tc-mobile-link tc-mobile-login" id="tcMobileLogin">👤 Log In / Sign Up</a>

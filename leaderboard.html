@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeCert — Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="nav.js" defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080810;--surface:#0f0f1a;--surface2:#16162a;--surface3:#1e1e35;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --accent:#7c6dfa;--accent2:#fa6d8a;--green:#00e5a0;--yellow:#f5c518;
+  --text:#f0f0fa;--muted:#8888aa;--dimmed:#4a4a6a;
+  --font-display:'Syne',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;-webkit-font-smoothing:antialiased}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.1}
+.orb1{width:500px;height:500px;background:#7c6dfa;top:-100px;right:-100px}
+.orb2{width:400px;height:400px;background:#fa6d8a;bottom:-100px;left:-100px}
+.container{max-width:900px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+/* Header */
+.page-header{padding:48px 0 32px;text-align:center}
+.page-title{font-family:var(--font-display);font-size:36px;font-weight:800;margin-bottom:10px}
+.page-title span{color:var(--accent)}
+.page-sub{color:var(--muted);font-size:15px}
+
+/* Filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.filter-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all 0.2s}
+.filter-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.25)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+
+/* Your rank banner */
+.your-rank{background:linear-gradient(135deg,rgba(124,109,250,0.15),rgba(124,109,250,0.05));border:1px solid rgba(124,109,250,0.25);border-radius:14px;padding:18px 24px;margin-bottom:24px;display:none;align-items:center;justify-content:space-between;gap:12px}
+.your-rank.show{display:flex}
+.yr-label{font-size:13px;color:var(--muted)}
+.yr-rank{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--accent)}
+.yr-stats{display:flex;gap:20px}
+.yr-stat{text-align:center}
+.yr-val{font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text)}
+.yr-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Table */
+.board-wrap{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:40px}
+.board-row{display:grid;grid-template-columns:56px 1fr 100px 100px 90px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);transition:background 0.15s}
+.board-row:last-child{border-bottom:none}
+.board-row:hover{background:rgba(255,255,255,0.02)}
+.board-row.header{background:var(--surface2);padding:12px 20px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.board-row.header:hover{background:var(--surface2)}
+.board-row.top3{background:rgba(124,109,250,0.04)}
+.board-row.is-me{background:rgba(124,109,250,0.08);border-left:3px solid var(--accent)}
+
+.rank-num{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--dimmed)}
+.rank-1 .rank-num{color:#f5c518;font-size:18px}
+.rank-2 .rank-num{color:#aaaacc;font-size:17px}
+.rank-3 .rank-num{color:#cd7f32;font-size:16px}
+
+.user-info{display:flex;align-items:center;gap:12px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+.user-name{font-size:14px;font-weight:500}
+.user-date{font-size:11px;color:var(--dimmed);margin-top:2px}
+
+.wpm-val{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent);text-align:center}
+.acc-val{font-family:var(--font-mono);font-size:14px;color:var(--green);text-align:center}
+.exam-badge{font-size:11px;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.06);color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* States */
+.loading-state,.empty-state{padding:60px 20px;text-align:center;color:var(--muted)}
+.loading-dots{display:inline-flex;gap:6px;margin-top:16px}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:dot 1.2s infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{opacity:.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px}
+.cta-btn{display:inline-block;margin-top:20px;padding:10px 24px;background:var(--accent);color:white;border-radius:8px;text-decoration:none;font-size:14px;font-weight:500;transition:all 0.2s}
+.cta-btn:hover{background:#6b5cf0;transform:translateY(-1px)}
+
+@media(max-width:600px){
+  .board-row{grid-template-columns:40px 1fr 70px 70px}
+  .exam-badge{display:none}
+  .page-title{font-size:28px}
+  .your-rank{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="container">
+  <div class="page-header">
+    <div class="page-title">🏆 <span>Leader</span>board</div>
+    <div class="page-sub">Top typing speeds across all TypeCert users</div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all')">All Exams</button>
+    <button class="filter-btn" onclick="setFilter('practice')">Practice</button>
+    <button class="filter-btn" onclick="setFilter('ssc_cgl')">SSC CGL</button>
+    <button class="filter-btn" onclick="setFilter('ssc_chsl')">SSC CHSL</button>
+    <button class="filter-btn" onclick="setFilter('rrb_ntpc')">RRB NTPC</button>
+    <button class="filter-btn" onclick="setFilter('rpsc')">RPSC</button>
+  </div>
+
+  <!-- Your rank banner (shown when logged in) -->
+  <div class="your-rank" id="yourRank">
+    <div>
+      <div class="yr-label">Your best rank</div>
+      <div class="yr-rank" id="yourRankNum">#—</div>
+    </div>
+    <div class="yr-stats">
+      <div class="yr-stat">
+        <div class="yr-val" id="yourBestWpm">—</div>
+        <div class="yr-lbl">Best WPM</div>
+      </div>
+      <div class="yr-stat">
+        <div class="yr-val" id="yourBestAcc">—</div>
+        <div class="yr-lbl">Best Accuracy</div>
+      </div>
+      <div class="yr-stat">
+        <div class="yr-val" id="yourTotalTests">—</div>
+        <div class="yr-lbl">Total Tests</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard table -->
+  <div class="board-wrap" id="boardWrap">
+    <div class="loading-state">
+      Loading scores…
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { supabase, getUser } from './supabase.js';
+
+let currentFilter = 'all';
+let currentUser = null;
+
+async function init() {
+  currentUser = await getUser();
+  await loadLeaderboard();
+}
+
+window.setFilter = async function(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(
+      filter === 'all' ? 'all' :
+      filter === 'ssc_cgl' ? 'ssc cgl' :
+      filter === 'ssc_chsl' ? 'ssc chsl' :
+      filter === 'rrb_ntpc' ? 'rrb' :
+      filter === 'rpsc' ? 'rpsc' :
+      filter
+    ));
+  });
+  await loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+  const wrap = document.getElementById('boardWrap');
+  wrap.innerHTML = `<div class="loading-state">Loading scores…<div class="loading-dots"><span></span><span></span><span></span></div></div>`;
+
+  // Build query — get best result per user (highest net_wpm)
+  let query = supabase
+    .from('test_results')
+    .select('user_id, wpm, net_wpm, accuracy, exam_type, created_at, profiles(username, full_name)')
+    .order('net_wpm', { ascending: false })
+    .limit(50);
+
+  if (currentFilter !== 'all') {
+    query = query.eq('exam_type', currentFilter);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Could not load scores</div><p>${error.message}</p></div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <div class="empty-title">No scores yet</div>
+        <p>Be the first on the leaderboard!</p>
+        <a href="practice.html" class="cta-btn">Start Typing →</a>
+      </div>`;
+    return;
+  }
+
+  // Deduplicate — keep only best score per user
+  const seen = new Set();
+  const unique = [];
+  for (const row of data) {
+    if (!seen.has(row.user_id)) {
+      seen.add(row.user_id);
+      unique.push(row);
+    }
+  }
+
+  // Find current user's rank & stats
+  if (currentUser) {
+    const myRank = unique.findIndex(r => r.user_id === currentUser.id);
+    if (myRank !== -1) {
+      const myRow = unique[myRank];
+      document.getElementById('yourRank').classList.add('show');
+      document.getElementById('yourRankNum').textContent = '#' + (myRank + 1);
+      document.getElementById('yourBestWpm').textContent = myRow.wpm;
+      document.getElementById('yourBestAcc').textContent = myRow.accuracy + '%';
+    }
+    // Total tests count
+    const { count } = await supabase
+      .from('test_results')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', currentUser.id);
+    document.getElementById('yourTotalTests').textContent = count || 0;
+  }
+
+  // Render table
+  const medals = ['🥇', '🥈', '🥉'];
+  const rows = unique.slice(0, 20).map((row, i) => {
+    const isMe = currentUser && row.user_id === currentUser.id;
+    const name = row.profiles?.full_name || row.profiles?.username || 'Anonymous';
+    const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const date = new Date(row.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    const examLabel = row.exam_type ? row.exam_type.replace(/_/g,' ').toUpperCase() : '—';
+    const rankDisplay = i < 3 ? medals[i] : (i + 1);
+    return `
+      <div class="board-row ${i < 3 ? 'top3 rank-'+(i+1) : ''} ${isMe ? 'is-me' : ''}">
+        <div class="rank-num">${rankDisplay}</div>
+        <div class="user-info">
+          <div class="user-avatar">${initials}</div>
+          <div>
+            <div class="user-name">${name}${isMe ? ' <span style="color:var(--accent);font-size:11px">(you)</span>' : ''}</div>
+            <div class="user-date">${date}</div>
+          </div>
+        </div>
+        <div class="wpm-val">${row.net_wpm ?? row.wpm}</div>
+        <div class="acc-val">${row.accuracy}%</div>
+        <div class="exam-badge">${examLabel}</div>
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="board-row header">
+      <div>Rank</div><div>User</div><div style="text-align:center">Net WPM</div><div style="text-align:center">Accuracy</div><div style="text-align:center">Exam</div>
+    </div>
+    ${rows}`;
+}
+
+init();
+</script>
+</body>
+</html>

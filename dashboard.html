@@ -257,42 +257,85 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 </div>
 </div>
 
-<script>
-// Load data
-const bestWpm=parseInt(localStorage.getItem('bestWpm')||47);
-const testsToday=parseInt(localStorage.getItem('testsToday')||0);
-const streak=parseInt(localStorage.getItem('streak')||3);
-const totalTests=parseInt(localStorage.getItem('totalTests')||28);
+<script type="module">
+import { supabase, requireAuth } from './supabase.js';
 
-// Set stats
-document.getElementById('statBestWpm').textContent=bestWpm;
-document.getElementById('statAccuracy').textContent='94%';
-document.getElementById('statStreak').textContent=streak;
-document.getElementById('statTests').textContent=totalTests;
-document.getElementById('streakBig').textContent=streak;
-document.getElementById('statTestsChange').textContent='↑ +'+testsToday+' today';
+// Redirect to login if not signed in
+const user = await requireAuth();
 
 // Greeting
-const h=new Date().getHours();
-const greet=h<12?'Good morning':'h<17'?'Good afternoon':'Good evening';
-document.getElementById('greetingText').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Savita!';
-document.getElementById('dateText').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+const h = new Date().getHours();
+const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long',day:'numeric',month:'long'});
+
+// Load profile
+const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+const displayName = profile?.full_name || profile?.username || user.email.split('@')[0];
+const firstName = displayName.split(' ')[0];
+document.getElementById('greetingText').textContent = `${greeting}, ${firstName}!`;
+if (document.getElementById('profileName')) document.getElementById('profileName').textContent = displayName;
+if (document.getElementById('avatarEl')) {
+  document.getElementById('avatarEl').textContent = displayName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+}
+
+// Load real stats from Supabase
+const { data: results } = await supabase
+  .from('test_results')
+  .select('wpm, net_wpm, accuracy, created_at, exam_type')
+  .eq('user_id', user.id)
+  .order('created_at', { ascending: false });
+
+if (results && results.length > 0) {
+  const bestWpm    = Math.max(...results.map(r => r.wpm));
+  const bestAcc    = Math.max(...results.map(r => parseFloat(r.accuracy)));
+  const totalTests = results.length;
+  const today      = new Date().toDateString();
+  const testsToday = results.filter(r => new Date(r.created_at).toDateString() === today).length;
+
+  document.getElementById('statBestWpm').textContent = bestWpm;
+  document.getElementById('statAccuracy').textContent = bestAcc.toFixed(0) + '%';
+  document.getElementById('statTests').textContent    = totalTests;
+  document.getElementById('statTestsChange').textContent = '↑ +' + testsToday + ' today';
+
+  // Build chart data from last 7 days
+  const last7 = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const label = d.toLocaleDateString('en-IN', {weekday:'short'}).slice(0,3);
+    const dayResults = results.filter(r => new Date(r.created_at).toDateString() === d.toDateString());
+    const avgWpm = dayResults.length ? Math.round(dayResults.reduce((s,r) => s + r.wpm, 0) / dayResults.length) : 0;
+    last7.push({ label, value: avgWpm });
+  }
+  window._chartData = {
+    week:  { labels: last7.map(d=>d.label),        values: last7.map(d=>d.value || 0) },
+    month: { labels: ['W1','W2','W3','W4'],         values: [0,0,0,0] },
+    all:   { labels: ['Jan','Feb','Mar','Apr','May','Jun'], values: [0,0,0,0,0,0] }
+  };
+} else {
+  // No results yet — show zeros and prompt
+  document.getElementById('statBestWpm').textContent = '—';
+  document.getElementById('statAccuracy').textContent = '—';
+  document.getElementById('statTests').textContent = '0';
+  document.getElementById('statTestsChange').textContent = 'No tests yet';
+  window._chartData = {
+    week:  { labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], values:[0,0,0,0,0,0,0] },
+    month: { labels:['W1','W2','W3','W4'],                      values:[0,0,0,0] },
+    all:   { labels:['Jan','Feb','Mar','Apr','May','Jun'],       values:[0,0,0,0,0,0] }
+  };
+}
+
+// Streak (kept in localStorage as before, real streak coming Day 6)
+const streak = parseInt(localStorage.getItem('streak') || 0);
+document.getElementById('statStreak').textContent = streak;
+if (document.getElementById('streakBig')) document.getElementById('streakBig').textContent = streak;
 
 // Avatar
-const name=document.getElementById('profileName').textContent;
-document.getElementById('avatarEl').textContent=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-
-// Chart data
-const chartData={
-  week:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],values:[32,38,35,42,45,47,44]},
-  month:{labels:['W1','W2','W3','W4'],values:[30,36,42,47]},
-  all:{labels:['Jan','Feb','Mar','Apr','May','Jun'],values:[25,28,33,38,43,47]}
-};
+const name = displayName;
 
 function updateChart(period,btn){
   document.querySelectorAll('.chart-filter').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderChart(chartData[period]);
+  renderChart((window._chartData||{})[period] || {labels:[],values:[]});
 }
 
 function renderChart(data){
@@ -319,7 +362,7 @@ function renderChart(data){
   labelsEl.innerHTML=data.labels.map(l=>`<span class="chart-label">${l}</span>`).join('');
 }
 
-renderChart(chartData.week);
+renderChart((window._chartData||{week:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],values:[0,0,0,0,0,0,0]}}).week);
 
 // Streak grid
 function buildStreakGrid(){
