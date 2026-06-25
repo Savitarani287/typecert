@@ -89,7 +89,10 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 
 /* TOP BAR */
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.wpm-display{display:flex;align-items:baseline;gap:6px}
+.layout-btn{flex:1;padding:6px 8px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:11px;cursor:pointer;transition:all 0.2s;text-align:center}
+.layout-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.25)}
+.layout-btn.active{background:rgba(124,109,250,0.15);border-color:var(--accent);color:var(--accent)}
+
 .wpm-num{font-family:var(--font-mono);font-size:48px;font-weight:700;color:var(--accent);line-height:1}
 .wpm-unit{font-size:14px;color:var(--muted)}
 .top-right{display:flex;gap:12px;align-items:center}
@@ -218,6 +221,18 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
           <button class="opt-btn" onclick="setLang('hindi',this)"><span class="opt-icon">🇮🇳</span><span class="opt-label">Hindi</span></button>
           <button class="opt-btn" onclick="setLang('hinglish',this)"><span class="opt-icon">🔀</span><span class="opt-label">Hinglish</span></button>
         </div>
+        <!-- Hindi layout selector — visible only when Hindi is active -->
+        <div id="hindiLayoutPanel" style="display:none;margin-top:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Keyboard Layout</div>
+          <div style="display:flex;gap:6px">
+            <button class="layout-btn active" id="btnInscript" onclick="setHindiLayout('inscript',this)">Mangal (Inscript)</button>
+            <button class="layout-btn" id="btnKrutidev" onclick="setHindiLayout('krutidev',this)">Krutidev</button>
+          </div>
+          <div id="hindiSetupTip" style="margin-top:10px;background:rgba(124,109,250,0.08);border:1px solid rgba(124,109,250,0.2);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);line-height:1.6">
+            <strong style="color:var(--text)">⌨️ Setup required:</strong><br>
+            <span id="hindiTipText">Press <kbd style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-size:11px">Win + Space</kbd> to switch to <strong>Hindi Inscript</strong> keyboard in Windows, then start typing.</span>
+          </div>
+        </div>
       </div>
 
       <div class="sidebar-card">
@@ -267,7 +282,12 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
         <div class="top-bar">
           <div class="wpm-display">
             <div class="wpm-num" id="wpmNum">0</div>
-            <div class="wpm-unit">WPM</div>
+            <div class="wpm-unit" id="wpmLabel">WPM</div>
+          </div>
+          <!-- KDPH panel: shown only in Hindi mode -->
+          <div id="kdphPanel" style="display:none;flex-direction:column;align-items:center;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.2);border-radius:10px;padding:6px 14px">
+            <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--yellow)" id="kdphNum">0</div>
+            <div style="font-size:10px;color:var(--muted);letter-spacing:1px">KDPH</div>
           </div>
           <div class="top-right">
             <div class="stat-chip"><div class="chip-val" style="color:var(--yellow)" id="netNum">0</div><div class="chip-lbl">Net WPM</div></div>
@@ -310,6 +330,7 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
         <div class="result-grid">
           <div class="result-box"><div class="result-num" style="color:var(--accent)" id="rWpm">0</div><div class="result-lbl">WPM</div></div>
           <div class="result-box"><div class="result-num" style="color:var(--yellow)" id="rNet">0</div><div class="result-lbl">Net WPM</div></div>
+          <div class="result-box" id="rKdphBox" style="display:none"><div class="result-num" style="color:var(--yellow)" id="rKdph">0</div><div class="result-lbl">KDPH</div></div>
           <div class="result-box"><div class="result-num" style="color:var(--green)" id="rAcc">0%</div><div class="result-lbl">Accuracy</div></div>
           <div class="result-box"><div class="result-num" style="color:var(--accent2)" id="rErr">0</div><div class="result-lbl">Errors</div></div>
         </div>
@@ -366,9 +387,21 @@ const textBanks={
     hard:["Transaction ID: 9876543210123456 dated 15/03/2025 for amount Rs.125000.00 with reference number REF-2025-MARCH-987654321"]
   },
   hindi:{
-    easy:["भारत एक महान देश है यहाँ अनेक भाषाएँ हैं लोग मिलकर रहते हैं","हमारा देश सुंदर है यहाँ पहाड़ नदियाँ और जंगल हैं प्रकृति अद्भुत है"],
-    medium:["सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में सुधार होगा।"],
-    hard:["मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से कठिन लक्ष्य भी प्राप्त किए जा सकते हैं।"]
+    easy:[
+      "भारत एक महान देश है यहाँ अनेक भाषाएँ हैं लोग मिलकर रहते हैं",
+      "हमारा देश सुंदर है यहाँ पहाड़ नदियाँ और जंगल हैं प्रकृति अद्भुत है",
+      "आज का दिन बहुत अच्छा है आसमान साफ है और ठंडी हवा चल रही है",
+      "पढ़ाई करना जरूरी है ज्ञान से ही जीवन में उन्नति होती है",
+    ],
+    medium:[
+      "सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में सुधार होगा। नियमित अभ्यास से सफलता अवश्य मिलती है।",
+      "भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं के लिए टाइपिंग मानक निर्धारित किए हैं। एसएससी और रेलवे परीक्षाओं में हिंदी टाइपिंग का विशेष महत्व है।",
+      "कंप्यूटर पर काम करने के लिए टाइपिंग का ज्ञान आवश्यक है। आज के युग में हर सरकारी कार्यालय में कंप्यूटर का उपयोग होता है।",
+    ],
+    hard:[
+      "मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से कठिन लक्ष्य भी प्राप्त किए जा सकते हैं। अपने लक्ष्य को पाने के लिए प्रतिदिन अभ्यास करना चाहिए।",
+      "भारतीय संविधान में सभी नागरिकों को समान अधिकार दिए गए हैं। लोकतंत्र में जनता की शक्ति सर्वोपरि होती है। प्रत्येक नागरिक का कर्तव्य है कि वह देश की उन्नति में योगदान दे।",
+    ]
   },
   hinglish:{
     easy:["yeh ek acha din hai aaj mausam bahut sundar hai bahar jaana chahiye"],
@@ -388,6 +421,8 @@ let currentText='',typed=0,correct=0,errCount=0,timeLeft=60,totalTime=60;
 let timer=null,started=false,finished=false;
 let practiceType='paragraph',lang='english',difficulty='easy';
 let keyErrors={},keyTotal={};
+let keyDepressions=0; // counts every keydown — used for KDPH in Hindi mode
+let hindiLayout='inscript'; // 'inscript' or 'krutidev'
 let bestWpm=parseInt(localStorage.getItem('bestWpm')||0);
 let testsToday=parseInt(localStorage.getItem('testsToday')||0);
 let streak=parseInt(localStorage.getItem('streak')||0);
@@ -398,14 +433,23 @@ document.getElementById('testsToday').textContent=testsToday;
 document.getElementById('streakNum').textContent=streak;
 
 function getText(){
-  const bank=textBanks[practiceType]?.[lang]?.[difficulty]||textBanks.paragraph.easy;
+  // Hindi has its own top-level bank (not nested under paragraph/words/sentences)
+  if(lang==='hindi'){
+    const bank=textBanks.hindi[difficulty]||textBanks.hindi.medium;
+    return bank[Math.floor(Math.random()*bank.length)];
+  }
+  if(lang==='hinglish'){
+    const bank=textBanks.hinglish[difficulty]||textBanks.hinglish.medium;
+    return bank[Math.floor(Math.random()*bank.length)];
+  }
+  const bank=textBanks[practiceType]?.[difficulty]||textBanks.paragraph.easy;
   return bank[Math.floor(Math.random()*bank.length)];
 }
 
 function init(){
   currentText=getText();
   typed=0;correct=0;errCount=0;timeLeft=totalTime;
-  started=false;finished=false;keyErrors={};keyTotal={};
+  started=false;finished=false;keyErrors={};keyTotal={};keyDepressions=0;
   if(timer)clearInterval(timer);
   document.getElementById('typingInput').value='';
   document.getElementById('typingInput').disabled=false;
@@ -463,7 +507,15 @@ document.getElementById('typingInput').addEventListener('input',function(){
 });
 
 document.getElementById('typingInput').addEventListener('keydown',e=>{
-  if(e.key==='Tab'){e.preventDefault();resetTest();}
+  if(e.key==='Tab'){e.preventDefault();resetTest();return;}
+  if(started && !finished) keyDepressions++;
+  // Update KDPH display live in Hindi mode
+  if(lang==='hindi' && started){
+    const elapsed=(totalTime-timeLeft)/3600; // hours
+    const kdph=elapsed>0?Math.round(keyDepressions/elapsed):0;
+    const kdphEl=document.getElementById('kdphNum');
+    if(kdphEl) kdphEl.textContent=kdph.toLocaleString('en-IN');
+  }
 });
 
 function startTimer(){
@@ -496,6 +548,15 @@ function endTest(){
   document.getElementById('rNet').textContent=finalNet;
   document.getElementById('rAcc').textContent=finalAcc+'%';
   document.getElementById('rErr').textContent=errCount;
+  // Show KDPH in results if Hindi mode
+  if(lang==='hindi'){
+    const elapsedHrs=t/3600;
+    const kdph=elapsedHrs>0?Math.round(keyDepressions/elapsedHrs):0;
+    document.getElementById('rKdph').textContent=kdph.toLocaleString('en-IN');
+    document.getElementById('rKdphBox').style.display='block';
+  } else {
+    document.getElementById('rKdphBox').style.display='none';
+  }
   if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);document.getElementById('bestWpm').textContent=bestWpm;showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
   testsToday++;localStorage.setItem('testsToday',testsToday);document.getElementById('testsToday').textContent=testsToday;
   generateTips();
@@ -584,6 +645,24 @@ function setLang(l,btn){
   lang=l;
   document.querySelectorAll('[onclick*="setLang"]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // Show/hide Hindi-specific UI
+  const isHindi = l==='hindi';
+  document.getElementById('hindiLayoutPanel').style.display = isHindi ? 'block' : 'none';
+  document.getElementById('kdphPanel').style.display = isHindi ? 'flex' : 'none';
+  // Update typing area direction for Hindi
+  document.getElementById('typingInput').style.direction = isHindi ? 'ltr' : 'ltr';
+  resetTest();
+}
+
+function setHindiLayout(layout, btn){
+  hindiLayout = layout;
+  document.querySelectorAll('.layout-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const tips = {
+    inscript: 'Press <kbd style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-size:11px">Win + Space</kbd> to switch to <strong>Hindi Inscript</strong> keyboard in Windows, then start typing.',
+    krutidev: 'Install Krutidev keyboard from your Windows language settings. Press <kbd style="background:var(--surface3);padding:2px 6px;border-radius:4px;font-size:11px">Win + Space</kbd> to activate it, then type.'
+  };
+  document.getElementById('hindiTipText').innerHTML = tips[layout];
   resetTest();
 }
 
