@@ -202,10 +202,35 @@ const exams=[
 ];
 
 const passages={
-  english:["The Government of India has launched several initiatives to improve the typing skills of candidates appearing for various competitive examinations. Regular practice on official exam interfaces helps aspirants understand the actual test environment and reduce anxiety on the day of examination.","India's railway network is one of the largest in the world carrying millions of passengers every day across thousands of kilometers of track. The Indian Railways employs a large number of people in various technical and non-technical positions requiring different skill sets.","The Staff Selection Commission conducts examinations for recruitment to various posts in different Ministries and Departments of the Government of India. Typing speed and accuracy are essential requirements for several posts in the clerical category."],
-  hindi:["भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं में उपस्थित होने वाले उम्मीदवारों की टाइपिंग कौशल में सुधार के लिए कई पहल शुरू की हैं। आधिकारिक परीक्षा इंटरफेस पर नियमित अभ्यास से उम्मीदवारों को वास्तविक परीक्षा वातावरण को समझने में मदद मिलती है।"],
-  numbers:["12345 67890 11111 22222 33333 44444 55555 66666 77777 88888 99999 00000 12345 67890 98765 43210 11223 34455 66778 89900 12121 34343 56565 78787 90909"]
+  english:[
+    "The Government of India has launched several initiatives to improve the typing skills of candidates appearing for various competitive examinations. Regular practice on official exam interfaces helps aspirants understand the actual test environment and reduce anxiety on the day of examination. Candidates should focus on accuracy first and then gradually increase their typing speed through daily practice sessions of at least thirty minutes.",
+    "India's railway network is one of the largest in the world carrying millions of passengers every day across thousands of kilometers of track. The Indian Railways employs a large number of people in various technical and non-technical positions requiring different skill sets. The Railway Recruitment Board conducts examinations periodically to fill vacancies in different departments across the country.",
+    "The Staff Selection Commission conducts examinations for recruitment to various posts in different Ministries and Departments of the Government of India. Typing speed and accuracy are essential requirements for several posts in the clerical category. Candidates must achieve the minimum required speed to qualify for the skill test and secure a position in the government service.",
+    "Computer literacy has become an indispensable requirement for employment in modern government offices across India. Data entry operators and lower division clerks are expected to type accurately at a reasonable speed to handle the large volumes of official correspondence generated daily. Aspirants preparing for government examinations must dedicate sufficient time to develop their typing proficiency.",
+    "The selection process for government jobs in India is highly competitive with millions of candidates appearing for a limited number of vacancies every year. Preparation requires a systematic approach covering all aspects of the examination including general knowledge aptitude reasoning and specific skills like typing. Consistent effort over several months is the key to achieving success in these prestigious examinations.",
+  ],
+  hindi:[
+    "भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं में उपस्थित होने वाले उम्मीदवारों की टाइपिंग कौशल में सुधार के लिए कई महत्वपूर्ण पहल शुरू की हैं। आधिकारिक परीक्षा इंटरफेस पर नियमित अभ्यास से उम्मीदवारों को वास्तविक परीक्षा वातावरण को समझने में मदद मिलती है और परीक्षा के दिन आत्मविश्वास बढ़ता है।",
+    "सरकारी नौकरी प्राप्त करना भारत के लाखों युवाओं का सपना है। इसके लिए कठिन परिश्रम और नियमित अभ्यास की आवश्यकता होती है। टाइपिंग परीक्षा में सफलता पाने के लिए उम्मीदवारों को प्रतिदिन कम से कम एक घंटे का अभ्यास करना चाहिए और अपनी गलतियों पर ध्यान देना चाहिए।",
+    "राजस्थान लोक सेवा आयोग राज्य सरकार के विभिन्न विभागों में भर्ती के लिए परीक्षाएं आयोजित करता है। इन परीक्षाओं में हिंदी टाइपिंग का विशेष महत्व है। उम्मीदवारों को मंगल फॉन्ट में इन्स्क्रिप्ट कीबोर्ड लेआउट पर टाइपिंग का अभ्यास करना चाहिए।",
+  ],
+  numbers:["12345 67890 11111 22222 33333 44444 55555 66666 77777 88888 99999 00000 12345 67890 98765 43210 11223 34455 66778 89900 12121 34343 56565 78787 90909 13579 24680 11235 81321 34558 91441 72356 81233 21345 56789"]
 };
+
+// Generate enough text to last the full exam duration
+function getExamText(langKey, durationSeconds) {
+  const pool = passages[langKey] || passages.english;
+  const targetChars = Math.ceil((durationSeconds / 60) * 80 * 6);
+  let result = '';
+  let attempts = 0;
+  while(result.length < targetChars && attempts < 30){
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    if(result && !result.endsWith(' ')) result += ' ';
+    result += pick;
+    attempts++;
+  }
+  return result.trim();
+}
 
 let selectedExam=null,currentText='',typed=0,correct=0,errors=0;
 let timeLeft=600,timer=null,started=false,finished=false;
@@ -259,8 +284,7 @@ function showCountdown(exam){
 
 function initExam(exam){
   const langKey=exam.lang==='Hindi'?'hindi':exam.lang==='Numbers'?'numbers':'english';
-  const bank=passages[langKey]||passages.english;
-  currentText=bank[Math.floor(Math.random()*bank.length)];
+  currentText=getExamText(langKey, exam.duration);
   typed=0;correct=0;errors=0;timeLeft=exam.duration;started=false;finished=false;
   if(timer)clearInterval(timer);
   document.getElementById('examTitle').textContent=exam.name+' — Typing Test';
