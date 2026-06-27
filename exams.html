@@ -303,7 +303,7 @@ function buildFilters(data){
     </button>`).join('');
 }
 
-function filterByState(state, btn){
+window.filterByState = function filterByState(state, btn){
   activeFilter=state;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -352,7 +352,7 @@ const fallbackExams=[
   {id:'custom_exam',exam_name:'Custom Practice',state:null,category:'Custom',qualifying_wpm:40,duration_minutes:5,language:'english',description:'Set your own speed target and practice at your pace.'},
 ];
 
-function startExam(id, btnEl){
+window.startExam = function startExam(id, btnEl){
   console.log('startExam called, id:', id, 'exams count:', exams.length);
   // Search by id or by exam_name (fallback)
   selectedExam=exams.find(e=>String(e.id)===String(id));
@@ -445,7 +445,7 @@ function updateExamTimer(t){
   el.classList.toggle('warning',t<=60);
 }
 
-function submitExam(){
+window.submitExam = function submitExam(){
   if(finished)return;
   finished=true;clearInterval(timer);
   document.getElementById('sscInput').disabled=true;
@@ -494,7 +494,7 @@ async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, languag
   } catch(e) { console.error('saveTestResult error:', e); }
 }
 
-function retryExam(){if(selectedExam)startExam(selectedExam.id);}
+window.retryExam = function retryExam(){if(selectedExam)window.startExam(selectedExam.id);}
 function showNotif(msg,type){const n=document.getElementById('notif');n.textContent=msg;n.className='notif show '+(type||'');setTimeout(()=>n.classList.remove('show'),4000);}
 loadExams();
 </script>
