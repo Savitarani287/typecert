@@ -194,7 +194,8 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 
 <div class="notif" id="notif"></div>
 
-<script>
+<script type="module">
+import { supabase } from './supabase.js';
 window.onerror = function(msg, url, line, col, error) {
   console.error('PAGE ERROR:', msg, 'at line', line);
   alert('Error detected: ' + msg + ' (line ' + line + ')');
@@ -273,7 +274,6 @@ async function loadExams(){
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Loading exam patterns…</div>';
 
   try {
-    const {supabase}=await import('./supabase.js');
     const {data,error}=await supabase
       .from('exam_patterns')
       .select('*')
@@ -353,8 +353,16 @@ const fallbackExams=[
 ];
 
 function startExam(id, btnEl){
+  console.log('startExam called, id:', id, 'exams count:', exams.length);
+  // Search by id or by exam_name (fallback)
   selectedExam=exams.find(e=>String(e.id)===String(id));
-  if(!selectedExam){console.error('Exam not found for id:', id);return;}
+  console.log('selectedExam:', selectedExam);
+  if(!selectedExam){
+    // Try finding by index in case UUID got mangled
+    console.error('Exam not found for id:', id, 'Available ids:', exams.map(e=>e.id));
+    showNotif('Could not start exam. Please try again.','');
+    return;
+  }
   document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
   if(btnEl) btnEl.closest('.exam-card').classList.add('selected');
   document.getElementById('examResults').classList.remove('show');
@@ -474,7 +482,6 @@ function showResults(){
 
 async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, language, duration_seconds) {
   try {
-    const { supabase } = await import('./supabase.js');
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { console.log('Not logged in — skipping save'); return; }
     const user_id = session.user.id;
@@ -482,7 +489,7 @@ async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, languag
       user_id, wpm, net_wpm, accuracy, errors,
       exam_type, language, duration_seconds
     });
-    if (error) console.error('Save failed:', error.message, error.details);
+    if (error) console.error('Save failed:', error.message);
     else console.log('Result saved ✓', wpm, 'WPM');
   } catch(e) { console.error('saveTestResult error:', e); }
 }
