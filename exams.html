@@ -107,6 +107,9 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .ch{display:inline}.ch.correct{color:#1a6b3a}.ch.wrong{color:#c0392b;background:rgba(192,57,43,0.08);border-radius:2px}.ch.current{border-left:2.5px solid #1a3a6b;margin-left:-2.5px;animation:blink 1s step-end infinite}
 @keyframes blink{0%,100%{border-color:#1a3a6b}50%{border-color:transparent}}
 @media(max-width:768px){.exams-grid{grid-template-columns:1fr}.exam-result-grid{grid-template-columns:1fr 1fr}.nav-links{display:none}}
+.filter-btn{padding:7px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.filter-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.3)}
+.filter-btn.active{background:rgba(124,109,250,0.15);border-color:var(--accent);color:var(--accent)}
 </style>
 <script src="nav.js" defer></script>
 </head>
@@ -120,6 +123,11 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
     <div class="page-tag">Exam simulation</div>
     <h1 class="page-title">Real exam patterns</h1>
     <p class="page-sub">Practice on exact replicas of SSC, Railway and State exam interfaces. Feel the real pressure before exam day.</p>
+  </div>
+
+  <!-- State filters -->
+  <div style="max-width:1100px;margin:0 auto 24px;padding:0 28px;overflow-x:auto;white-space:nowrap;scrollbar-width:none">
+    <div id="stateFilters" style="display:inline-flex;gap:8px;flex-wrap:nowrap"></div>
   </div>
 
   <div class="exams-grid" id="examsGrid"></div>
@@ -192,14 +200,6 @@ window.onerror = function(msg, url, line, col, error) {
   alert('Error detected: ' + msg + ' (line ' + line + ')');
   return false;
 };
-const exams=[
-  {id:'ssc_chsl',icon:'🏛️',name:'SSC CHSL',full:'Combined Higher Secondary Level',wpm:35,duration:600,lang:'English',difficulty:'medium',diffClass:'diff-medium',req:'35 WPM English or 30 WPM Hindi',instruction:'This test simulates the SSC CHSL typing test. Type the passage as accurately as possible. Net WPM = Gross WPM minus error deduction. Minimum required: 35 WPM net speed.'},
-  {id:'ssc_cgl',icon:'⚖️',name:'SSC CGL',full:'Combined Graduate Level',wpm:35,duration:600,lang:'English',difficulty:'medium',diffClass:'diff-medium',req:'35 WPM English',instruction:'SSC CGL typing test simulation. Court transcription pattern. Type accurately — errors are penalized heavily in this examination.'},
-  {id:'rrb_ntpc',icon:'🚂',name:'RRB NTPC',full:'Railway Non-Technical Popular Categories',wpm:30,duration:600,lang:'English',difficulty:'easy',diffClass:'diff-easy',req:'30 WPM English or 25 WPM Hindi',instruction:'Railway NTPC typing test. Type the given passage within the time limit. Minimum speed required is 30 WPM with reasonable accuracy.'},
-  {id:'rpsc_ldc',icon:'📋',name:'RPSC LDC',full:'Rajasthan Lower Division Clerk',wpm:30,duration:600,lang:'Hindi',difficulty:'medium',diffClass:'diff-medium',req:'30 WPM Hindi (Mangal/Kruti Dev)',instruction:'Rajasthan State typing test in Hindi. Mangal font Unicode typing. Special characters and matras must be typed accurately.'},
-  {id:'ssc_data',icon:'💻',name:'Data Entry',full:'SSC Data Entry Operator',wpm:8000,duration:600,lang:'Numbers',difficulty:'hard',diffClass:'diff-hard',req:'8000 Key Depressions/Hour',instruction:'Data entry operator test. Focus on number accuracy and speed. Key Depression speed is measured — every key press counts.'},
-  {id:'custom_exam',icon:'⚙️',name:'Custom Exam',full:'Set your own requirements',wpm:40,duration:300,lang:'English',difficulty:'easy',diffClass:'diff-easy',req:'Set your own WPM target',instruction:'Configure your own exam parameters. Great for practicing specific speed targets.'}
-];
 
 const passages={
   english:[
@@ -232,35 +232,128 @@ function getExamText(langKey, durationSeconds) {
   return result.trim();
 }
 
-let selectedExam=null,currentText='',typed=0,correct=0,errors=0;
+let exams=[], selectedExam=null,currentText='',typed=0,correct=0,errors=0;
 let timeLeft=600,timer=null,started=false,finished=false;
 let finalWpm=0,finalNet=0,finalAcc=0;
+let activeFilter='all';
 
-function buildCards(){
+// Icon map by category/exam name
+function getIcon(exam){
+  const name=(exam.exam_name||'').toLowerCase();
+  if(name.includes('ssc')) return '🏛️';
+  if(name.includes('rrb')||name.includes('railway')) return '🚂';
+  if(name.includes('bank')||name.includes('ibps')||name.includes('sbi')) return '🏦';
+  if(name.includes('police')) return '👮';
+  if(name.includes('data entry')||name.includes('deo')) return '💻';
+  if(name.includes('custom')) return '⚙️';
+  return '📋';
+}
+
+function getDiffClass(wpm){
+  if(!wpm) return 'diff-hard';
+  if(wpm<=25) return 'diff-easy';
+  if(wpm<=32) return 'diff-medium';
+  return 'diff-hard';
+}
+
+function getDiffLabel(wpm){
+  if(!wpm) return 'Advanced';
+  if(wpm<=25) return 'Easy';
+  if(wpm<=32) return 'Medium';
+  return 'Hard';
+}
+
+function formatReq(exam){
+  if(exam.language==='numbers') return '8000 KDPH';
+  return (exam.qualifying_wpm||'—')+' WPM '+exam.language.charAt(0).toUpperCase()+exam.language.slice(1);
+}
+
+async function loadExams(){
   const grid=document.getElementById('examsGrid');
-  exams.forEach(e=>{
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">Loading exam patterns…</div>';
+
+  try {
+    const {supabase}=await import('./supabase.js');
+    const {data,error}=await supabase
+      .from('exam_patterns')
+      .select('*')
+      .order('state',{ascending:true})
+      .order('exam_name',{ascending:true});
+
+    if(error) throw error;
+    exams=data;
+    buildFilters(data);
+    buildCards(data);
+  } catch(e){
+    // Fallback to hardcoded if Supabase not ready
+    console.warn('Supabase load failed, using fallback:', e.message);
+    exams=fallbackExams;
+    buildFilters(fallbackExams);
+    buildCards(fallbackExams);
+  }
+}
+
+function buildFilters(data){
+  const states=['all',...new Set(data.map(e=>e.state||'Central').filter(Boolean).sort())];
+  const wrap=document.getElementById('stateFilters');
+  if(!wrap) return;
+  wrap.innerHTML=states.map(s=>`
+    <button class="filter-btn ${s==='all'?'active':''}" onclick="filterByState('${s}',this)">
+      ${s==='all'?'All Exams':s}
+    </button>`).join('');
+}
+
+function filterByState(state, btn){
+  activeFilter=state;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered=state==='all'?exams:exams.filter(e=>(e.state||'Central')===state);
+  buildCards(filtered);
+}
+
+function buildCards(list){
+  const grid=document.getElementById('examsGrid');
+  if(!list||list.length===0){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px">No exams found for this filter.</div>';
+    return;
+  }
+  grid.innerHTML='';
+  list.forEach(e=>{
+    const diffClass=getDiffClass(e.qualifying_wpm);
+    const diffLabel=getDiffLabel(e.qualifying_wpm);
+    const req=formatReq(e);
+    const duration=e.duration_minutes||10;
     const card=document.createElement('div');
     card.className='exam-card';
     card.innerHTML=`
-      <div class="exam-difficulty ${e.diffClass}">${e.difficulty}</div>
-      <div class="exam-icon">${e.icon}</div>
-      <div class="exam-name">${e.name}</div>
-      <div class="exam-full">${e.full}</div>
+      <div class="exam-difficulty ${diffClass}">${diffLabel}</div>
+      <div class="exam-icon">${getIcon(e)}</div>
+      <div class="exam-name">${e.exam_name}</div>
+      <div class="exam-full">${e.state&&e.state!=='Central'?e.state+' — ':''}${e.category||''}</div>
       <div class="exam-stats">
-        <div class="exam-stat wpm">${e.wpm} WPM</div>
-        <div class="exam-stat time">${e.duration/60} min</div>
-        <div class="exam-stat lang">${e.lang}</div>
+        <div class="exam-stat wpm">${e.qualifying_wpm||'8000 KD'} ${e.language==='numbers'?'KDPH':'WPM'}</div>
+        <div class="exam-stat time">${duration} min</div>
+        <div class="exam-stat lang">${e.language.charAt(0).toUpperCase()+e.language.slice(1)}</div>
       </div>
-      <div class="exam-req">${e.req}</div>
-      <button class="exam-start-btn" onclick="startExam('${e.id}', this)">Start ${e.name} exam →</button>
+      <div class="exam-req">${e.description?e.description.substring(0,80)+'…':req}</div>
+      <button class="exam-start-btn" onclick="startExam('${e.id}',this)">Start ${e.exam_name} →</button>
     `;
     grid.appendChild(card);
   });
 }
 
+// Fallback exams if Supabase not connected yet
+const fallbackExams=[
+  {id:'ssc_chsl',exam_name:'SSC CHSL',state:'Central',category:'SSC',qualifying_wpm:35,duration_minutes:10,language:'english',description:'Combined Higher Secondary Level — 35 WPM English typing test.'},
+  {id:'ssc_cgl',exam_name:'SSC CGL',state:'Central',category:'SSC',qualifying_wpm:35,duration_minutes:10,language:'english',description:'Combined Graduate Level — 35 WPM English.'},
+  {id:'rrb_ntpc',exam_name:'RRB NTPC',state:'Central',category:'Railway',qualifying_wpm:30,duration_minutes:10,language:'english',description:'Railway NTPC — 30 WPM English or 25 WPM Hindi.'},
+  {id:'rpsc_ldc',exam_name:'RPSC LDC',state:'Rajasthan',category:'State PSC',qualifying_wpm:30,duration_minutes:10,language:'hindi',description:'Rajasthan LDC — 30 WPM Hindi Mangal Inscript.'},
+  {id:'ssc_deo',exam_name:'SSC DEO',state:'Central',category:'SSC',qualifying_wpm:null,duration_minutes:10,language:'numbers',description:'Data Entry Operator — 8000 KDPH.'},
+  {id:'custom_exam',exam_name:'Custom Practice',state:null,category:'Custom',qualifying_wpm:40,duration_minutes:5,language:'english',description:'Set your own speed target and practice at your pace.'},
+];
+
 function startExam(id, btnEl){
-  console.log('startExam called with id:', id, 'btnEl:', btnEl);
-  selectedExam=exams.find(e=>e.id===id);
+  selectedExam=exams.find(e=>String(e.id)===String(id));
   if(!selectedExam){console.error('Exam not found for id:', id);return;}
   document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
   if(btnEl) btnEl.closest('.exam-card').classList.add('selected');
@@ -271,7 +364,7 @@ function startExam(id, btnEl){
 function showCountdown(exam){
   const modal=document.getElementById('countdownModal');
   const num=document.getElementById('cdNum');
-  document.getElementById('cdExamName').textContent=exam.name.toUpperCase()+' EXAM';
+  document.getElementById('cdExamName').textContent=(exam.exam_name||exam.name||'EXAM').toUpperCase()+' TYPING TEST';
   modal.classList.add('show');
   let c=3;num.textContent=c;num.className='countdown-big';
   const iv=setInterval(()=>{
@@ -283,12 +376,15 @@ function showCountdown(exam){
 }
 
 function initExam(exam){
-  const langKey=exam.lang==='Hindi'?'hindi':exam.lang==='Numbers'?'numbers':'english';
-  currentText=getExamText(langKey, exam.duration);
-  typed=0;correct=0;errors=0;timeLeft=exam.duration;started=false;finished=false;
+  const lang=exam.language||exam.lang||'english';
+  const langKey=lang==='hindi'?'hindi':lang==='numbers'?'numbers':'english';
+  const duration=(exam.duration_minutes||10)*60;
+  currentText=getExamText(langKey, duration);
+  timeLeft=duration;
+  typed=0;correct=0;errors=0;started=false;finished=false;
   if(timer)clearInterval(timer);
-  document.getElementById('examTitle').textContent=exam.name+' — Typing Test';
-  document.getElementById('examInstruction').textContent=exam.instruction;
+  document.getElementById('examTitle').textContent=(exam.exam_name||exam.name)+' — Typing Test';
+  document.getElementById('examInstruction').textContent=exam.description||exam.instruction||'Type the passage as accurately as possible within the time limit.';
   document.getElementById('sscInput').value='';
   document.getElementById('sscInput').disabled=false;
   ['sscWpm','sscNet','sscErr'].forEach(id=>document.getElementById(id).textContent='0');
@@ -323,7 +419,7 @@ document.getElementById('sscInput').addEventListener('input',function(){
     if(i<val.length){if(val[i]===currentText[i]){correct++;el.classList.add('correct');}else{errors++;el.classList.add('wrong');}}
     else if(i===val.length)el.classList.add('current');
   }
-  const elapsed=(selectedExam.duration-timeLeft)/60;
+  const elapsed=(((selectedExam.duration_minutes||10)*60)-timeLeft)/60;
   const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;
   const net=Math.max(0,Math.round(wpm-(errors/(elapsed||0.01))));
   const acc=typed>0?Math.round((correct/typed)*100):100;
@@ -345,7 +441,7 @@ function submitExam(){
   if(finished)return;
   finished=true;clearInterval(timer);
   document.getElementById('sscInput').disabled=true;
-  const elapsed=(selectedExam.duration-timeLeft)/60;
+  const elapsed=(((selectedExam.duration_minutes||10)*60)-timeLeft)/60;
   finalWpm=elapsed>0?Math.round((correct/5)/elapsed):parseInt(document.getElementById('sscWpm').textContent)||0;
   finalNet=Math.max(0,Math.round(finalWpm-(errors/(elapsed||0.01))));
   finalAcc=typed>0?Math.round((correct/typed)*100):100;
@@ -353,7 +449,7 @@ function submitExam(){
 }
 
 function showResults(){
-  const req=selectedExam.wpm;
+  const req=selectedExam.qualifying_wpm;
   const passed=finalNet>=req;
   document.getElementById('erWpm').textContent=finalWpm;
   document.getElementById('erNet').textContent=finalNet;
@@ -370,10 +466,10 @@ function showResults(){
   document.getElementById('rbReq').textContent='Required: '+req;
   document.getElementById('examResults').classList.add('show');
   document.getElementById('examResults').scrollIntoView({behavior:'smooth',block:'center'});
-  if(passed)showNotif('🎉 Excellent! You passed the '+selectedExam.name+' typing requirement!','success');
+  if(passed)showNotif('🎉 Excellent! You passed the '+(selectedExam.exam_name||selectedExam.name)+' typing requirement!','success');
   else showNotif('Keep practicing! You need '+req+' WPM, you got '+finalNet+' WPM','success');
   // Save result to Supabase (silently — don't block the UI)
-  saveTestResult(finalWpm, finalNet, finalAcc, errors, selectedExam.id, selectedExam.lang.toLowerCase(), selectedExam.duration);
+  saveTestResult(finalWpm, finalNet, finalAcc, errors, selectedExam.id, ( selectedExam.language||'english'), ((selectedExam.duration_minutes||10)*60));
 }
 
 async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, language, duration_seconds) {
@@ -393,7 +489,7 @@ async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, languag
 
 function retryExam(){if(selectedExam)startExam(selectedExam.id);}
 function showNotif(msg,type){const n=document.getElementById('notif');n.textContent=msg;n.className='notif show '+(type||'');setTimeout(()=>n.classList.remove('show'),4000);}
-buildCards();
+loadExams();
 </script>
 </body>
 </html>
