@@ -73,6 +73,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
 .tcs-timer-wrap{background:#f5c518;color:#1a1a1a;padding:6px 16px;border-radius:6px;font-family:var(--font-mono);font-size:18px;font-weight:800;min-width:80px;text-align:center}
 .tcs-timer-wrap.urgent{background:#e53935;color:white;animation:timerPulse .5s ease infinite alternate}
 @keyframes timerPulse{from{opacity:1}to{opacity:.7}}
+.ambient-btn{padding:6px 14px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.25);border-radius:6px;font-family:var(--font-body);font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.ambient-btn:hover{background:rgba(255,255,255,.2);color:white}
+.ambient-btn.ambient-on{background:rgba(0,229,160,.2);border-color:var(--green);color:var(--green)}
 
 /* TCS iON body — white background like real exam */
 .tcs-body{background:#f5f5f5;border-left:1px solid #ddd;border-right:1px solid #ddd}
@@ -178,6 +181,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
         <div class="tcs-info-item"><span class="tcs-info-label">Required Speed:</span> <span id="tcsRequired">35 WPM</span></div>
         <div class="tcs-info-item"><span class="tcs-info-label">Duration:</span> <span id="tcsDuration">10 Minutes</span></div>
         <div class="tcs-timer-wrap" id="tcsTimer">10:00</div>
+        <button class="ambient-btn" onclick="toggleAmbient(this)">🔇 Hall Sound: OFF</button>
       </div>
     </div>
 
@@ -289,8 +293,10 @@ let examTimer = null;
 let timeLeft = 0, totalTime = 0;
 let started = false;
 let audioCtx = null;
+let ambientRunning = false;
+let ambientTimeouts = [];
 
-// ══ AUDIO — pressure tick ══════════════════════════════════════
+// ══ AUDIO ══════════════════════════════════════════════════════
 function getAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
@@ -308,6 +314,77 @@ function playTick(type = 'normal') {
     osc.start(); osc.stop(ctx.currentTime + (type === 'end' ? 0.4 : 0.05));
   } catch(e) {}
 }
+
+// ── One keyboard click ────────────────────────────────────────
+function playKeyClick(ctx, when, freq = 800, vol = 0.04) {
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass'; filter.frequency.value = freq; filter.Q.value = 0.8;
+    osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq * (0.9 + Math.random() * 0.2);
+    gain.gain.setValueAtTime(vol, when);
+    gain.gain.exponentialRampToValueAtTime(0.001, when + 0.04);
+    osc.start(when); osc.stop(when + 0.05);
+  } catch(e) {}
+}
+
+// ── 8 virtual typists in exam hall ───────────────────────────
+function startAmbientSound() {
+  if (ambientRunning) return;
+  ambientRunning = true;
+  const ctx = getAudio();
+  if (ctx.state === 'suspended') ctx.resume();
+
+  const typists = [
+    { minMs:90,  maxMs:180, freq:900,  vol:0.05  },
+    { minMs:110, maxMs:200, freq:750,  vol:0.04  },
+    { minMs:130, maxMs:240, freq:1050, vol:0.035 },
+    { minMs:80,  maxMs:160, freq:820,  vol:0.045 },
+    { minMs:150, maxMs:300, freq:680,  vol:0.03  },
+    { minMs:100, maxMs:190, freq:970,  vol:0.04  },
+    { minMs:120, maxMs:220, freq:1100, vol:0.025 },
+    { minMs:95,  maxMs:175, freq:760,  vol:0.038 },
+  ];
+
+  function scheduleTypist(typist) {
+    if (!ambientRunning) return;
+    const delay = typist.minMs + Math.random() * (typist.maxMs - typist.minMs);
+    const t = setTimeout(() => {
+      if (!ambientRunning) return;
+      const ctx = getAudio();
+      playKeyClick(ctx, ctx.currentTime, typist.freq, typist.vol);
+      if (Math.random() < 0.12)
+        playKeyClick(ctx, ctx.currentTime + 0.06, typist.freq * 1.05, typist.vol * 0.7);
+      scheduleTypist(typist);
+    }, delay);
+    ambientTimeouts.push(t);
+  }
+
+  typists.forEach(typist => {
+    const t = setTimeout(() => scheduleTypist(typist), Math.random() * 300);
+    ambientTimeouts.push(t);
+  });
+}
+
+function stopAmbientSound() {
+  ambientRunning = false;
+  ambientTimeouts.forEach(t => clearTimeout(t));
+  ambientTimeouts = [];
+}
+
+window.toggleAmbient = function(btn) {
+  if (ambientRunning) {
+    stopAmbientSound();
+    btn.textContent = '🔇 Hall Sound: OFF';
+    btn.classList.remove('ambient-on');
+  } else {
+    startAmbientSound();
+    btn.textContent = '🔊 Hall Sound: ON';
+    btn.classList.add('ambient-on');
+  }
+};
 
 // ══ LOAD EXAMS ════════════════════════════════════════════════
 async function loadExams() {
