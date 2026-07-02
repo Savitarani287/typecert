@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /auth.html
+
+Sitemap: https://typecert-ten.vercel.app/sitemap.xml
