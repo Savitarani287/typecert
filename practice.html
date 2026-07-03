@@ -482,27 +482,48 @@ let streak=parseInt(localStorage.getItem('streak')||0);
 let finalWpm=0,finalNet=0,finalAcc=0;
 
 function getText(){
-  // Target ~80 WPM worth of chars for the duration, so text never runs out
-  // Average word = 5 chars + space = 6 chars. At 80 WPM worst case:
   const targetChars = Math.ceil((totalTime / 60) * 80 * 6);
 
-  let pool;
+  // Hindi / Hinglish — own pool
   if(lang==='hindi'){
-    pool = textBanks.hindi[difficulty] || textBanks.hindi.medium;
-  } else if(lang==='hinglish'){
-    pool = textBanks.hinglish[difficulty] || textBanks.hinglish.medium;
-  } else {
-    pool = textBanks[practiceType]?.[difficulty] || textBanks.paragraph.easy;
+    const pool = textBanks.hindi[difficulty] || textBanks.hindi.medium;
+    return buildText(pool, targetChars);
+  }
+  if(lang==='hinglish'){
+    const pool = textBanks.hinglish[difficulty] || textBanks.hinglish.medium;
+    return buildText(pool, targetChars);
   }
 
-  // Keep joining passages until we have enough characters
-  let result = '';
-  let attempts = 0;
-  while(result.length < targetChars && attempts < 20){
-    const pick = pool[Math.floor(Math.random() * pool.length)];
+  // Words mode — pick individual words and repeat to fill time
+  if(practiceType==='words'){
+    const wordList = (textBanks.words[difficulty] || textBanks.words.easy)[0].split(' ');
+    let result = '';
+    while(result.length < targetChars){
+      const w = wordList[Math.floor(Math.random()*wordList.length)];
+      result += (result ? ' ' : '') + w;
+    }
+    return result.trim();
+  }
+
+  // Numbers mode
+  if(practiceType==='numbers'){
+    const pool = textBanks.numbers[difficulty] || textBanks.numbers.easy;
+    return buildText(pool, targetChars);
+  }
+
+  // Paragraph / Sentences — standard
+  const pool = textBanks[practiceType]?.[difficulty] || textBanks.paragraph.easy;
+  return buildText(pool, targetChars);
+}
+
+function buildText(pool, targetChars){
+  const shuffled = [...pool].sort(()=>Math.random()-0.5);
+  let result='', tries=0;
+  while(result.length < targetChars && tries < 30){
+    const pick = shuffled[tries % shuffled.length];
     if(result && !result.endsWith(' ')) result += ' ';
     result += pick;
-    attempts++;
+    tries++;
   }
   return result.trim();
 }
@@ -628,6 +649,7 @@ function endTest(){
   }
   if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
   testsToday++;localStorage.setItem('testsToday',testsToday);
+  updateStreak();
   generateTips();
   document.getElementById('resultsCard').classList.add('show');
   buildHeatmap();
@@ -635,6 +657,27 @@ function endTest(){
   document.getElementById('resultsCard').scrollIntoView({behavior:'smooth',block:'nearest'});
   // Save result to Supabase (silently — don't block the UI)
   saveTestResult(finalWpm, finalNet, finalAcc, errCount, 'practice', 'english', totalTime);
+}
+
+function updateStreak(){
+  // Only track streak for logged-in users
+  import('./supabase.js').then(({supabase})=>{
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(!session) return; // Guest — no streak
+      const today=new Date().toDateString();
+      const lastDate=localStorage.getItem('streak_date_'+session.user.id);
+      const yesterday=new Date(Date.now()-86400000).toDateString();
+      if(lastDate===today){ /* already counted today */ }
+      else if(lastDate===yesterday){ streak++; }
+      else { streak=1; }
+      localStorage.setItem('streak',streak);
+      localStorage.setItem('streak_date_'+session.user.id, today);
+      const el=document.getElementById('streakNum');
+      if(el) el.textContent=streak;
+      // Also save streak to Supabase profiles table
+      supabase.from('profiles').update({streak}).eq('id',session.user.id).then(()=>{});
+    });
+  }).catch(()=>{});
 }
 
 async function saveTestResult(wpm, net_wpm, accuracy, errors, exam_type, language, duration_seconds) {

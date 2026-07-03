@@ -297,6 +297,8 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
     <div class="ctrl-group">
       <button class="ctrl-btn active" onclick="setLang('english',this)" data-lang="english">English</button>
       <button class="ctrl-btn" onclick="setLang('hindi',this)" data-lang="hindi">Hindi</button>
+      <button class="ctrl-btn" onclick="setLang('words',this)" data-lang="words">Words</button>
+      <button class="ctrl-btn" onclick="setLang('sentences',this)" data-lang="sentences">Sentences</button>
       <button class="ctrl-btn" onclick="setLang('numbers',this)" data-lang="numbers">Numbers</button>
     </div>
     <div class="ctrl-group" id="examControls" style="display:none">
@@ -490,10 +492,22 @@ const texts={
     "Success in the SSC examination requires dedication hard work and consistent effort over a long period of time. Candidates must practice typing every single day to achieve the required speed of thirty five words per minute. Regular practice on realistic test interfaces makes a significant difference in final performance.",
     "Technology has transformed the way we communicate and work in the modern world. Fast and accurate typing is now an essential skill for professionals in every sector from banking to information technology. Government job aspirants must treat typing practice as seriously as any other subject in their preparation.",
   ],
+  words:"the and for was that with this have from they will each other about which their said also time into just two more when make like can could than after",
+  sentences:[
+    "Type the passage carefully. Focus on accuracy before speed.",
+    "The candidate must achieve minimum typing speed to qualify.",
+    "Practice every day to improve your speed and accuracy.",
+    "Government jobs require strong typing skills and dedication.",
+    "Regular daily practice of thirty minutes improves speed significantly.",
+    "Accuracy is more important than speed in the early stages.",
+    "The railway recruitment board evaluates both speed and accuracy.",
+    "Develop your typing skills to succeed in government examinations.",
+  ],
   hindi:[
     "भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं में उपस्थित होने वाले उम्मीदवारों की टाइपिंग कौशल में सुधार के लिए कई महत्वपूर्ण पहल शुरू की हैं। नियमित अभ्यास से उम्मीदवारों को वास्तविक परीक्षा वातावरण को समझने में मदद मिलती है।",
     "सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में निश्चित रूप से सुधार होगा। नियमित और सही तरीके से अभ्यास करने पर कम समय में अच्छी टाइपिंग स्पीड हासिल की जा सकती है।",
     "मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से बड़े से बड़ा लक्ष्य भी प्राप्त किया जा सकता है। अपने लक्ष्य को पाने के लिए प्रतिदिन नियमित रूप से अभ्यास करना आवश्यक है।",
+    "कंप्यूटर पर काम करने के लिए टाइपिंग का अच्छा ज्ञान होना आवश्यक है। आज के युग में हर सरकारी और निजी कार्यालय में कंप्यूटर का उपयोग बड़े पैमाने पर किया जाता है।",
   ],
   numbers:[
     "1234 5678 9012 3456 7890 2468 1357 9753 8642 0246 1357 2468 3579 4680 5791 6802 7913 8024 9135 0246 1122 3344 5566 7788 9900 1234 5678 9012 3456 7890",
@@ -502,15 +516,35 @@ const texts={
 };
 
 function getIndexText(langKey){
-  const pool = texts[langKey] || texts.english;
-  const targetChars = Math.ceil((totalTime / 60) * 80 * 6);
-  let result = '';
-  let attempts = 0;
-  while(result.length < targetChars && attempts < 20){
-    const pick = pool[Math.floor(Math.random() * pool.length)];
-    if(result && !result.endsWith(' ')) result += ' ';
-    result += pick;
-    attempts++;
+  const target = Math.ceil((totalTime/60)*80*6);
+
+  // Words mode — pick random words and repeat
+  if(langKey==='words'){
+    const wordArr = texts.words.split(' ');
+    let result='';
+    while(result.length < target){
+      const w = wordArr[Math.floor(Math.random()*wordArr.length)];
+      result += (result?' ':'')+w;
+    }
+    return result.trim();
+  }
+
+  // Sentences mode — join sentences
+  if(langKey==='sentences'){
+    return buildIndexText(texts.sentences, target);
+  }
+
+  const pool = Array.isArray(texts[langKey]) ? texts[langKey] : texts.english;
+  return buildIndexText(pool, target);
+}
+
+function buildIndexText(pool, target){
+  const shuffled=[...pool].sort(()=>Math.random()-0.5);
+  let result='', tries=0;
+  while(result.length<target && tries<30){
+    const pick=shuffled[tries%shuffled.length];
+    if(result && !result.endsWith(' ')) result+=' ';
+    result+=pick; tries++;
   }
   return result.trim();
 }
@@ -526,7 +560,26 @@ document.getElementById('typingInput').addEventListener('input',function(){if(fi
   if(typed>=currentText.length)endTest();});
 document.getElementById('typingInput').addEventListener('keydown',function(e){if(strictMode&&e.key==='Backspace')e.preventDefault();});
 function startTimer(){timer=setInterval(()=>{timeLeft--;document.getElementById('timerVal').textContent=timeLeft;document.getElementById('examTimerBadge').textContent='00:'+(timeLeft<10?'0':'')+timeLeft;if(timeLeft<=0)endTest();},1000);}
-function endTest(){if(finished)return;finished=true;clearInterval(timer);document.getElementById('typingInput').disabled=true;finalTime=totalTime-timeLeft;const min=finalTime/60;finalWpm=finalTime>0?Math.round((correct/5)/min):0;finalNet=Math.max(0,Math.round(finalWpm-(errors/(min||0.01))));finalAcc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('rWpm').textContent=finalWpm;document.getElementById('rNet').textContent=finalNet;document.getElementById('rAcc').textContent=finalAcc+'%';document.getElementById('rTime').textContent=finalTime+'s';document.getElementById('previewWpm').textContent=finalWpm;document.getElementById('previewAcc').textContent=finalAcc+'%';setPersonality(finalWpm);setPercentile(finalWpm);document.getElementById('resultsSection').classList.add('show');document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'center'});}
+function updateStreak(){
+  // Only track streak for logged-in users
+  import('./supabase.js').then(({supabase})=>{
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(!session) return; // Guest — no streak tracking
+      const today=new Date().toDateString();
+      const last=localStorage.getItem('streak_date_'+session.user.id);
+      const yesterday=new Date(Date.now()-86400000).toDateString();
+      let streak=parseInt(localStorage.getItem('streak')||0);
+      if(last===today){}
+      else if(last===yesterday){streak++;}
+      else{streak=1;}
+      localStorage.setItem('streak',streak);
+      localStorage.setItem('streak_date_'+session.user.id,today);
+      supabase.from('profiles').update({streak}).eq('id',session.user.id).then(()=>{});
+    });
+  }).catch(()=>{});
+}
+
+function endTest(){if(finished)return;finished=true;clearInterval(timer);document.getElementById('typingInput').disabled=true;finalTime=totalTime-timeLeft;const min=finalTime/60;finalWpm=finalTime>0?Math.round((correct/5)/min):0;finalNet=Math.max(0,Math.round(finalWpm-(errors/(min||0.01))));finalAcc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('rWpm').textContent=finalWpm;document.getElementById('rNet').textContent=finalNet;document.getElementById('rAcc').textContent=finalAcc+'%';document.getElementById('rTime').textContent=finalTime+'s';document.getElementById('previewWpm').textContent=finalWpm;document.getElementById('previewAcc').textContent=finalAcc+'%';setPersonality(finalWpm);setPercentile(finalWpm);document.getElementById('resultsSection').classList.add('show');document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'center'});updateStreak();}
 function setPersonality(w){let t;if(w<20)t='🐢 Tortoise — keep practicing!';else if(w<35)t='🐌 Slow & steady typist';else if(w<50)t='⌨️ Steady typist';else if(w<70)t='⚡ Speed demon';else t='🔥 Keyboard warrior';document.getElementById('tagText').textContent=t;}
 function setPercentile(w){const p=Math.min(99,Math.round((w/90)*100));document.getElementById('percentileNum').textContent=p+'%';document.getElementById('percentileFill').style.width=p+'%';document.getElementById('percentileText').textContent='Top '+(100-p)+'% of all typists on TypeCert';}
 function setMode(m,btn){mode=m;document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('examControls').style.display=m==='exam'?'flex':'none';if(m==='exam'){totalTime=examData[exam].duration;lang=examData[exam].lang;}else totalTime=60;resetTest();}
