@@ -279,7 +279,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 
 </div>
 
-<script>
+<script type="module">
+import { supabase } from './supabase.js';
 const params=new URLSearchParams(window.location.search);
 const wpm=params.get('wpm')||localStorage.getItem('lastWpm')||'47';
 const acc=params.get('acc')||localStorage.getItem('lastAcc')||'94%';
@@ -299,12 +300,100 @@ function updateBlurPreview(){
   if(el)el.textContent=name;
 }
 
-function getCertId(){return'TCERT-2025-'+String(Math.floor(Math.random()*99999)).padStart(5,'0');}
+function getCertCode(){
+  // Generate a unique human-readable cert code
+  const year=new Date().getFullYear();
+  const rand=String(Math.floor(Math.random()*99999)).padStart(5,'0');
+  return `TCERT-${year}-${rand}`;
+}
 function getDate(){return new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});}
 
 let certId='',certDate='',paymentDone=false;
 
-function buildGoldCertSVG(name,wpm,acc,net,type,certId,date){
+async function initiatePayment(){
+  const name=document.getElementById('certNameInput').value.trim();
+  const email=document.getElementById('certEmailInput').value.trim();
+  if(!name){document.getElementById('certNameInput').focus();document.getElementById('certNameInput').style.borderColor='#fa6d8a';setTimeout(()=>document.getElementById('certNameInput').style.borderColor='',2000);return;}
+  if(!email||!email.includes('@')){document.getElementById('certEmailInput').focus();document.getElementById('certEmailInput').style.borderColor='#fa6d8a';setTimeout(()=>document.getElementById('certEmailInput').style.borderColor='',2000);return;}
+
+  const btn=document.getElementById('payBtn');
+  btn.textContent='Processing…';btn.style.opacity='.7';btn.disabled=true;
+
+  // ── RAZORPAY INTEGRATION (uncomment when KYC approved) ────────────
+  // const options={
+  //   key:'rzp_live_YOUR_KEY_ID_HERE',
+  //   amount:1100,currency:'INR',
+  //   name:'TypeCert',description:'Verified Typing Certificate',
+  //   handler:async function(response){
+  //     await issueCertificate(name,email,'paid',response.razorpay_payment_id);
+  //   },
+  //   prefill:{name,email},theme:{color:'#c8a84b'},
+  //   modal:{ondismiss:()=>{btn.textContent='🏆 Pay ₹11 & Download Certificate';btn.style.opacity='1';btn.disabled=false;}}
+  // };
+  // new Razorpay(options).open(); return;
+  // ─────────────────────────────────────────────────────────────────
+
+  // DEMO MODE — issues cert with payment_status='demo' until Razorpay is live
+  await issueCertificate(name, email, 'demo', null);
+}
+
+async function issueCertificate(name, email, paymentStatus, paymentId){
+  const btn=document.getElementById('payBtn');
+  try {
+    const {data:{session}}=await supabase.auth.getSession();
+
+    const certCode=getCertCode();
+    const type=document.getElementById('certTypeInput').value;
+    const wpmVal=parseInt(wpm)||0;
+    const accVal=parseInt((acc||'100').replace('%',''))||100;
+    const netVal=Math.max(0,Math.round(wpmVal*(accVal/100)));
+
+    // Save real certificate row to Supabase
+    const certRow={
+      certificate_code: certCode,
+      user_id: session?.user?.id || null,
+      wpm: wpmVal,
+      accuracy: accVal,
+      exam_type: type,
+      payment_status: paymentStatus,
+      candidate_name: name,
+      candidate_email: email,
+      issued_at: new Date().toISOString()
+    };
+
+    const {error}=await supabase.from('certificates').insert(certRow);
+    if(error) throw error;
+
+    certId=certCode;
+    certDate=getDate();
+    showCertificate(name,wpmVal,accVal,netVal,type,certCode,certDate);
+
+  } catch(e){
+    console.error('Certificate issue failed:',e.message);
+    // Fallback — still show cert with local ID so user isn't blocked
+    certId=getCertCode();
+    certDate=getDate();
+    const type=document.getElementById('certTypeInput').value;
+    const wpmVal=parseInt(wpm)||0;
+    const accVal=parseInt((acc||'100').replace('%',''))||100;
+    const netVal=Math.max(0,Math.round(wpmVal*(accVal/100)));
+    showCertificate(name,wpmVal,accVal,netVal,type,certId,certDate);
+  }
+}
+
+function showCertificate(name,wpmVal,accVal,netVal,type,certCode,date){
+  const svgHtml=buildGoldCertSVG(name,wpmVal,accVal,netVal,type,certCode,date);
+  document.getElementById('finalCertSvg').innerHTML=svgHtml;
+  document.getElementById('finalCertSection').classList.add('show');
+  document.getElementById('payBtn').style.display='none';
+  document.getElementById('successState').classList.add('show');
+  document.getElementById('finalCertSection').scrollIntoView({behavior:'smooth',block:'center'});
+
+  // Show verification URL
+  const verifyUrl=`${window.location.origin}/verify.html?id=${certCode}`;
+  const urlEl=document.getElementById('verifyUrlDisplay');
+  if(urlEl) urlEl.textContent=verifyUrl;
+}(name,wpm,acc,net,type,certId,date){
   return `<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
 <rect width="680" height="430" fill="#fffdf5" rx="14"/>
 <rect x="1" y="1" width="678" height="428" fill="none" stroke="#c8a84b" stroke-width="1.5" rx="13"/>
@@ -429,6 +518,10 @@ function copyVerifyLink(){
     btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent=orig,2000);
   });
 }
+
+// Expose to window for inline onclick handlers
+window.initiatePayment = initiatePayment;
+window.downloadCert = downloadCert;
 </script>
 </body>
 </html>

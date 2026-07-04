@@ -266,53 +266,61 @@ footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;margi
   <div class="footer-text">TypeCert — India's typing identity platform • <a href="index.html" style="color:var(--accent);text-decoration:none">typecert.in</a></div>
 </footer>
 
-<script>
-// Demo certificate database
-const certDB = {
-  'TCERT-2025-00847': {name:'Savita Rani',wpm:47,acc:'94%',net:44,test:'Speed Mode — 1 Minute English',date:'15 May 2025',id:'TCERT-2025-00847'},
-  'TCERT-2025-00731': {name:'Savita Rani',wpm:42,acc:'91%',net:38,test:'SSC CHSL Pattern — 10 Minute English',date:'12 May 2025',id:'TCERT-2025-00731'},
-  'TCERT-2025-00612': {name:'Rahul Sharma',wpm:89,acc:'98%',net:87,test:'Speed Mode — 2 Minute English',date:'10 May 2025',id:'TCERT-2025-00612'},
-  'TCERT-2025-00589': {name:'Priya Mehta',wpm:81,acc:'97%',net:79,test:'SSC CGL Pattern — 10 Minute English',date:'08 May 2025',id:'TCERT-2025-00589'},
-};
+<script type="module">
+import { supabase } from './supabase.js';
 
 function formatId(input) {
   let v = input.value.toUpperCase().replace(/[^A-Z0-9-]/g,'');
   input.value = v;
 }
+window.formatId = formatId;
 
-function verifyCert() {
+async function verifyCert() {
   const id = document.getElementById('certIdInput').value.trim().toUpperCase();
   if (!id) { document.getElementById('certIdInput').focus(); return; }
 
-  // Hide all states
   hideAll();
-  document.getElementById('emptyState').classList.remove('show');
-
-  // Show loading
   document.getElementById('loadingState').style.display = 'block';
 
-  // Simulate API call
-  setTimeout(() => {
+  try {
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('certificate_code', id)
+      .single();
+
     document.getElementById('loadingState').style.display = 'none';
-    const cert = certDB[id];
-    if (cert) showValid(cert);
-    else showInvalid(id);
-  }, 1200);
+
+    if (error || !data) {
+      showInvalid(id);
+    } else {
+      showValid(data);
+    }
+  } catch(e) {
+    document.getElementById('loadingState').style.display = 'none';
+    showInvalid(id);
+  }
 }
+window.verifyCert = verifyCert;
 
 function showValid(cert) {
-  document.getElementById('vCertName').textContent = cert.name;
-  document.getElementById('vCertTest').textContent = cert.test;
-  document.getElementById('vCertWpm').textContent = cert.wpm;
-  document.getElementById('vCertAcc').textContent = cert.acc;
-  document.getElementById('vCertNet').textContent = cert.net;
-  document.getElementById('vCertId').textContent = 'ID: ' + cert.id;
-  document.getElementById('vCertDate').textContent = 'Issued on ' + cert.date;
-  document.getElementById('metaName').textContent = cert.name;
-  document.getElementById('metaDate').textContent = cert.date;
-  document.getElementById('metaTest').textContent = cert.test;
-  document.getElementById('metaWpm').textContent = cert.wpm + ' WPM (' + cert.acc + ' accuracy)';
-  document.getElementById('metaId').textContent = cert.id;
+  const name = cert.candidate_name || 'Candidate';
+  const date = new Date(cert.issued_at).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  const test = cert.exam_type || 'Typing Test';
+  const acc  = cert.accuracy + '%';
+
+  document.getElementById('vCertName').textContent = name;
+  document.getElementById('vCertTest').textContent = test;
+  document.getElementById('vCertWpm').textContent  = cert.wpm;
+  document.getElementById('vCertAcc').textContent  = acc;
+  document.getElementById('vCertNet').textContent  = cert.net_wpm || cert.wpm;
+  document.getElementById('vCertId').textContent   = 'ID: ' + cert.certificate_code;
+  document.getElementById('vCertDate').textContent = 'Issued on ' + date;
+  document.getElementById('metaName').textContent  = name;
+  document.getElementById('metaDate').textContent  = date;
+  document.getElementById('metaTest').textContent  = test;
+  document.getElementById('metaWpm').textContent   = cert.wpm + ' WPM (' + acc + ' accuracy)';
+  document.getElementById('metaId').textContent    = cert.certificate_code;
   document.getElementById('validResult').classList.add('show');
   document.getElementById('validResult').scrollIntoView({behavior:'smooth', block:'center'});
 }
@@ -328,14 +336,14 @@ function hideAll() {
   });
 }
 
-function clearSearch() {
+window.clearSearch = function() {
   document.getElementById('certIdInput').value = '';
   hideAll();
   document.getElementById('emptyState').classList.add('show');
   document.getElementById('certIdInput').focus();
-}
+};
 
-function copyVerifyLink() {
+window.copyVerifyLink = function() {
   const id = document.getElementById('certIdInput').value.trim().toUpperCase();
   const link = window.location.origin + '/verify.html?id=' + id;
   navigator.clipboard.writeText(link).then(() => {
@@ -343,9 +351,9 @@ function copyVerifyLink() {
     btn.textContent = '✓ Copied!';
     setTimeout(() => btn.textContent = '🔗 Copy verify link', 2000);
   });
-}
+};
 
-// Check URL params for direct verification
+// Auto-verify if ID in URL
 const urlParams = new URLSearchParams(window.location.search);
 const idParam = urlParams.get('id');
 if (idParam) {
