@@ -393,7 +393,9 @@ function showCertificate(name,wpmVal,accVal,netVal,type,certCode,date){
   const verifyUrl=`${window.location.origin}/verify.html?id=${certCode}`;
   const urlEl=document.getElementById('verifyUrlDisplay');
   if(urlEl) urlEl.textContent=verifyUrl;
-}(name,wpm,acc,net,type,certId,date){
+}
+
+function buildGoldCertSVG(name,wpm,acc,net,type,certId,date){
   return `<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
 <rect width="680" height="430" fill="#fffdf5" rx="14"/>
 <rect x="1" y="1" width="678" height="428" fill="none" stroke="#c8a84b" stroke-width="1.5" rx="13"/>
@@ -453,51 +455,6 @@ function showCertificate(name,wpmVal,accVal,netVal,type,certCode,date){
 </svg>`;
 }
 
-function initiatePayment(){
-  const name=document.getElementById('certNameInput').value.trim();
-  const email=document.getElementById('certEmailInput').value.trim();
-  if(!name){document.getElementById('certNameInput').focus();document.getElementById('certNameInput').style.borderColor='#fa6d8a';setTimeout(()=>document.getElementById('certNameInput').style.borderColor='',2000);return;}
-  if(!email||!email.includes('@')){document.getElementById('certEmailInput').focus();document.getElementById('certEmailInput').style.borderColor='#fa6d8a';setTimeout(()=>document.getElementById('certEmailInput').style.borderColor='',2000);return;}
-  const btn=document.getElementById('payBtn');
-  btn.textContent='Processing...';btn.style.opacity='.7';btn.disabled=true;
-
-  // ── RAZORPAY INTEGRATION ──────────────────────────────────────────
-  // Uncomment below and remove the setTimeout demo block when Razorpay KYC is approved:
-  //
-  // const options={
-  //   key:'rzp_live_YOUR_KEY_ID_HERE',
-  //   amount:1100,
-  //   currency:'INR',
-  //   name:'TypeCert',
-  //   description:'Verified Typing Certificate',
-  //   handler:function(response){
-  //     btn.style.opacity='1';btn.disabled=false;
-  //     showCertificate(name,email);
-  //   },
-  //   prefill:{name:name,email:email},
-  //   theme:{color:'#c8a84b'},
-  //   modal:{ondismiss:function(){btn.textContent='🏆 Pay ₹11 & Download Certificate';btn.style.opacity='1';btn.disabled=false;}}
-  // };
-  // const rzp=new Razorpay(options);rzp.open();
-  // ─────────────────────────────────────────────────────────────────
-
-  // DEMO MODE — remove when Razorpay is live:
-  setTimeout(()=>{showCertificate(name,email);},1500);
-}
-
-function showCertificate(name,email){
-  certId=getCertId();certDate=getDate();
-  const type=document.getElementById('certTypeInput').value;
-  const accNum=parseInt((acc||'94').replace('%',''))||94;
-  const netVal=Math.max(0,Math.round(parseInt(wpm)*accNum/100));
-  const svgHtml=buildGoldCertSVG(name,parseInt(wpm)||47,accNum,netVal,type,certId,certDate);
-  document.getElementById('finalCertSvg').innerHTML=svgHtml;
-  document.getElementById('finalCertSection').classList.add('show');
-  document.getElementById('payBtn').style.display='none';
-  document.getElementById('successState').classList.add('show');
-  document.getElementById('finalCertSection').scrollIntoView({behavior:'smooth',block:'center'});
-}
-
 function downloadCert(){
   const svgEl=document.getElementById('finalCertSvg').querySelector('svg');
   if(!svgEl){alert('Please complete payment first.');return;}
@@ -522,6 +479,9 @@ function copyVerifyLink(){
 // Expose to window for inline onclick handlers
 window.initiatePayment = initiatePayment;
 window.downloadCert = downloadCert;
+window.updateBlurPreview = updateBlurPreview;
+window.shareLinkedIn = shareLinkedIn;
+window.copyVerifyLink = copyVerifyLink;
 </script>
 </body>
 </html>
