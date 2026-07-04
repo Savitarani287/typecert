@@ -353,6 +353,7 @@ async function issueCertificate(name, email, paymentStatus, paymentId){
       certificate_code: certCode,
       user_id: session?.user?.id || null,
       wpm: wpmVal,
+      net_wpm: netVal,
       accuracy: accVal,
       exam_type: type,
       payment_status: paymentStatus,
