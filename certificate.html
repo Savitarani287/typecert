@@ -320,17 +320,17 @@ async function initiatePayment(){
   btn.textContent='Processing…';btn.style.opacity='.7';btn.disabled=true;
 
   // ── RAZORPAY INTEGRATION (uncomment when KYC approved) ────────────
-  // const options={
-  //   key:'rzp_live_YOUR_KEY_ID_HERE',
-  //   amount:1100,currency:'INR',
-  //   name:'TypeCert',description:'Verified Typing Certificate',
-  //   handler:async function(response){
-  //     await issueCertificate(name,email,'paid',response.razorpay_payment_id);
-  //   },
-  //   prefill:{name,email},theme:{color:'#c8a84b'},
-  //   modal:{ondismiss:()=>{btn.textContent='🏆 Pay ₹11 & Download Certificate';btn.style.opacity='1';btn.disabled=false;}}
-  // };
-  // new Razorpay(options).open(); return;
+  const options={
+    key:'rzp_live_T9kNIoEzQrWqpV',
+    amount:1100,currency:'INR',
+    name:'TypeCert',description:'Verified Typing Certificate',
+    handler:async function(response){
+      await issueCertificate(name,email,'paid',response.razorpay_payment_id);
+    },
+    prefill:{name,email},theme:{color:'#c8a84b'},
+    modal:{ondismiss:()=>{btn.textContent='🏆 Pay ₹11 & Download Certificate';btn.style.opacity='1';btn.disabled=false;}}
+  };
+  new Razorpay(options).open(); return;
   // ─────────────────────────────────────────────────────────────────
 
   // DEMO MODE — issues cert with payment_status='demo' until Razorpay is live
