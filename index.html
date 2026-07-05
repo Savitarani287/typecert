@@ -3,25 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TypeCert — Free Typing Test for SSC, Railway & Govt Exams</title>
-<meta name="description" content="Free typing test platform for SSC CHSL, SSC CGL, RRB NTPC, RPSC and all Indian government job aspirants. Practice in English & Hindi. Get a verified certificate.">
-<meta name="keywords" content="typing test, SSC typing test, RRB NTPC typing, RPSC typing test, government job typing, hindi typing test, free typing test india, online typing practice">
-<meta name="author" content="TypeCert">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://typecert-ten.vercel.app/index.html">
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="TypeCert — Free Typing Test for SSC, Railway & Govt Exams">
-<meta property="og:description" content="Free typing test platform for SSC CHSL, SSC CGL, RRB NTPC, RPSC and all Indian government job aspirants. Practice in English & Hindi. Get a verified certificate.">
-<meta property="og:url" content="https://typecert-ten.vercel.app/index.html">
-<meta property="og:image" content="https://typecert-ten.vercel.app/og-image.png">
-<meta property="og:site_name" content="TypeCert">
-<meta property="og:locale" content="en_IN">
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="TypeCert — Free Typing Test for SSC, Railway & Govt Exams">
-<meta name="twitter:description" content="Free typing test platform for SSC CHSL, SSC CGL, RRB NTPC, RPSC and all Indian government job aspirants. Practice in English & Hindi. Get a verified certificate.">
-<meta name="twitter:image" content="https://typecert-ten.vercel.app/og-image.png">
+<title>TypeCert — Type Fast. Get Certified.</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -41,6 +23,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .orb3{width:300px;height:300px;background:#00e5a0;top:50%;left:50%;transform:translate(-50%,-50%)}
 .container{max-width:1100px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
 nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;background:rgba(8,8,16,0.8)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-0.5px;cursor:pointer}
+.logo .t{color:var(--accent)}.logo .c{color:var(--text)}
+.logo-sub{font-size:10px;color:var(--dimmed);font-family:var(--font-mono);letter-spacing:2px;text-transform:uppercase}
 .nav-links{display:flex;align-items:center;gap:32px}
 .nav-link{font-size:14px;color:var(--muted);text-decoration:none;transition:color .2s;cursor:pointer}
 .nav-link:hover{color:var(--text)}
@@ -83,11 +69,8 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .typing-card.active::before{transform:scaleX(1)}
 .strict-badge{position:absolute;top:16px;right:16px;background:rgba(250,109,138,0.12);border:1px solid rgba(250,109,138,0.3);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--accent2);font-family:var(--font-mono);display:none}
 .strict-badge.show{display:block}
-.stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:16px;margin-bottom:28px;align-items:center}
+.stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:28px}
 .stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
-.ambient-toggle{padding:10px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;color:var(--muted);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.ambient-toggle:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
-.ambient-toggle.ambient-on{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
 .stat-val{font-family:var(--font-mono);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
 .stat-val.wpm{color:var(--accent)}.stat-val.acc{color:var(--green)}.stat-val.time{color:var(--accent2)}.stat-val.net{color:var(--yellow)}
 .stat-lbl2{font-size:10px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px}
@@ -100,9 +83,8 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .exam-wrapper.show{display:block}
 .exam-header{background:#1a3a6b;color:white;border-radius:8px 8px 0 0;padding:12px 20px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:space-between;margin:-28px -28px 20px}
 .exam-timer-badge{background:rgba(255,255,255,0.15);border-radius:4px;padding:4px 10px;font-family:monospace;font-size:14px}
-.text-display{font-family:var(--font-mono);font-size:19px;line-height:2.2;letter-spacing:0.2px;height:130px;overflow:hidden;user-select:none;word-break:break-word;position:relative}
+.text-display{font-family:var(--font-mono);font-size:19px;line-height:2;letter-spacing:0.2px;margin-bottom:20px;min-height:130px;user-select:none;word-break:break-word}
 .exam-wrapper .text-display{font-family:'Courier New',monospace;color:#1a1a1a;font-size:18px;line-height:2}
-.typing-area-wrap{position:relative}
 .ch{display:inline}
 .ch.correct{color:var(--green)}.ch.wrong{color:var(--accent2);background:rgba(250,109,138,0.12);border-radius:2px}
 .ch.current{border-left:2.5px solid var(--accent);margin-left:-2.5px;animation:blink 1s step-end infinite}
@@ -112,7 +94,6 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .type-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,0.08)}
 .type-input::placeholder{color:var(--dimmed)}
 .exam-wrapper .type-input{background:#f5f5f5;color:#1a1a1a;border-color:#ddd}
-.type-input-overlay{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:text;font-size:20px;resize:none;border:none;background:transparent;outline:none;z-index:10;}
 .countdown-overlay{position:absolute;inset:0;background:rgba(8,8,16,0.92);display:flex;align-items:center;justify-content:center;border-radius:20px;z-index:10;backdrop-filter:blur(4px)}
 .countdown-num{font-family:var(--font-display);font-size:96px;font-weight:800;color:var(--accent);animation:countAnim 1s ease-out}
 @keyframes countAnim{from{transform:scale(1.5);opacity:0}to{transform:scale(1);opacity:1}}
@@ -239,19 +220,7 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
 .footer-link:hover{color:var(--text)}
 @media(max-width:768px){
   .stats-strip{flex-direction:column}.stat-item{border-right:none;border-bottom:1px solid var(--border)}.stat-item:last-child{border-bottom:none}
-  .testi-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr 1fr}
-  .stats-bar{grid-template-columns:1fr 1fr;gap:10px}.ambient-toggle{grid-column:1/-1}
-  .nav-links{display:none}.cert-features{grid-template-columns:1fr}
-  .hero h1{font-size:42px}.hero-sub{font-size:16px}
-  .hero-actions{flex-direction:column;align-items:center}
-  .btn-hero{width:100%;max-width:300px;text-align:center}
-  .mode-tabs{flex-wrap:wrap}
-  .container{padding:0 16px}
-}
-@media(max-width:480px){
-  .hero h1{font-size:34px}
-  .results-grid{grid-template-columns:1fr}
-  .typing-card-main{padding:20px 16px}
+  .testi-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr 1fr}.stats-bar{grid-template-columns:1fr 1fr}.nav-links{display:none}.cert-features{grid-template-columns:1fr}
 }
 </style>
 <script src="nav.js" defer></script>
@@ -297,8 +266,6 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
     <div class="ctrl-group">
       <button class="ctrl-btn active" onclick="setLang('english',this)" data-lang="english">English</button>
       <button class="ctrl-btn" onclick="setLang('hindi',this)" data-lang="hindi">Hindi</button>
-      <button class="ctrl-btn" onclick="setLang('words',this)" data-lang="words">Words</button>
-      <button class="ctrl-btn" onclick="setLang('sentences',this)" data-lang="sentences">Sentences</button>
       <button class="ctrl-btn" onclick="setLang('numbers',this)" data-lang="numbers">Numbers</button>
     </div>
     <div class="ctrl-group" id="examControls" style="display:none">
@@ -320,7 +287,6 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
       <div class="stat-box"><div class="stat-val net" id="netVal">0</div><div class="stat-lbl2">Net WPM</div></div>
       <div class="stat-box"><div class="stat-val acc" id="accVal">100%</div><div class="stat-lbl2">Accuracy</div></div>
       <div class="stat-box"><div class="stat-val time" id="timerVal">60</div><div class="stat-lbl2">Seconds</div></div>
-      <button class="ambient-toggle" id="ambientBtn" onclick="toggleAmbient(this)">🔇 Hall Sound</button>
     </div>
     <div class="progress-wrap">
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
@@ -328,15 +294,10 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
     </div>
     <div class="exam-wrapper" id="examWrapper">
       <div class="exam-header"><span>SSC CHSL — Typing Test Module</span><span class="exam-timer-badge" id="examTimerBadge">00:60</span></div>
-      <div class="typing-area-wrap" onclick="document.getElementById('typingInput').focus()">
-        <div class="text-display" id="examTextDisplay"></div>
-        <textarea class="type-input-overlay" id="typingInputExam" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-      </div>
+      <div class="text-display" id="examTextDisplay"></div>
     </div>
-    <div class="typing-area-wrap" id="speedTypingWrap" onclick="document.getElementById('typingInput').focus()">
-      <div class="text-display" id="speedTextDisplay"></div>
-      <textarea class="type-input-overlay" id="typingInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-    </div>
+    <div class="text-display" id="speedTextDisplay"></div>
+    <textarea class="type-input" id="typingInput" rows="3" placeholder="Click here and start typing to begin the test..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     <div class="btn-row">
       <button class="btn btn-outline" onclick="resetTest()">↺ Restart</button>
       <button class="btn btn-accent" onclick="resetTest()">New text</button>
@@ -483,103 +444,16 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
 <div class="notif" id="notif"></div>
 
 <script>
-const texts={
-  english:[
-    "The Government of India has launched several initiatives to improve the typing skills of candidates appearing for various competitive examinations. Regular practice on official exam interfaces helps aspirants understand the actual test environment and reduce anxiety. Candidates should focus on accuracy first and then gradually increase their typing speed through daily practice sessions.",
-    "India's railway network is one of the largest in the world carrying millions of passengers every day across thousands of kilometers of track. The Indian Railways employs a large number of people in various technical and non-technical positions requiring different skill sets and qualifications.",
-    "The Staff Selection Commission conducts examinations for recruitment to various posts in different Ministries and Departments of the Government of India. Typing speed and accuracy are essential requirements for several posts in the clerical category and candidates must achieve the minimum required speed to qualify.",
-    "Computer literacy has become an indispensable requirement for employment in modern government offices across India. Data entry operators and lower division clerks are expected to type accurately at a reasonable speed to handle the large volumes of official correspondence generated daily in government offices.",
-    "Success in the SSC examination requires dedication hard work and consistent effort over a long period of time. Candidates must practice typing every single day to achieve the required speed of thirty five words per minute. Regular practice on realistic test interfaces makes a significant difference in final performance.",
-    "Technology has transformed the way we communicate and work in the modern world. Fast and accurate typing is now an essential skill for professionals in every sector from banking to information technology. Government job aspirants must treat typing practice as seriously as any other subject in their preparation.",
-  ],
-  words:"the and for was that with this have from they will each other about which their said also time into just two more when make like can could than after",
-  sentences:[
-    "Type the passage carefully. Focus on accuracy before speed.",
-    "The candidate must achieve minimum typing speed to qualify.",
-    "Practice every day to improve your speed and accuracy.",
-    "Government jobs require strong typing skills and dedication.",
-    "Regular daily practice of thirty minutes improves speed significantly.",
-    "Accuracy is more important than speed in the early stages.",
-    "The railway recruitment board evaluates both speed and accuracy.",
-    "Develop your typing skills to succeed in government examinations.",
-  ],
-  hindi:[
-    "भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं में उपस्थित होने वाले उम्मीदवारों की टाइपिंग कौशल में सुधार के लिए कई महत्वपूर्ण पहल शुरू की हैं। नियमित अभ्यास से उम्मीदवारों को वास्तविक परीक्षा वातावरण को समझने में मदद मिलती है।",
-    "सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में निश्चित रूप से सुधार होगा। नियमित और सही तरीके से अभ्यास करने पर कम समय में अच्छी टाइपिंग स्पीड हासिल की जा सकती है।",
-    "मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से बड़े से बड़ा लक्ष्य भी प्राप्त किया जा सकता है। अपने लक्ष्य को पाने के लिए प्रतिदिन नियमित रूप से अभ्यास करना आवश्यक है।",
-    "कंप्यूटर पर काम करने के लिए टाइपिंग का अच्छा ज्ञान होना आवश्यक है। आज के युग में हर सरकारी और निजी कार्यालय में कंप्यूटर का उपयोग बड़े पैमाने पर किया जाता है।",
-  ],
-  numbers:[
-    "1234 5678 9012 3456 7890 2468 1357 9753 8642 0246 1357 2468 3579 4680 5791 6802 7913 8024 9135 0246 1122 3344 5566 7788 9900 1234 5678 9012 3456 7890",
-    "Phone: 9876543210 Amount: 12500 Date: 15-03-2025 Invoice: 987654 PAN: 456789 Code: 112233 Ref: 778899 Pin: 302001 ID: 445566 Qty: 150 Rate: 250 Total: 37500"
-  ]
-};
-
-function getIndexText(langKey){
-  const target = Math.ceil((totalTime/60)*80*6);
-
-  // Words mode — pick random words and repeat
-  if(langKey==='words'){
-    const wordArr = texts.words.split(' ');
-    let result='';
-    while(result.length < target){
-      const w = wordArr[Math.floor(Math.random()*wordArr.length)];
-      result += (result?' ':'')+w;
-    }
-    return result.trim();
-  }
-
-  // Sentences mode — join sentences
-  if(langKey==='sentences'){
-    return buildIndexText(texts.sentences, target);
-  }
-
-  const pool = Array.isArray(texts[langKey]) ? texts[langKey] : texts.english;
-  return buildIndexText(pool, target);
-}
-
-function buildIndexText(pool, target){
-  const shuffled=[...pool].sort(()=>Math.random()-0.5);
-  let result='', tries=0;
-  while(result.length<target && tries<30){
-    const pick=shuffled[tries%shuffled.length];
-    if(result && !result.endsWith(' ')) result+=' ';
-    result+=pick; tries++;
-  }
-  return result.trim();
-}
+const texts={english:["The quick brown fox jumps over the lazy dog. Government jobs require excellent typing skills and consistent practice is the key to improving speed and accuracy. Every aspirant should practice daily without fail.","India is home to millions of government job aspirants who work tirelessly toward their dreams. Typing speed and accuracy are critical components of many competitive examinations held across the country each year.","Success in the SSC examination requires dedication hard work and consistent effort over a long period. Candidates must practice typing every single day to achieve the required speed of thirty five words per minute.","Technology has transformed the way we communicate and work in the modern world. Fast and accurate typing is now an essential skill for professionals in every sector from banking to information technology.","The railway recruitment board conducts typing tests for various posts across India. Aspirants need to achieve a minimum speed to qualify. Regular practice on realistic test interfaces makes a significant difference."],hindi:["भारत एक महान देश है जहाँ अनेक भाषाएँ और संस्कृतियाँ हैं। सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से गति और सटीकता में सुधार होता है।","मेहनत और लगन से काम करने वाला व्यक्ति हमेशा सफल होता है। एसएससी परीक्षा में अच्छा प्रदर्शन करने के लिए नियमित टाइपिंग अभ्यास बहुत आवश्यक है।"],numbers:["1234 5678 9012 3456 7890 2468 1357 9753 8642 0246 1357 2468 3579 4680 5791 6802 7913 8024 9135 0246","The total amount is 12500 rupees and the invoice number is 987654321. Call 9876543210 for support. Reference code 456789 dated 15 March 2025."]};
 const examData={ssc_chsl:{name:"SSC CHSL",wpm:35,duration:600,lang:"english"},ssc_cgl:{name:"SSC CGL",wpm:35,duration:600,lang:"english"},rrb:{name:"Railway RRB",wpm:30,duration:600,lang:"english"},rpsc:{name:"RPSC LDC",wpm:30,duration:600,lang:"hindi"}};
 const faqs=[{q:"Is the certificate valid for government job applications?",a:"TypeCert certificates are issued as skill verification documents. They are widely accepted as supplementary proof of typing proficiency by coaching centres and private employers. Always check specific exam requirements."},{q:"Why should I pay ₹11 when I can screenshot the preview?",a:"The preview is intentionally blurred with a watermark. The paid certificate includes a unique verification ID recruiters can verify at typecert.in/verify. It's a PDF you can attach to applications, and includes a LinkedIn direct share feature. A screenshot has none of these."},{q:"What is strict mode?",a:"In strict mode, you cannot use the backspace key — exactly like some government exam interfaces. This trains you to type carefully rather than relying on corrections, improving your net WPM score significantly."},{q:"How do I share my speed on social media?",a:"After completing any test, you'll see share buttons for WhatsApp, LinkedIn, Instagram, and Twitter. Each generates a beautiful speed card with your WPM, accuracy, percentile rank, and a challenge link for friends."},{q:"What is net WPM?",a:"Net WPM = Gross WPM minus error penalty. SSC and Railway exams often use net speed for scoring. A high gross WPM with many errors gives a low net WPM — accuracy matters as much as speed."},{q:"Is TypeCert free?",a:"Yes — all practice features are completely free forever. You only pay ₹11 when you want to download a verified certificate. There is no subscription required for practice."}];
 let currentText='',typed=0,correct=0,errors=0,timeLeft=60,totalTime=60,timer=null,started=false,finished=false,lang='english',mode='speed',exam='ssc_chsl',strictMode=false,finalWpm=0,finalAcc=0,finalNet=0,finalTime=0;
-function init(){const bank=getIndexText(lang);currentText=bank;typed=0;correct=0;errors=0;timeLeft=totalTime;started=false;finished=false;if(timer)clearInterval(timer);document.getElementById('typingInput').value='';document.getElementById('typingInput').disabled=false;['wpmVal','netVal'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('accVal').textContent='100%';document.getElementById('timerVal').textContent=timeLeft;document.getElementById('progressFill').style.width='0%';document.getElementById('charsTyped').textContent='0 chars';document.getElementById('errorsCount').textContent='0 errors';document.getElementById('typingCard').classList.remove('active');document.getElementById('resultsSection').classList.remove('show');document.getElementById('certFinal').classList.remove('show');document.getElementById('countdown').style.display='none';renderText();}
+function init(){const bank=texts[lang]||texts.english;currentText=bank[Math.floor(Math.random()*bank.length)];typed=0;correct=0;errors=0;timeLeft=totalTime;started=false;finished=false;if(timer)clearInterval(timer);document.getElementById('typingInput').value='';document.getElementById('typingInput').disabled=false;['wpmVal','netVal'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('accVal').textContent='100%';document.getElementById('timerVal').textContent=timeLeft;document.getElementById('progressFill').style.width='0%';document.getElementById('charsTyped').textContent='0 chars';document.getElementById('errorsCount').textContent='0 errors';document.getElementById('typingCard').classList.remove('active');document.getElementById('resultsSection').classList.remove('show');document.getElementById('certFinal').classList.remove('show');document.getElementById('countdown').style.display='none';renderText();}
 function renderText(){['speedTextDisplay','examTextDisplay'].forEach(id=>{const el=document.getElementById(id);el.innerHTML='';for(let i=0;i<currentText.length;i++){const s=document.createElement('span');s.className='ch'+(i===0?' current':'');s.id=id[0]+i;s.textContent=currentText[i]===' '?'\u00a0':currentText[i];el.appendChild(s);}});document.getElementById('speedTextDisplay').style.display=mode==='exam'?'none':'block';document.getElementById('examWrapper').classList.toggle('show',mode==='exam');}
-document.getElementById('typingInput').addEventListener('input',function(){if(finished)return;if(!started){started=true;document.getElementById('typingCard').classList.add('active');startTimer();}const val=this.value;typed=val.length;correct=0;errors=0;for(let i=0;i<currentText.length;i++){['s','e'].forEach(p=>{const el=document.getElementById(p+i);if(!el)return;el.className='ch';if(i<val.length){if(val[i]===currentText[i]){if(p==='s')correct++;el.classList.add('correct');}else{if(p==='s')errors++;el.classList.add('wrong');}}else if(i===val.length)el.classList.add('current');});}const elapsed=(totalTime-timeLeft)/60;const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;const netWpm=Math.max(0,Math.round(wpm-(errors/(elapsed||0.01))));const acc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('wpmVal').textContent=wpm;document.getElementById('netVal').textContent=netWpm;document.getElementById('accVal').textContent=acc+'%';document.getElementById('progressFill').style.width=Math.min((typed/currentText.length)*100,100)+'%';document.getElementById('charsTyped').textContent=typed+' chars';document.getElementById('errorsCount').textContent=errors+' errors';
-  // Scroll text so current position stays visible
-  const curEl=document.getElementById('s'+typed);
-  if(curEl){const display=document.getElementById('speedTextDisplay');const lineH=parseFloat(getComputedStyle(display).lineHeight)||42;display.scrollTop=Math.max(0,curEl.offsetTop-lineH);}
-  if(typed>=currentText.length)endTest();});
+document.getElementById('typingInput').addEventListener('input',function(){if(finished)return;if(!started){started=true;document.getElementById('typingCard').classList.add('active');startTimer();}const val=this.value;typed=val.length;correct=0;errors=0;for(let i=0;i<currentText.length;i++){['s','e'].forEach(p=>{const el=document.getElementById(p+i);if(!el)return;el.className='ch';if(i<val.length){if(val[i]===currentText[i]){if(p==='s')correct++;el.classList.add('correct');}else{if(p==='s')errors++;el.classList.add('wrong');}}else if(i===val.length)el.classList.add('current');});}const elapsed=(totalTime-timeLeft)/60;const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;const netWpm=Math.max(0,Math.round(wpm-(errors/(elapsed||0.01))));const acc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('wpmVal').textContent=wpm;document.getElementById('netVal').textContent=netWpm;document.getElementById('accVal').textContent=acc+'%';document.getElementById('progressFill').style.width=Math.min((typed/currentText.length)*100,100)+'%';document.getElementById('charsTyped').textContent=typed+' chars';document.getElementById('errorsCount').textContent=errors+' errors';if(typed>=currentText.length)endTest();});
 document.getElementById('typingInput').addEventListener('keydown',function(e){if(strictMode&&e.key==='Backspace')e.preventDefault();});
 function startTimer(){timer=setInterval(()=>{timeLeft--;document.getElementById('timerVal').textContent=timeLeft;document.getElementById('examTimerBadge').textContent='00:'+(timeLeft<10?'0':'')+timeLeft;if(timeLeft<=0)endTest();},1000);}
-function updateStreak(){
-  // Only track streak for logged-in users
-  import('./supabase.js').then(({supabase})=>{
-    supabase.auth.getSession().then(({data:{session}})=>{
-      if(!session) return; // Guest — no streak tracking
-      const today=new Date().toDateString();
-      const last=localStorage.getItem('streak_date_'+session.user.id);
-      const yesterday=new Date(Date.now()-86400000).toDateString();
-      let streak=parseInt(localStorage.getItem('streak')||0);
-      if(last===today){}
-      else if(last===yesterday){streak++;}
-      else{streak=1;}
-      localStorage.setItem('streak',streak);
-      localStorage.setItem('streak_date_'+session.user.id,today);
-      supabase.from('profiles').update({streak}).eq('id',session.user.id).then(()=>{});
-    });
-  }).catch(()=>{});
-}
-
-function endTest(){if(finished)return;finished=true;clearInterval(timer);document.getElementById('typingInput').disabled=true;finalTime=totalTime-timeLeft;const min=finalTime/60;finalWpm=finalTime>0?Math.round((correct/5)/min):0;finalNet=Math.max(0,Math.round(finalWpm-(errors/(min||0.01))));finalAcc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('rWpm').textContent=finalWpm;document.getElementById('rNet').textContent=finalNet;document.getElementById('rAcc').textContent=finalAcc+'%';document.getElementById('rTime').textContent=finalTime+'s';document.getElementById('previewWpm').textContent=finalWpm;document.getElementById('previewAcc').textContent=finalAcc+'%';setPersonality(finalWpm);setPercentile(finalWpm);document.getElementById('resultsSection').classList.add('show');document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'center'});updateStreak();}
+function endTest(){if(finished)return;finished=true;clearInterval(timer);document.getElementById('typingInput').disabled=true;finalTime=totalTime-timeLeft;const min=finalTime/60;finalWpm=finalTime>0?Math.round((correct/5)/min):0;finalNet=Math.max(0,Math.round(finalWpm-(errors/(min||0.01))));finalAcc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('rWpm').textContent=finalWpm;document.getElementById('rNet').textContent=finalNet;document.getElementById('rAcc').textContent=finalAcc+'%';document.getElementById('rTime').textContent=finalTime+'s';document.getElementById('previewWpm').textContent=finalWpm;document.getElementById('previewAcc').textContent=finalAcc+'%';setPersonality(finalWpm);setPercentile(finalWpm);document.getElementById('resultsSection').classList.add('show');document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'center'});}
 function setPersonality(w){let t;if(w<20)t='🐢 Tortoise — keep practicing!';else if(w<35)t='🐌 Slow & steady typist';else if(w<50)t='⌨️ Steady typist';else if(w<70)t='⚡ Speed demon';else t='🔥 Keyboard warrior';document.getElementById('tagText').textContent=t;}
 function setPercentile(w){const p=Math.min(99,Math.round((w/90)*100));document.getElementById('percentileNum').textContent=p+'%';document.getElementById('percentileFill').style.width=p+'%';document.getElementById('percentileText').textContent='Top '+(100-p)+'% of all typists on TypeCert';}
 function setMode(m,btn){mode=m;document.querySelectorAll('.mode-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('examControls').style.display=m==='exam'?'flex':'none';if(m==='exam'){totalTime=examData[exam].duration;lang=examData[exam].lang;}else totalTime=60;resetTest();}
@@ -603,60 +477,13 @@ const faqList=document.getElementById('faqList');
 faqs.forEach(f=>{const item=document.createElement('div');item.className='faq-item';item.innerHTML=`<div class="faq-q">${f.q}<span class="faq-icon">+</span></div><div class="faq-a">${f.a}</div>`;item.querySelector('.faq-q').addEventListener('click',()=>{const o=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>x.classList.remove('open'));if(!o)item.classList.add('open');});faqList.appendChild(item);});
 setInterval(()=>{const el=document.getElementById('liveTests');if(el)el.textContent=(parseInt(el.textContent.replace(/,/g,''))+Math.floor(Math.random()*3+1)).toLocaleString('en-IN');},4000);
 
-// ── Exam Hall Ambient Sound (noise-based realistic keyboard clicks) ──
-let ambientCtx=null, ambientRunning=false, ambientTimeouts=[];
-function getAmbientCtx(){if(!ambientCtx)ambientCtx=new(window.AudioContext||window.webkitAudioContext)();return ambientCtx;}
-function playRealClick(ctx, when, vol=1.0){
-  try{
-    const sr=ctx.sampleRate;
-    // Layer 1: Sharp click transient
-    const cb=ctx.createBuffer(1,Math.floor(sr*0.015),sr),cd=cb.getChannelData(0);
-    for(let i=0;i<cd.length;i++) cd[i]=(Math.random()*2-1)*Math.pow(1-i/cd.length,3);
-    const click=ctx.createBufferSource(); click.buffer=cb;
-    const cf=ctx.createBiquadFilter(); cf.type='highpass'; cf.frequency.value=2000+Math.random()*2000;
-    const cg=ctx.createGain(); cg.gain.setValueAtTime(vol*1.8,when); cg.gain.exponentialRampToValueAtTime(0.001,when+0.015);
-    click.connect(cf); cf.connect(cg); cg.connect(ctx.destination); click.start(when); click.stop(when+0.02);
-    // Layer 2: Body thump
-    const tb=ctx.createBuffer(1,Math.floor(sr*0.06),sr),td=tb.getChannelData(0);
-    for(let i=0;i<td.length;i++) td[i]=(Math.random()*2-1)*Math.pow(1-i/td.length,1.5);
-    const thump=ctx.createBufferSource(); thump.buffer=tb;
-    const tf=ctx.createBiquadFilter(); tf.type='bandpass'; tf.frequency.value=300+Math.random()*400; tf.Q.value=1.5;
-    const tg=ctx.createGain(); tg.gain.setValueAtTime(vol*1.2,when); tg.gain.exponentialRampToValueAtTime(0.001,when+0.06);
-    thump.connect(tf); tf.connect(tg); tg.connect(ctx.destination); thump.start(when); thump.stop(when+0.08);
-    // Layer 3: Room tail
-    const rb=ctx.createBuffer(1,Math.floor(sr*0.12),sr),rd=rb.getChannelData(0);
-    for(let i=0;i<rd.length;i++) rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,4);
-    const tail=ctx.createBufferSource(); tail.buffer=rb;
-    const rf=ctx.createBiquadFilter(); rf.type='bandpass'; rf.frequency.value=800+Math.random()*600; rf.Q.value=3;
-    const rg=ctx.createGain(); rg.gain.setValueAtTime(vol*0.3,when+0.01); rg.gain.exponentialRampToValueAtTime(0.001,when+0.12);
-    tail.connect(rf); rf.connect(rg); rg.connect(ctx.destination); tail.start(when+0.01); tail.stop(when+0.15);
-  }catch(e){}
-}
-function startAmbient(){
-  if(ambientRunning)return;ambientRunning=true;
-  const ctx=getAmbientCtx();if(ctx.state==='suspended')ctx.resume();
-  const typists=[{minMs:70,maxMs:130,vol:1.4},{minMs:90,maxMs:160,vol:1.3},{minMs:110,maxMs:190,vol:1.2},
-    {minMs:130,maxMs:210,vol:1.2},{minMs:140,maxMs:230,vol:1.3},{minMs:160,maxMs:260,vol:1.1},
-    {minMs:150,maxMs:240,vol:1.2},{minMs:180,maxMs:300,vol:1.0},{minMs:200,maxMs:320,vol:1.0},{minMs:100,maxMs:180,vol:1.3}];
-  function sched(t){
-    if(!ambientRunning)return;
-    const id=setTimeout(()=>{
-      if(!ambientRunning)return;
-      const c=getAmbientCtx();
-      playRealClick(c,c.currentTime,t.vol);
-      if(Math.random()<0.15){playRealClick(c,c.currentTime+0.07,t.vol*0.85);if(Math.random()<0.5)playRealClick(c,c.currentTime+0.14,t.vol*0.75);}
-      sched(t);
-    },t.minMs+Math.random()*(t.maxMs-t.minMs));
-    ambientTimeouts.push(id);
-  }
-  typists.forEach((t,i)=>{const id=setTimeout(()=>sched(t),i*80+Math.random()*100);ambientTimeouts.push(id);});
-}
-function stopAmbient(){ambientRunning=false;ambientTimeouts.forEach(t=>clearTimeout(t));ambientTimeouts=[];}
-window.toggleAmbient=function(btn){
-  if(ambientRunning){stopAmbient();btn.textContent='🔇 Hall Sound';btn.classList.remove('ambient-on');}
-  else{startAmbient();btn.textContent='🔊 Hall Sound: ON';btn.classList.add('ambient-on');}
-};
-
+// Pull real test count from Supabase
+import('./supabase.js').then(({supabase})=>{
+  supabase.from('test_results').select('id',{count:'exact',head:true}).then(({count})=>{
+    const el=document.getElementById('liveTests');
+    if(el && count) el.textContent=count.toLocaleString('en-IN');
+  });
+}).catch(()=>{});
 init();
 </script>
 </body>

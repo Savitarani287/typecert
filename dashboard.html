@@ -3,25 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — TypeCert | Your Typing Progress</title>
-<meta name="description" content="Track your typing speed progress, test history, accuracy trends and streaks. Personalized dashboard for government exam preparation.">
-<meta name="keywords" content="typing progress dashboard, WPM tracker, typing speed history, exam preparation tracker">
-<meta name="author" content="TypeCert">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://typecert-ten.vercel.app/dashboard.html">
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="Dashboard — TypeCert | Your Typing Progress">
-<meta property="og:description" content="Track your typing speed progress, test history, accuracy trends and streaks. Personalized dashboard for government exam preparation.">
-<meta property="og:url" content="https://typecert-ten.vercel.app/dashboard.html">
-<meta property="og:image" content="https://typecert-ten.vercel.app/og-image.png">
-<meta property="og:site_name" content="TypeCert">
-<meta property="og:locale" content="en_IN">
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Dashboard — TypeCert | Your Typing Progress">
-<meta name="twitter:description" content="Track your typing speed progress, test history, accuracy trends and streaks. Personalized dashboard for government exam preparation.">
-<meta name="twitter:image" content="https://typecert-ten.vercel.app/og-image.png">
+<title>TypeCert — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -276,85 +258,138 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 </div>
 
 <script type="module">
-import { supabase, requireAuth } from './supabase.js';
+import { supabase } from './supabase.js';
 
-// Redirect to login if not signed in
-const user = await requireAuth();
+// ── Redirect if not logged in ─────────────────────────────────
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) { window.location.href = 'auth.html?next=dashboard.html'; }
 
-// Greeting
+// ── Greeting ──────────────────────────────────────────────────
 const h = new Date().getHours();
 const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long',day:'numeric',month:'long'});
+document.getElementById('dateText').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
 
-// Load profile
+// ── Load profile ──────────────────────────────────────────────
 const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 const displayName = profile?.full_name || profile?.username || user.email.split('@')[0];
 const firstName = displayName.split(' ')[0];
 document.getElementById('greetingText').textContent = `${greeting}, ${firstName}!`;
-if (document.getElementById('profileName')) document.getElementById('profileName').textContent = displayName;
-if (document.getElementById('avatarEl')) {
-  document.getElementById('avatarEl').textContent = displayName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-}
+if(document.getElementById('profileName')) document.getElementById('profileName').textContent = displayName;
+if(document.getElementById('avatarEl')) document.getElementById('avatarEl').textContent = displayName.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
 
-// Load real stats from Supabase
+// ── Load real stats from Supabase ─────────────────────────────
 const { data: results } = await supabase
   .from('test_results')
   .select('wpm, net_wpm, accuracy, created_at, exam_type')
   .eq('user_id', user.id)
   .order('created_at', { ascending: false });
 
+let bestWpm = 0, bestAcc = 0, totalTests = 0, testsToday = 0, streak = 0;
+const chartWeek = [0,0,0,0,0,0,0];
+
 if (results && results.length > 0) {
-  const bestWpm    = Math.max(...results.map(r => r.wpm));
-  const bestAcc    = Math.max(...results.map(r => parseFloat(r.accuracy)));
-  const totalTests = results.length;
-  const today      = new Date().toDateString();
-  const testsToday = results.filter(r => new Date(r.created_at).toDateString() === today).length;
+  bestWpm    = Math.max(...results.map(r => r.wpm));
+  bestAcc    = Math.max(...results.map(r => parseFloat(r.accuracy)));
+  totalTests = results.length;
+  const today = new Date().toDateString();
+  testsToday  = results.filter(r => new Date(r.created_at).toDateString() === today).length;
 
-  document.getElementById('statBestWpm').textContent = bestWpm;
-  document.getElementById('statAccuracy').textContent = bestAcc.toFixed(0) + '%';
-  document.getElementById('statTests').textContent    = totalTests;
-  document.getElementById('statTestsChange').textContent = '↑ +' + testsToday + ' today';
-
-  // Build chart data from last 7 days
-  const last7 = [];
+  // Build last 7 days chart
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const label = d.toLocaleDateString('en-IN', {weekday:'short'}).slice(0,3);
     const dayResults = results.filter(r => new Date(r.created_at).toDateString() === d.toDateString());
-    const avgWpm = dayResults.length ? Math.round(dayResults.reduce((s,r) => s + r.wpm, 0) / dayResults.length) : 0;
-    last7.push({ label, value: avgWpm });
+    chartWeek[6 - i] = dayResults.length ? Math.round(dayResults.reduce((s,r)=>s+r.wpm,0)/dayResults.length) : 0;
   }
-  window._chartData = {
-    week:  { labels: last7.map(d=>d.label),        values: last7.map(d=>d.value || 0) },
-    month: { labels: ['W1','W2','W3','W4'],         values: [0,0,0,0] },
-    all:   { labels: ['Jan','Feb','Mar','Apr','May','Jun'], values: [0,0,0,0,0,0] }
-  };
-} else {
-  // No results yet — show zeros and prompt
-  document.getElementById('statBestWpm').textContent = '—';
-  document.getElementById('statAccuracy').textContent = '—';
-  document.getElementById('statTests').textContent = '0';
-  document.getElementById('statTestsChange').textContent = 'No tests yet';
-  window._chartData = {
-    week:  { labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], values:[0,0,0,0,0,0,0] },
-    month: { labels:['W1','W2','W3','W4'],                      values:[0,0,0,0] },
-    all:   { labels:['Jan','Feb','Mar','Apr','May','Jun'],       values:[0,0,0,0,0,0] }
-  };
 }
 
-// Streak (kept in localStorage as before, real streak coming Day 6)
-const streak = parseInt(localStorage.getItem('streak') || 0);
-document.getElementById('statStreak').textContent = streak;
-if (document.getElementById('streakBig')) document.getElementById('streakBig').textContent = streak;
+// Streak from profile or localStorage
+streak = profile?.streak || parseInt(localStorage.getItem('streak') || 0);
 
-// Avatar
-const name = displayName;
+// Update stat cards
+document.getElementById('statBestWpm').textContent  = bestWpm || '—';
+document.getElementById('statAccuracy').textContent = bestAcc ? bestAcc.toFixed(0)+'%' : '—';
+document.getElementById('statStreak').textContent   = streak;
+document.getElementById('statTests').textContent    = totalTests;
+if(document.getElementById('streakBig')) document.getElementById('streakBig').textContent = streak;
+document.getElementById('statTestsChange').textContent = testsToday > 0 ? `↑ +${testsToday} today` : 'No tests today';
 
-function updateChart(period,btn){
+// ── Chart data ────────────────────────────────────────────────
+const days = [];
+for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toLocaleDateString('en-IN',{weekday:'short'}).slice(0,3));}
+
+window._chartData = {
+  week:  { labels: days, values: chartWeek },
+  month: { labels: ['W1','W2','W3','W4'], values: [0,0,0,0] },
+  all:   { labels: ['Jan','Feb','Mar','Apr','May','Jun'], values: [0,0,0,0,0,0] }
+};
+
+// ── Goals (dynamic based on real data) ───────────────────────
+const goals = [
+  { label:'Reach 60 WPM',   current: Math.min(bestWpm, 60), target: 60,  unit:'WPM' },
+  { label:'Complete 50 tests', current: Math.min(totalTests,50), target: 50, unit:'tests' },
+  { label:'7-day streak',   current: Math.min(streak, 7),   target: 7,   unit:'days' },
+  { label:'Achieve 95% accuracy', current: Math.min(bestAcc||0,95), target: 95, unit:'%' },
+];
+const goalsList = document.getElementById('goalsList');
+if(goalsList){
+  goalsList.innerHTML = goals.map(g => {
+    const pct = Math.min(Math.round((g.current/g.target)*100),100);
+    const color = pct>=100?'#00e5a0':pct>=60?'#7c6dfa':'#f5c518';
+    return `<div class="goal-item">
+      <div class="goal-header"><span class="goal-label">${g.label}</span><span class="goal-progress">${g.current} / ${g.target} ${g.unit}</span></div>
+      <div class="goal-bar"><div class="goal-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div style="text-align:right;font-size:11px;color:var(--dimmed);margin-top:4px">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Certificates ──────────────────────────────────────────────
+const { data: certs } = await supabase
+  .from('certificates')
+  .select('*')
+  .eq('user_id', user.id)
+  .order('issued_at', { ascending: false });
+
+const certCount = document.getElementById('certCount');
+if(certCount) certCount.textContent = certs?.length || 0;
+
+const certList = document.getElementById('certList');
+if(certList && certs && certs.length > 0){
+  certList.innerHTML = certs.map(c => {
+    const date = new Date(c.issued_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    return `<div class="cert-item">
+      <div class="cert-meta"><div class="cert-type">${c.exam_type||'Typing Test'}</div><div class="cert-date">${date} · ${c.certificate_code}</div></div>
+      <div class="cert-wpm">${c.wpm} WPM</div>
+      <div class="cert-actions">
+        <a href="verify.html?id=${c.certificate_code}" class="btn-sm">Verify</a>
+        <button class="btn-sm btn-accent" onclick="window.location.href='certificate.html'">Download</button>
+      </div>
+    </div>`;
+  }).join('');
+} else if(certList){
+  certList.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">No certificates yet. <a href="certificate.html" style="color:var(--accent)">Get your first certificate →</a></div>';
+}
+
+// ── Chart functions ───────────────────────────────────────────
+window.updateChart = function(period, btn) {
   document.querySelectorAll('.chart-filter').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderChart((window._chartData||{})[period] || {labels:[],values:[]});
-}
+};
+
+window.showSection = function(sec) {
+  document.querySelectorAll('.section-pane').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.menu-item').forEach(el=>el.classList.remove('active'));
+  const pane = document.getElementById('section-'+sec);
+  if(pane) pane.classList.add('active');
+  const menu = document.querySelector(`[onclick="showSection('${sec}')"]`);
+  if(menu) menu.classList.add('active');
+};
+
+window.verifyCert = function() { window.location.href = 'verify.html'; };
+window.downloadCert = function() { window.location.href = 'certificate.html'; };
+
+
 
 function renderChart(data){
   const svg=document.getElementById('chartSvg');
@@ -380,7 +415,7 @@ function renderChart(data){
   labelsEl.innerHTML=data.labels.map(l=>`<span class="chart-label">${l}</span>`).join('');
 }
 
-renderChart((window._chartData||{week:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],values:[0,0,0,0,0,0,0]}}).week);
+renderChart(chartData.week);
 
 // Streak grid
 function buildStreakGrid(){
