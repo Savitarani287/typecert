@@ -1,301 +1,797 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TypeCert — Get Your Certificate</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="nav.js" defer></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#080810;--surface:#0f0f1a;--surface2:#16162a;--surface3:#1e1e35;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#7c6dfa;--accent2:#fa6d8a;--green:#00e5a0;--yellow:#f5c518;--text:#f0f0fa;--muted:#8888aa;--dimmed:#4a4a6a;--gold:#c8a84b;--gold2:#f0d882;--gold3:#8a6a10;}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-.orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.12}
-.orb1{width:500px;height:500px;background:#7c6dfa;top:-100px;right:-100px}
-.orb2{width:400px;height:400px;background:#c8a84b;bottom:-100px;left:-100px}
-.container{max-width:960px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeCert — Get Your Certificate</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=EB+Garamond:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="nav.js" defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
 
-/* PAGE HEADER */
-.page-header{padding:48px 0 36px;text-align:center}
-.page-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);border-radius:20px;padding:5px 16px;font-size:11px;color:var(--gold);font-family:'JetBrains Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
-.page-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-1.5px;margin-bottom:8px}
-.page-title span{color:var(--gold)}
-.page-sub{font-size:15px;color:var(--muted);line-height:1.6;max-width:440px;margin:0 auto}
+    :root {
+      --bg: #080810;
+      --surface: #0f0f1a;
+      --surface2: #16162a;
+      --surface3: #1e1e35;
+      --border: rgba(255, 255, 255, 0.07);
+      --border2: rgba(255, 255, 255, 0.12);
+      --accent: #7c6dfa;
+      --accent2: #fa6d8a;
+      --green: #00e5a0;
+      --yellow: #f5c518;
+      --text: #f0f0fa;
+      --muted: #8888aa;
+      --dimmed: #4a4a6a;
+      --gold: #c8a84b;
+      --gold2: #f0d882;
+      --gold3: #8a6a10;
+    }
 
-/* LAYOUT */
-.cert-layout{display:grid;grid-template-columns:1fr 380px;gap:28px;padding-bottom:60px;align-items:start}
+    html {
+      scroll-behavior: smooth
+    }
 
-/* PREVIEW SIDE */
-.preview-wrap{position:relative;border-radius:16px;overflow:hidden;margin-bottom:20px;border:1px solid rgba(200,168,75,0.2)}
-.cert-blurred-wrap{filter:blur(5px);user-select:none;pointer-events:none}
-.cert-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.watermark-text{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:rgba(200,168,75,0.25);transform:rotate(-20deg);letter-spacing:8px;text-transform:uppercase}
-.unlock-btn{background:linear-gradient(135deg,#c8a84b,#f0d882);color:#1a0a00;padding:13px 30px;border-radius:24px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;letter-spacing:0.5px}
-.unlock-btn:hover{transform:translateY(-2px)}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden
+    }
 
-/* FEATURES */
-.features{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.feat-row{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
-.feat-check{width:22px;height:22px;border-radius:50%;background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);flex-shrink:0}
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: .12
+    }
 
-/* PAYMENT CARD */
-.payment-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:sticky;top:90px}
-.payment-header{padding:22px 26px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(200,168,75,0.08),rgba(124,109,250,0.06))}
-.payment-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:4px}
-.payment-sub{font-size:13px;color:var(--muted)}
-.payment-body{padding:24px}
+    .orb1 {
+      width: 500px;
+      height: 500px;
+      background: #7c6dfa;
+      top: -100px;
+      right: -100px
+    }
 
-/* SCORE BOX */
-.score-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:18px}
-.score-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.score-item{text-align:center}
-.score-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;line-height:1;margin-bottom:3px}
-.score-val.wpm{color:var(--accent)}.score-val.acc{color:var(--green)}.score-val.net{color:var(--yellow)}
-.score-lbl{font-size:10px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px}
+    .orb2 {
+      width: 400px;
+      height: 400px;
+      background: #c8a84b;
+      bottom: -100px;
+      left: -100px
+    }
 
-/* FORM */
-.form-group{margin-bottom:14px}
-.form-label{display:block;font-size:11px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
-.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 15px;color:var(--text);font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
-.form-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,75,0.08)}
-.form-input::placeholder{color:var(--dimmed)}
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 28px;
+      position: relative;
+      z-index: 1
+    }
 
-/* PRICE */
-.price-row{background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.price-lbl{font-size:13px;color:var(--muted)}
-.price-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--gold)}
-.price-crossed{font-size:13px;color:var(--dimmed);text-decoration:line-through;margin-right:6px}
+    /* PAGE HEADER */
+    .page-header {
+      padding: 48px 0 36px;
+      text-align: center
+    }
 
-/* PAY BTN */
-.pay-btn{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,#c8a84b,#f0d882);border:none;color:#1a0a00;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;margin-bottom:10px;letter-spacing:0.3px}
-.pay-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(200,168,75,0.3)}
-.pay-safety{text-align:center;font-size:12px;color:var(--dimmed);margin-bottom:14px}
-.pay-methods{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.pay-method{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+    .page-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(200, 168, 75, 0.12);
+      border: 1px solid rgba(200, 168, 75, 0.3);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 11px;
+      color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px
+    }
 
-/* SUCCESS */
-.success-state{display:none;text-align:center;padding:20px 0}
-.success-state.show{display:block}
-.success-icon{font-size:48px;margin-bottom:12px}
-.success-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--gold);margin-bottom:6px}
-.success-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
-.btn{padding:11px 22px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
-.btn-gold{background:linear-gradient(135deg,#c8a84b,#f0d882);color:#1a0a00;font-weight:700}
-.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border2)}.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
-.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 8px
+    }
 
-/* FINAL CERTIFICATE AREA */
-.final-cert-section{display:none;margin-top:32px;margin-bottom:48px}
-.final-cert-section.show{display:block}
-.final-cert-label{text-align:center;font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
-.cert-svg-wrap{border-radius:16px;overflow:hidden;border:1px solid rgba(200,168,75,0.3);margin-bottom:20px}
-.cert-download-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.cert-dl-btn{padding:13px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
-.cert-dl-btn.primary{background:linear-gradient(135deg,#c8a84b,#f0d882);color:#1a0a00}
-.cert-dl-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(200,168,75,0.3)}
-.cert-dl-btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}.cert-dl-btn.secondary:hover{border-color:var(--gold);color:var(--gold)}
+    .page-title span {
+      color: var(--gold)
+    }
 
-@media(max-width:820px){.cert-layout{grid-template-columns:1fr}.payment-card{position:static}}
-</style>
+    .page-sub {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 440px;
+      margin: 0 auto
+    }
+
+    /* LAYOUT */
+    .cert-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 28px;
+      padding-bottom: 60px;
+      align-items: start
+    }
+
+    /* PREVIEW SIDE */
+    .preview-wrap {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid rgba(200, 168, 75, 0.2)
+    }
+
+    .cert-blurred-wrap {
+      filter: blur(5px);
+      user-select: none;
+      pointer-events: none
+    }
+
+    .cert-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px
+    }
+
+    .watermark-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: rgba(200, 168, 75, 0.25);
+      transform: rotate(-20deg);
+      letter-spacing: 8px;
+      text-transform: uppercase
+    }
+
+    .unlock-btn {
+      background: linear-gradient(135deg, #c8a84b, #f0d882);
+      color: #1a0a00;
+      padding: 13px 30px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.5px
+    }
+
+    .unlock-btn:hover {
+      transform: translateY(-2px)
+    }
+
+    /* FEATURES */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    .feat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .feat-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(200, 168, 75, 0.12);
+      border: 1px solid rgba(200, 168, 75, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--gold);
+      flex-shrink: 0
+    }
+
+    /* PAYMENT CARD */
+    .payment-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      position: sticky;
+      top: 90px
+    }
+
+    .payment-header {
+      padding: 22px 26px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(200, 168, 75, 0.08), rgba(124, 109, 250, 0.06))
+    }
+
+    .payment-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 4px
+    }
+
+    .payment-sub {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .payment-body {
+      padding: 24px
+    }
+
+    /* SCORE BOX */
+    .score-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 18px
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px
+    }
+
+    .score-item {
+      text-align: center
+    }
+
+    .score-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 3px
+    }
+
+    .score-val.wpm {
+      color: var(--accent)
+    }
+
+    .score-val.acc {
+      color: var(--green)
+    }
+
+    .score-val.net {
+      color: var(--yellow)
+    }
+
+    .score-lbl {
+      font-size: 10px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    /* FORM */
+    .form-group {
+      margin-bottom: 14px
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      color: var(--dimmed);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 7px
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 15px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+      transition: border-color .2s
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200, 168, 75, 0.08)
+    }
+
+    .form-input::placeholder {
+      color: var(--dimmed)
+    }
+
+    /* PRICE */
+    .price-row {
+      background: rgba(200, 168, 75, 0.06);
+      border: 1px solid rgba(200, 168, 75, 0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px
+    }
+
+    .price-lbl {
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .price-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gold)
+    }
+
+    .price-crossed {
+      font-size: 13px;
+      color: var(--dimmed);
+      text-decoration: line-through;
+      margin-right: 6px
+    }
+
+    /* PAY BTN */
+    .pay-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #c8a84b, #f0d882);
+      border: none;
+      color: #1a0a00;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px
+    }
+
+    .pay-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(200, 168, 75, 0.3)
+    }
+
+    .pay-safety {
+      text-align: center;
+      font-size: 12px;
+      color: var(--dimmed);
+      margin-bottom: 14px
+    }
+
+    .pay-methods {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .pay-method {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    /* SUCCESS */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 20px 0
+    }
+
+    .success-state.show {
+      display: block
+    }
+
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 12px
+    }
+
+    .success-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 6px
+    }
+
+    .success-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.6
+    }
+
+    .btn {
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #c8a84b, #f0d882);
+      color: #1a0a00;
+      font-weight: 700
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2)
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold)
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    /* FINAL CERTIFICATE AREA */
+    .final-cert-section {
+      display: none;
+      margin-top: 32px;
+      margin-bottom: 48px
+    }
+
+    .final-cert-section.show {
+      display: block
+    }
+
+    .final-cert-label {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px
+    }
+
+    .cert-svg-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(200, 168, 75, 0.3);
+      margin-bottom: 20px
+    }
+
+    .cert-download-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .cert-dl-btn {
+      padding: 13px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s
+    }
+
+    .cert-dl-btn.primary {
+      background: linear-gradient(135deg, #c8a84b, #f0d882);
+      color: #1a0a00
+    }
+
+    .cert-dl-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(200, 168, 75, 0.3)
+    }
+
+    .cert-dl-btn.secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border2)
+    }
+
+    .cert-dl-btn.secondary:hover {
+      border-color: var(--gold);
+      color: var(--gold)
+    }
+
+    @media(max-width:820px) {
+      .cert-layout {
+        grid-template-columns: 1fr
+      }
+
+      .payment-card {
+        position: static
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
 
-<div class="container">
-<div class="page-header">
-  <div class="page-tag">Official certificate</div>
-  <h1 class="page-title">Your <span>gold certificate</span> awaits</h1>
-  <p class="page-sub">A premium verified certificate with gold accents. Trusted by recruiters, shareable on LinkedIn, valid forever.</p>
-</div>
-
-<div class="cert-layout">
-
-  <!-- LEFT — PREVIEW -->
-  <div>
-    <div class="preview-wrap">
-      <div class="cert-blurred-wrap" id="blurredCert">
-        <!-- Blurred preview SVG -->
-        <svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
-          <rect width="680" height="430" fill="#fffdf5" rx="14"/>
-          <rect x="1" y="1" width="678" height="428" fill="none" stroke="#c8a84b" stroke-width="1.5" rx="13"/>
-          <rect x="12" y="12" width="656" height="406" fill="none" stroke="#e8d08a" stroke-width="0.5" rx="10"/>
-          <rect x="0" y="0" width="680" height="70" fill="#f9f3dc" rx="14"/>
-          <rect x="0" y="54" width="680" height="16" fill="#f9f3dc"/>
-          <line x1="12" y1="70" x2="668" y2="70" stroke="#c8a84b" stroke-width="0.5"/>
-          <circle cx="340" cy="35" r="20" fill="white" stroke="#c8a84b" stroke-width="1"/>
-          <text x="340" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8a6a10" letter-spacing="1">TYPE</text>
-          <text x="340" y="43" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8a6a10" letter-spacing="1">CERT</text>
-          <text x="80" y="32" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#a08030" letter-spacing="4">TYPECERT</text>
-          <text x="600" y="32" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#a08030" letter-spacing="4">VERIFIED</text>
-          <text x="340" y="62" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#b09040" letter-spacing="4">CERTIFICATE OF ACHIEVEMENT</text>
-          <text x="340" y="103" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#a08040" letter-spacing="2">This is to certify that</text>
-          <rect x="140" y="118" width="400" height="48" fill="#fffdf5" rx="4"/>
-          <text x="340" y="155" text-anchor="middle" font-family="Georgia,serif" font-size="38" fill="#1a1208" font-weight="700" id="blurName">Your Name</text>
-          <line x1="80" y1="167" x2="240" y2="167" stroke="#c8a84b" stroke-width="0.5"/>
-          <polygon points="244,167 252,163 252,171" fill="#c8a84b"/>
-          <polygon points="436,167 428,163 428,171" fill="#c8a84b"/>
-          <line x1="440" y1="167" x2="600" y2="167" stroke="#c8a84b" stroke-width="0.5"/>
-          <text x="340" y="190" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#806030">has successfully completed the typing assessment</text>
-          <rect x="210" y="200" width="260" height="24" fill="none" stroke="#c8a84b" stroke-width="0.5" rx="12"/>
-          <text x="340" y="217" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#8a6a10" letter-spacing="1" id="blurType">SSC CHSL Pattern</text>
-          <rect x="60" y="238" width="560" height="108" fill="#fffbee" rx="10"/>
-          <rect x="60" y="238" width="560" height="108" fill="none" stroke="#d4b060" stroke-width="0.5" rx="10"/>
-          <line x1="247" y1="252" x2="247" y2="332" stroke="#e8d08a" stroke-width="0.5"/>
-          <line x1="433" y1="252" x2="433" y2="332" stroke="#e8d08a" stroke-width="0.5"/>
-          <text x="153" y="294" text-anchor="middle" font-family="Georgia,serif" font-size="44" fill="#b8860b" font-weight="700" id="blurWpm">??</text>
-          <text x="153" y="314" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#a07828" letter-spacing="2">WORDS PER MIN</text>
-          <text x="340" y="294" text-anchor="middle" font-family="Georgia,serif" font-size="44" fill="#1d6b44" font-weight="700" id="blurAcc">??%</text>
-          <text x="340" y="314" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#1d6b44" letter-spacing="2">ACCURACY</text>
-          <text x="527" y="294" text-anchor="middle" font-family="Georgia,serif" font-size="44" fill="#8b4513" font-weight="700" id="blurNet">??</text>
-          <text x="527" y="314" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8b4513" letter-spacing="2">NET SPEED</text>
-          <rect x="60" y="238" width="8" height="8" fill="#c8a84b"/>
-          <rect x="612" y="238" width="8" height="8" fill="#c8a84b"/>
-          <rect x="60" y="338" width="8" height="8" fill="#c8a84b"/>
-          <rect x="612" y="338" width="8" height="8" fill="#c8a84b"/>
-          <line x1="80" y1="370" x2="280" y2="370" stroke="#e0c870" stroke-width="0.5"/>
-          <circle cx="340" cy="370" r="16" fill="white" stroke="#c8a84b" stroke-width="1"/>
-          <text x="340" y="366" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8a6a10" letter-spacing="1">TYPE</text>
-          <text x="340" y="377" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8a6a10" letter-spacing="1">CERT</text>
-          <line x1="400" y1="370" x2="600" y2="370" stroke="#e0c870" stroke-width="0.5"/>
-          <text x="340" y="400" text-anchor="middle" font-family="monospace" font-size="9" fill="#a08040" letter-spacing="1">TCERT-2025-?????</text>
-          <text x="80" y="416" font-family="monospace" font-size="8" fill="#c0a050">typecert.in/verify/TCERT-2025-?????</text>
-        </svg>
-      </div>
-      <div class="cert-overlay">
-        <div class="watermark-text">SAMPLE</div>
-        <button class="unlock-btn" onclick="document.getElementById('certNameInput').focus();document.querySelector('.payment-card').scrollIntoView({behavior:'smooth'})">
-          🔒 Unlock for ₹11 only
-        </button>
-      </div>
+  <div class="container">
+    <div class="page-header">
+      <div class="page-tag">Official certificate</div>
+      <h1 class="page-title">Your <span>gold certificate</span> awaits</h1>
+      <p class="page-sub">A premium verified certificate with gold accents. Trusted by recruiters, shareable on
+        LinkedIn, valid forever.</p>
     </div>
 
-    <div class="features">
-      <div class="feat-row"><div class="feat-check">✓</div>Gold bordered premium design — looks impressive on any resume</div>
-      <div class="feat-row"><div class="feat-check">✓</div>Unique certificate ID — recruiters can verify instantly at typecert.in</div>
-      <div class="feat-row"><div class="feat-check">✓</div>High resolution PDF — attach to any job application</div>
-      <div class="feat-row"><div class="feat-check">✓</div>One-click LinkedIn share — adds directly to your profile</div>
-      <div class="feat-row"><div class="feat-check">✓</div>Valid forever — never expires</div>
-    </div>
-  </div>
+    <div class="cert-layout">
 
-  <!-- RIGHT — PAYMENT -->
-  <div>
-    <div class="payment-card">
-      <div class="payment-header">
-        <div class="payment-title">Get your certificate</div>
-        <div class="payment-sub">Fill details → Pay ₹11 → Download instantly</div>
-      </div>
-      <div class="payment-body">
-
-        <div class="score-box">
-          <div style="font-size:10px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:10px;text-align:center">Your test result</div>
-          <div class="score-grid">
-            <div class="score-item"><div class="score-val wpm" id="scoreWpm">—</div><div class="score-lbl">WPM</div></div>
-            <div class="score-item"><div class="score-val acc" id="scoreAcc">—</div><div class="score-lbl">Accuracy</div></div>
-            <div class="score-item"><div class="score-val net" id="scoreNet">—</div><div class="score-lbl">Net WPM</div></div>
+      <!-- LEFT — PREVIEW -->
+      <div>
+        <div class="preview-wrap">
+          <div class="cert-blurred-wrap" id="blurredCert">
+            <!-- Blurred preview SVG -->
+            <svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
+              <rect width="680" height="430" fill="#fffdf5" rx="14" />
+              <rect x="1" y="1" width="678" height="428" fill="none" stroke="#c8a84b" stroke-width="1.5" rx="13" />
+              <rect x="12" y="12" width="656" height="406" fill="none" stroke="#e8d08a" stroke-width="0.5" rx="10" />
+              <rect x="0" y="0" width="680" height="70" fill="#f9f3dc" rx="14" />
+              <rect x="0" y="54" width="680" height="16" fill="#f9f3dc" />
+              <line x1="12" y1="70" x2="668" y2="70" stroke="#c8a84b" stroke-width="0.5" />
+              <circle cx="340" cy="35" r="20" fill="white" stroke="#c8a84b" stroke-width="1" />
+              <text x="340" y="30" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8a6a10"
+                letter-spacing="1">TYPE</text>
+              <text x="340" y="43" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8a6a10"
+                letter-spacing="1">CERT</text>
+              <text x="80" y="32" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#a08030"
+                letter-spacing="4">TYPECERT</text>
+              <text x="600" y="32" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#a08030"
+                letter-spacing="4">VERIFIED</text>
+              <text x="340" y="62" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#b09040"
+                letter-spacing="4">CERTIFICATE OF ACHIEVEMENT</text>
+              <text x="340" y="103" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#a08040"
+                letter-spacing="2">This is to certify that</text>
+              <rect x="140" y="118" width="400" height="48" fill="#fffdf5" rx="4" />
+              <text x="340" y="155" text-anchor="middle" font-family="Georgia,serif" font-size="38" fill="#1a1208"
+                font-weight="700" id="blurName">Your Name</text>
+              <line x1="80" y1="167" x2="240" y2="167" stroke="#c8a84b" stroke-width="0.5" />
+              <polygon points="244,167 252,163 252,171" fill="#c8a84b" />
+              <polygon points="436,167 428,163 428,171" fill="#c8a84b" />
+              <line x1="440" y1="167" x2="600" y2="167" stroke="#c8a84b" stroke-width="0.5" />
+              <text x="340" y="190" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#806030">has
+                successfully completed the typing assessment</text>
+              <rect x="210" y="200" width="260" height="24" fill="none" stroke="#c8a84b" stroke-width="0.5" rx="12" />
+              <text x="340" y="217" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="#8a6a10"
+                letter-spacing="1" id="blurType">SSC CHSL Pattern</text>
+              <rect x="60" y="238" width="560" height="108" fill="#fffbee" rx="10" />
+              <rect x="60" y="238" width="560" height="108" fill="none" stroke="#d4b060" stroke-width="0.5" rx="10" />
+              <line x1="247" y1="252" x2="247" y2="332" stroke="#e8d08a" stroke-width="0.5" />
+              <line x1="433" y1="252" x2="433" y2="332" stroke="#e8d08a" stroke-width="0.5" />
+              <text x="153" y="294" text-anchor="middle" font-family="Georgia,serif" font-size="44" fill="#b8860b"
+                font-weight="700" id="blurWpm">??</text>
+              <text x="153" y="314" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#a07828"
+                letter-spacing="2">WORDS PER MIN</text>
+              <text x="340" y="294" text-anchor="middle" font-family="Georgia,serif" font-size="44" fill="#1d6b44"
+                font-weight="700" id="blurAcc">??%</text>
+              <text x="340" y="314" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#1d6b44"
+                letter-spacing="2">ACCURACY</text>
+              <text x="527" y="294" text-anchor="middle" font-family="Georgia,serif" font-size="44" fill="#8b4513"
+                font-weight="700" id="blurNet">??</text>
+              <text x="527" y="314" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8b4513"
+                letter-spacing="2">NET SPEED</text>
+              <rect x="60" y="238" width="8" height="8" fill="#c8a84b" />
+              <rect x="612" y="238" width="8" height="8" fill="#c8a84b" />
+              <rect x="60" y="338" width="8" height="8" fill="#c8a84b" />
+              <rect x="612" y="338" width="8" height="8" fill="#c8a84b" />
+              <line x1="80" y1="370" x2="280" y2="370" stroke="#e0c870" stroke-width="0.5" />
+              <circle cx="340" cy="370" r="16" fill="white" stroke="#c8a84b" stroke-width="1" />
+              <text x="340" y="366" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8a6a10"
+                letter-spacing="1">TYPE</text>
+              <text x="340" y="377" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#8a6a10"
+                letter-spacing="1">CERT</text>
+              <line x1="400" y1="370" x2="600" y2="370" stroke="#e0c870" stroke-width="0.5" />
+              <text x="340" y="400" text-anchor="middle" font-family="monospace" font-size="9" fill="#a08040"
+                letter-spacing="1">TCERT-2025-?????</text>
+              <text x="80" y="416" font-family="monospace" font-size="8"
+                fill="#c0a050">typecert.in/verify/TCERT-2025-?????</text>
+            </svg>
+          </div>
+          <div class="cert-overlay">
+            <div class="watermark-text">SAMPLE</div>
+            <button class="unlock-btn"
+              onclick="document.getElementById('certNameInput').focus();document.querySelector('.payment-card').scrollIntoView({behavior:'smooth'})">
+              🔒 Unlock for ₹11 only
+            </button>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Full name (appears on certificate)</label>
-          <input class="form-input" id="certNameInput" type="text" placeholder="e.g. Savita Rani" maxlength="50" oninput="updateBlurPreview()">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email address</label>
-          <input class="form-input" id="certEmailInput" type="email" placeholder="yourname@gmail.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Exam type</label>
-          <select class="form-input" id="certTypeInput">
-            <option>SSC CHSL Pattern</option>
-            <option>SSC CGL Pattern</option>
-            <option>Railway RRB Pattern</option>
-            <option>RPSC LDC Pattern</option>
-            <option>Speed Mode</option>
-          </select>
-        </div>
-
-        <div class="price-row">
-          <div class="price-lbl">Certificate download</div>
-          <div><span class="price-crossed">₹99</span><span class="price-val">₹11</span></div>
-        </div>
-
-        <button class="pay-btn" id="payBtn" onclick="initiatePayment()">
-          🏆 Pay ₹11 & Download Certificate
-        </button>
-        <div class="pay-safety">🔒 Secure payment via Razorpay</div>
-        <div class="pay-methods">
-          <span class="pay-method">UPI</span>
-          <span class="pay-method">Card</span>
-          <span class="pay-method">Netbanking</span>
-          <span class="pay-method">Wallet</span>
-        </div>
-
-        <div class="success-state" id="successState">
-          <div class="success-icon">🎉</div>
-          <div class="success-title">Payment successful!</div>
-          <div class="success-sub">Your gold certificate is ready below. Download or share it directly to LinkedIn.</div>
-          <div class="btn-row">
-            <button class="btn btn-gold" onclick="downloadCert()">⬇ Download PDF</button>
-            <button class="btn btn-outline" onclick="shareLinkedIn()">💼 LinkedIn</button>
+        <div class="features">
+          <div class="feat-row">
+            <div class="feat-check">✓</div>Gold bordered premium design — looks impressive on any resume
+          </div>
+          <div class="feat-row">
+            <div class="feat-check">✓</div>Unique certificate ID — recruiters can verify instantly at typecert.in
+          </div>
+          <div class="feat-row">
+            <div class="feat-check">✓</div>High resolution PDF — attach to any job application
+          </div>
+          <div class="feat-row">
+            <div class="feat-check">✓</div>One-click LinkedIn share — adds directly to your profile
+          </div>
+          <div class="feat-row">
+            <div class="feat-check">✓</div>Valid forever — never expires
           </div>
         </div>
+      </div>
 
+      <!-- RIGHT — PAYMENT -->
+      <div>
+        <div class="payment-card">
+          <div class="payment-header">
+            <div class="payment-title">Get your certificate</div>
+            <div class="payment-sub">Fill details → Pay ₹11 → Download instantly</div>
+          </div>
+          <div class="payment-body">
+
+            <div class="score-box">
+              <div
+                style="font-size:10px;color:var(--dimmed);text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:10px;text-align:center">
+                Your test result</div>
+              <div class="score-grid">
+                <div class="score-item">
+                  <div class="score-val wpm" id="scoreWpm">—</div>
+                  <div class="score-lbl">WPM</div>
+                </div>
+                <div class="score-item">
+                  <div class="score-val acc" id="scoreAcc">—</div>
+                  <div class="score-lbl">Accuracy</div>
+                </div>
+                <div class="score-item">
+                  <div class="score-val net" id="scoreNet">—</div>
+                  <div class="score-lbl">Net WPM</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Full name (appears on certificate)</label>
+              <input class="form-input" id="certNameInput" type="text" placeholder="e.g. Savita Rani" maxlength="50"
+                oninput="updateBlurPreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email address</label>
+              <input class="form-input" id="certEmailInput" type="email" placeholder="yourname@gmail.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Exam type</label>
+              <select class="form-input" id="certTypeInput">
+                <option>SSC CHSL Pattern</option>
+                <option>SSC CGL Pattern</option>
+                <option>Railway RRB Pattern</option>
+                <option>RPSC LDC Pattern</option>
+                <option>Speed Mode</option>
+              </select>
+            </div>
+
+            <div class="price-row">
+              <div class="price-lbl">Certificate download</div>
+              <div><span class="price-crossed">₹99</span><span class="price-val">₹11</span></div>
+            </div>
+
+            <button class="pay-btn" id="payBtn" onclick="initiatePayment()">
+              🏆 Pay ₹11 & Download Certificate
+            </button>
+            <div class="pay-safety">🔒 Secure payment via Razorpay</div>
+            <div class="pay-methods">
+              <span class="pay-method">UPI</span>
+              <span class="pay-method">Card</span>
+              <span class="pay-method">Netbanking</span>
+              <span class="pay-method">Wallet</span>
+            </div>
+
+            <div class="success-state" id="successState">
+              <div class="success-icon">🎉</div>
+              <div class="success-title">Payment successful!</div>
+              <div class="success-sub">Your gold certificate is ready below. Download or share it directly to LinkedIn.
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-gold" onclick="downloadCert()">⬇ Download PDF</button>
+                <button class="btn btn-outline" onclick="shareLinkedIn()">💼 LinkedIn</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- FINAL CERTIFICATE -->
+    <div class="final-cert-section" id="finalCertSection">
+      <div class="final-cert-label">Your verified certificate</div>
+      <div class="cert-svg-wrap" id="finalCertSvg"></div>
+      <div class="cert-download-row">
+        <button class="cert-dl-btn primary" onclick="downloadCert()">⬇ Download PDF Certificate</button>
+        <button class="cert-dl-btn secondary" onclick="shareLinkedIn()">💼 Share on LinkedIn</button>
+        <button class="cert-dl-btn secondary" onclick="copyVerifyLink()">🔗 Copy verify link</button>
+      </div>
+    </div>
+
   </div>
-</div>
 
-<!-- FINAL CERTIFICATE -->
-<div class="final-cert-section" id="finalCertSection">
-  <div class="final-cert-label">Your verified certificate</div>
-  <div class="cert-svg-wrap" id="finalCertSvg"></div>
-  <div class="cert-download-row">
-    <button class="cert-dl-btn primary" onclick="downloadCert()">⬇ Download PDF Certificate</button>
-    <button class="cert-dl-btn secondary" onclick="shareLinkedIn()">💼 Share on LinkedIn</button>
-    <button class="cert-dl-btn secondary" onclick="copyVerifyLink()">🔗 Copy verify link</button>
-  </div>
-</div>
+  <script type="module">
+    import { supabase } from './supabase.js';
 
-</div>
+    // Redirect to login if not logged in — can't issue certificate to anonymous
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      window.location.href = 'auth.html?next=certificate.html';
+    }
 
-<script type="module">
-import { supabase } from './supabase.js';
+    const params = new URLSearchParams(window.location.search);
+    const wpm = params.get('wpm') || localStorage.getItem('lastWpm') || '0';
+    const acc = params.get('acc') || localStorage.getItem('lastAcc') || '100%';
+    const net = params.get('net') || localStorage.getItem('lastNet') || '0';
 
-// Redirect to login if not logged in — can't issue certificate to anonymous
-const { data: { user } } = await supabase.auth.getUser();
-if (!user) {
-  window.location.href = 'auth.html?next=certificate.html';
-}
+    document.getElementById('scoreWpm').textContent = wpm;
+    document.getElementById('scoreAcc').textContent = acc;
+    document.getElementById('scoreNet').textContent = net;
 
-const params=new URLSearchParams(window.location.search);
-const wpm=params.get('wpm')||localStorage.getItem('lastWpm')||'0';
-const acc=params.get('acc')||localStorage.getItem('lastAcc')||'100%';
-const net=params.get('net')||localStorage.getItem('lastNet')||'0';
+    document.getElementById('blurWpm').textContent = wpm;
+    document.getElementById('blurAcc').textContent = acc;
+    document.getElementById('blurNet').textContent = net;
 
-document.getElementById('scoreWpm').textContent=wpm;
-document.getElementById('scoreAcc').textContent=acc;
-document.getElementById('scoreNet').textContent=net;
+    function updateBlurPreview() {
+      const name = document.getElementById('certNameInput').value || 'Your Name';
+      const el = document.getElementById('blurName');
+      if (el) el.textContent = name;
+    }
 
-document.getElementById('blurWpm').textContent=wpm;
-document.getElementById('blurAcc').textContent=acc;
-document.getElementById('blurNet').textContent=net;
+    // Expose all onclick functions to window (required for module scripts)
+    function getDate() { return new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }); }
 
-function updateBlurPreview(){
-  const name=document.getElementById('certNameInput').value||'Your Name';
-  const el=document.getElementById('blurName');
-  if(el)el.textContent=name;
-}
+    let certId = '', certDate = '', paymentDone = false;
 
-function getCertId(){return'TCERT-2025-'+String(Math.floor(Math.random()*99999)).padStart(5,'0');}
-function getDate(){return new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});}
-
-let certId='',certDate='',paymentDone=false;
-
-function buildGoldCertSVG(name,wpm,acc,net,type,certId,date){
-  return `<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
+    function buildGoldCertSVG(name, wpm, acc, net, type, certId, date) {
+      return `<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
 <rect width="680" height="430" fill="#fffdf5" rx="14"/>
 <rect x="1" y="1" width="678" height="428" fill="none" stroke="#c8a84b" stroke-width="1.5" rx="13"/>
 <rect x="12" y="12" width="656" height="406" fill="none" stroke="#e8d08a" stroke-width="0.5" rx="10"/>
@@ -352,73 +848,125 @@ function buildGoldCertSVG(name,wpm,acc,net,type,certId,date){
 <text x="80" y="418" font-family="monospace" font-size="8" fill="#c0a050">Issued: ${date}</text>
 <text x="600" y="418" text-anchor="end" font-family="monospace" font-size="8" fill="#c0a050">typecert.in/verify/${certId}</text>
 </svg>`;
-}
+    }
 
-function initiatePayment(){
-  const name=document.getElementById('certNameInput').value.trim();
-  const email=document.getElementById('certEmailInput').value.trim();
-  if(!name){document.getElementById('certNameInput').focus();document.getElementById('certNameInput').style.borderColor='#fa6d8a';setTimeout(()=>document.getElementById('certNameInput').style.borderColor='',2000);return;}
-  if(!email||!email.includes('@')){document.getElementById('certEmailInput').focus();document.getElementById('certEmailInput').style.borderColor='#fa6d8a';setTimeout(()=>document.getElementById('certEmailInput').style.borderColor='',2000);return;}
-  const btn=document.getElementById('payBtn');
-  btn.textContent='Processing...';btn.style.opacity='.7';btn.disabled=true;
+    function getCertCode() {
+      const year = new Date().getFullYear();
+      const rand = String(Math.floor(Math.random() * 99999)).padStart(5, '0');
+      return `TCERT-${year}-${rand}`;
+    }
+    function getDate() { return new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }); }
 
-  // ── RAZORPAY INTEGRATION ──────────────────────────────────────────
-  // Uncomment below and remove the setTimeout demo block when Razorpay KYC is approved:
-  //
-  const options={
-    key:'rzp_live_T9kNIoEzQrWqpV',
-    amount:1100,
-    currency:'INR',
-    name:'TypeCert',
-    description:'Verified Typing Certificate',
-    handler:function(response){
-      btn.style.opacity='1';btn.disabled=false;
-      showCertificate(name,email);
-    },
-    prefill:{name:name,email:email},
-    theme:{color:'#c8a84b'},
-    modal:{ondismiss:function(){btn.textContent='🏆 Pay ₹11 & Download Certificate';btn.style.opacity='1';btn.disabled=false;}}
-  };
-  const rzp=new Razorpay(options);rzp.open();
-  // ─────────────────────────────────────────────────────────────────
+    // let certId='',certDate='';
 
-  // DEMO MODE — remove when Razorpay is live:
-  setTimeout(()=>{showCertificate(name,email);},1500);
-}
+    async function initiatePayment() {
+      const name = document.getElementById('certNameInput').value.trim();
+      const email = document.getElementById('certEmailInput').value.trim();
+      if (!name) { document.getElementById('certNameInput').focus(); document.getElementById('certNameInput').style.borderColor = '#fa6d8a'; setTimeout(() => document.getElementById('certNameInput').style.borderColor = '', 2000); return; }
+      if (!email || !email.includes('@')) { document.getElementById('certEmailInput').focus(); document.getElementById('certEmailInput').style.borderColor = '#fa6d8a'; setTimeout(() => document.getElementById('certEmailInput').style.borderColor = '', 2000); return; }
 
-function showCertificate(name,email){
-  certId=getCertId();certDate=getDate();
-  const type=document.getElementById('certTypeInput').value;
-  const accNum=parseInt((acc||'94').replace('%',''))||94;
-  const netVal=Math.max(0,Math.round(parseInt(wpm)*accNum/100));
-  const svgHtml=buildGoldCertSVG(name,parseInt(wpm)||47,accNum,netVal,type,certId,certDate);
-  document.getElementById('finalCertSvg').innerHTML=svgHtml;
-  document.getElementById('finalCertSection').classList.add('show');
-  document.getElementById('payBtn').style.display='none';
-  document.getElementById('successState').classList.add('show');
-  document.getElementById('finalCertSection').scrollIntoView({behavior:'smooth',block:'center'});
-}
+      const btn = document.getElementById('payBtn');
+      btn.textContent = 'Opening payment…'; btn.style.opacity = '.7'; btn.disabled = true;
 
-function downloadCert(){
-  const svgEl=document.getElementById('finalCertSvg').querySelector('svg');
-  if(!svgEl){alert('Please complete payment first.');return;}
-  const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head>
+      const options = {
+        key: 'rzp_live_T9kNIoEzQrWqpV', // ← paste your live key here
+        amount: 1100,
+        currency: 'INR',
+        name: 'TypeCert',
+        description: 'Verified Typing Speed Certificate',
+        prefill: { name, email },
+        theme: { color: '#c8a84b' },
+        handler: async function (response) {
+          btn.textContent = 'Generating certificate…';
+          await issueCertificate(name, email, 'paid', response.razorpay_payment_id);
+        },
+        modal: {
+          ondismiss: function () {
+            btn.textContent = '🏆 Pay ₹11 & Download Certificate';
+            btn.style.opacity = '1'; btn.disabled = false;
+          }
+        }
+      };
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function (r) {
+        btn.textContent = '🏆 Pay ₹11 & Download Certificate';
+        btn.style.opacity = '1'; btn.disabled = false;
+        alert('Payment failed: ' + r.error.description);
+      });
+      rzp.open();
+    }
+
+    async function issueCertificate(name, email, paymentStatus, paymentId) {
+      const btn = document.getElementById('payBtn');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const certCode = getCertCode();
+        const type = document.getElementById('certTypeInput').value;
+        const wpmVal = parseInt(wpm) || 0;
+        const accVal = parseInt((acc || '100').replace('%', '')) || 100;
+        const netVal = Math.max(0, Math.round(wpmVal * (accVal / 100)));
+
+        const { error } = await supabase.from('certificates').insert({
+          certificate_code: certCode,
+          user_id: session?.user?.id || null,
+          wpm: wpmVal, net_wpm: netVal, accuracy: accVal,
+          exam_type: type, payment_status: paymentStatus,
+          candidate_name: name, candidate_email: email,
+          issued_at: new Date().toISOString()
+        });
+        if (error) throw error;
+
+        certId = certCode; certDate = getDate();
+        showCertFinal(name, wpmVal, accVal, netVal, type, certCode, certDate);
+      } catch (e) {
+        console.error('Certificate issue failed:', e.message);
+        // Fallback — show cert anyway
+        certId = getCertCode(); certDate = getDate();
+        const type = document.getElementById('certTypeInput').value;
+        const wpmVal = parseInt(wpm) || 0, accVal = parseInt((acc || '100').replace('%', '')) || 100;
+        showCertFinal(name, wpmVal, accVal, Math.round(wpmVal * (accVal / 100)), type, certId, certDate);
+      }
+    }
+
+    function showCertFinal(name, wpmVal, accVal, netVal, type, certCode, date) {
+      const svgHtml = buildGoldCertSVG(name, wpmVal, accVal, netVal, type, certCode, date);
+      document.getElementById('finalCertSvg').innerHTML = svgHtml;
+      document.getElementById('finalCertSection').classList.add('show');
+      document.getElementById('payBtn').style.display = 'none';
+      document.getElementById('successState').classList.add('show');
+      document.getElementById('finalCertSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const urlEl = document.getElementById('verifyUrlDisplay');
+      if (urlEl) urlEl.textContent = window.location.origin + '/verify.html?id=' + certCode;
+    }
+
+    function downloadCert() {
+      const svgEl = document.getElementById('finalCertSvg').querySelector('svg');
+      if (!svgEl) { alert('Please complete payment first.'); return; }
+      const w = window.open('', '_blank');
+      w.document.write(`<!DOCTYPE html><html><head>
   <title>TypeCert Certificate — ${certId}</title>
   <style>*{margin:0;padding:0;box-sizing:border-box}body{background:#f5f0e0;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px}svg{max-width:800px;width:100%;border-radius:14px;box-shadow:0 20px 60px rgba(200,168,75,0.2)}</style>
   </head><body>${svgEl.outerHTML}</body></html>`);
-  w.document.close();setTimeout(()=>w.print(),600);
-}
+      w.document.close(); setTimeout(() => w.print(), 600);
+    }
 
-function shareLinkedIn(){window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent('https://typecert.in/verify/'+certId),'_blank');}
+    function shareLinkedIn() { window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://typecert.in/verify/' + certId), '_blank'); }
 
-function copyVerifyLink(){
-  const link='https://typecert.in/verify/'+certId;
-  navigator.clipboard.writeText(link).then(()=>{
-    const btn=event.currentTarget;const orig=btn.textContent;
-    btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent=orig,2000);
-  });
-}
-</script>
+    function copyVerifyLink() {
+      const link = 'https://typecert.in/verify/' + certId;
+      navigator.clipboard.writeText(link).then(() => {
+        const btn = event.currentTarget; const orig = btn.textContent;
+        btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
+
+    // Expose all onclick functions to window
+    window.initiatePayment = initiatePayment;
+    window.downloadCert = downloadCert;
+    window.updateBlurPreview = updateBlurPreview;
+    window.shareLinkedIn = shareLinkedIn;
+    window.copyVerifyLink = copyVerifyLink;
+  </script>
 </body>
+
 </html>

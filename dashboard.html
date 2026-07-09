@@ -142,7 +142,7 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
   <div class="sidebar">
     <div class="profile-card">
       <div class="avatar" id="avatarEl">S</div>
-      <div class="profile-name" id="profileName">Savita Rani</div>
+      <div class="profile-name" id="profileName">Loading…</div>
       <div class="profile-role">SSC Aspirant • Jaipur</div>
       <div class="profile-badge">⚡ Speed Demon</div>
     </div>
@@ -435,55 +435,70 @@ function buildStreakGrid(){
 }
 buildStreakGrid();
 
-// Certificates
-function buildCerts(){
+// Certificates — load from Supabase
+async function buildCerts(){
   const grid=document.getElementById('certsGrid');
-  const certs=[
-    {name:'Savita Rani',wpm:47,type:'Speed Mode — 1 Min English',date:'15 May 2025',id:'TCERT-2025-00847'},
-    {name:'Savita Rani',wpm:42,type:'SSC CHSL Pattern — 10 Min',date:'12 May 2025',id:'TCERT-2025-00731'}
-  ];
-  if(certs.length===0){
-    grid.innerHTML=`<div class="empty-state" style="grid-column:span 3"><div class="empty-icon">🏆</div><div class="empty-title">No certificates yet</div><div class="empty-sub">Complete a test and pay ₹11 to get your first certificate</div><button class="btn btn-accent" onclick="window.location.href='index.html'">Take a test now</button></div>`;
-    return;
-  }
-  certs.forEach(c=>{
-    const card=document.createElement('div');card.className='cert-card';
-    card.innerHTML=`
-      <div class="cert-thumb">
-        <div class="cert-thumb-logo">TypeCert</div>
-        <div class="cert-thumb-name">${c.name}</div>
-        <div class="cert-thumb-wpm">${c.wpm}</div>
-        <div class="cert-thumb-lbl">WPM</div>
-      </div>
-      <div class="cert-info">
-        <div class="cert-type">${c.type}</div>
-        <div class="cert-date">${c.date} • ${c.id}</div>
-        <div class="cert-actions">
-          <button class="cert-action-btn" onclick="verifyCert('${c.id}')">Verify</button>
-          <button class="cert-action-btn primary" onclick="downloadCert('${c.id}')">Download</button>
+  grid.innerHTML='<div style="color:var(--muted);padding:20px">Loading…</div>';
+  try{
+    const{data:certs,error}=await supabase.from('certificates').select('*')
+      .eq('user_id',(await supabase.auth.getUser()).data.user.id)
+      .order('issued_at',{ascending:false});
+    if(error)throw error;
+    if(!certs||certs.length===0){
+      grid.innerHTML=`<div class="empty-state" style="grid-column:span 3"><div class="empty-icon">🏆</div><div class="empty-title">No certificates yet</div><div class="empty-sub">Complete a test and pay ₹11 to get your first certificate</div><button class="btn btn-accent" onclick="window.location.href='index.html'">Take a test now</button></div>`;
+      return;
+    }
+    document.getElementById('certCount').textContent=certs.length;
+    grid.innerHTML='';
+    certs.forEach(c=>{
+      const date=new Date(c.issued_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      const card=document.createElement('div');card.className='cert-card';
+      card.innerHTML=`
+        <div class="cert-thumb">
+          <div class="cert-thumb-logo">TypeCert</div>
+          <div class="cert-thumb-name">${c.candidate_name||'Candidate'}</div>
+          <div class="cert-thumb-wpm">${c.wpm}</div>
+          <div class="cert-thumb-lbl">WPM</div>
         </div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-  document.getElementById('certCount').textContent=certs.length;
+        <div class="cert-info">
+          <div class="cert-type">${c.exam_type||'Typing Test'}</div>
+          <div class="cert-date">${date} · ${c.certificate_code}</div>
+          <div class="cert-actions">
+            <button class="cert-action-btn" onclick="window.open('verify.html?id=${c.certificate_code}','_blank')">Verify</button>
+            <button class="cert-action-btn primary" onclick="window.location.href='certificate.html'">Download</button>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }catch(e){
+    grid.innerHTML='<div style="color:var(--muted);padding:20px">Could not load certificates.</div>';
+  }
 }
 buildCerts();
 
-// Goals
-function buildGoals(){
-  const goals=[
-    {label:'Reach 50 WPM',current:47,target:50,unit:'WPM'},
-    {label:'Complete 50 tests',current:28,target:50,unit:'tests'},
-    {label:'Maintain 7-day streak',current:streak,target:7,unit:'days'},
-    {label:'Achieve 95% accuracy',current:94,target:95,unit:'%'}
-  ];
+// Goals — dynamic based on real stats
+async function buildGoals(){
   const el=document.getElementById('goalsList');
+  // Get real stats
+  const{data:results}=await supabase.from('test_results').select('wpm,accuracy')
+    .eq('user_id',(await supabase.auth.getUser()).data.user.id);
+  const bestWpm=results&&results.length?Math.max(...results.map(r=>r.wpm)):0;
+  const bestAcc=results&&results.length?Math.max(...results.map(r=>parseFloat(r.accuracy))):0;
+  const totalTests=results?results.length:0;
+  const streak=parseInt(localStorage.getItem('streak')||0);
+
+  const goals=[
+    {label:'Reach 60 WPM',current:Math.min(bestWpm,60),target:60,unit:'WPM'},
+    {label:'Complete 50 tests',current:Math.min(totalTests,50),target:50,unit:'tests'},
+    {label:'Maintain 7-day streak',current:Math.min(streak,7),target:7,unit:'days'},
+    {label:'Achieve 95% accuracy',current:Math.min(Math.round(bestAcc),95),target:95,unit:'%'}
+  ];
   el.innerHTML=goals.map(g=>{
     const pct=Math.min(100,Math.round((g.current/g.target)*100));
+    const color=pct>=100?'var(--green)':pct>=60?'var(--accent)':'var(--yellow)';
     return `<div style="margin-bottom:16px">
       <div class="goal-row"><span class="goal-label">${g.label}</span><span class="goal-val">${g.current} / ${g.target} ${g.unit}</span></div>
-      <div class="goal-track"><div class="goal-fill" style="width:${pct}%"></div></div>
+      <div class="goal-track"><div class="goal-fill" style="width:${pct}%;background:${color}"></div></div>
       <div class="goal-pct">${pct}%</div>
     </div>`;
   }).join('');

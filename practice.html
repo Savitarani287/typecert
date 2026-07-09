@@ -403,8 +403,39 @@ document.getElementById('testsToday').textContent=testsToday;
 document.getElementById('streakNum').textContent=streak;
 
 function getText(){
-  const bank=textBanks[practiceType]?.[lang]?.[difficulty]||textBanks.paragraph.easy;
-  return bank[Math.floor(Math.random()*bank.length)];
+  const targetChars = Math.ceil((totalTime/60)*80*6);
+
+  if(lang==='hindi'){
+    return buildText(textBanks.hindi[difficulty]||textBanks.hindi.medium, targetChars);
+  }
+  if(lang==='hinglish'){
+    return buildText(textBanks.hinglish[difficulty]||textBanks.hinglish.medium, targetChars);
+  }
+  if(practiceType==='words'){
+    const wordList=(textBanks.words[difficulty]||textBanks.words.easy)[0].split(' ');
+    let result='';
+    while(result.length<targetChars){
+      const w=wordList[Math.floor(Math.random()*wordList.length)];
+      result+=(result?' ':'')+w;
+    }
+    return result.trim();
+  }
+  if(practiceType==='numbers'){
+    return buildText(textBanks.numbers[difficulty]||textBanks.numbers.easy, targetChars);
+  }
+  const pool=textBanks[practiceType]?.[difficulty]||textBanks.paragraph.easy;
+  return buildText(pool, targetChars);
+}
+
+function buildText(pool, targetChars){
+  const shuffled=[...pool].sort(()=>Math.random()-0.5);
+  let result='',tries=0;
+  while(result.length<targetChars&&tries<30){
+    const pick=shuffled[tries%shuffled.length];
+    if(result&&!result.endsWith(' '))result+=' ';
+    result+=pick;tries++;
+  }
+  return result.trim();
 }
 
 function init(){
@@ -502,12 +533,16 @@ function endTest(){
   document.getElementById('rAcc').textContent=finalAcc+'%';
   document.getElementById('rErr').textContent=errCount;
   if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);document.getElementById('bestWpm').textContent=bestWpm;showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
-  testsToday++;localStorage.setItem('testsToday',testsToday);document.getElementById('testsToday').textContent=testsToday;
+  testsToday++;localStorage.setItem('testsToday',testsToday);
+  updateStreak();
   generateTips();
   document.getElementById('resultsCard').classList.add('show');
   buildHeatmap();
   document.getElementById('heatmapCard').classList.add('show');
   document.getElementById('resultsCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+  saveTestResult(finalWpm,finalNet,finalAcc,errCount,
+    lang==='hindi'?'hindi_practice':lang==='hinglish'?'hinglish_practice':practiceType,
+    lang, totalTime);
 }
 
 function generateTips(){
@@ -614,6 +649,37 @@ function resetTest(){init();document.getElementById('typingInput').focus();}
 function showNotif(msg,type){
   const n=document.getElementById('notif');n.textContent=msg;n.className='notif show '+(type||'');
   setTimeout(()=>n.classList.remove('show'),3500);
+}
+
+function updateStreak(){
+  import('./supabase.js').then(({supabase})=>{
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(!session)return;
+      const today=new Date().toDateString();
+      const last=localStorage.getItem('streak_date_'+session.user.id);
+      const yesterday=new Date(Date.now()-86400000).toDateString();
+      let streak=parseInt(localStorage.getItem('streak')||0);
+      if(last===today){}
+      else if(last===yesterday){streak++;}
+      else{streak=1;}
+      localStorage.setItem('streak',streak);
+      localStorage.setItem('streak_date_'+session.user.id,today);
+      supabase.from('profiles').update({streak}).eq('id',session.user.id).then(()=>{});
+    });
+  }).catch(()=>{});
+}
+
+async function saveTestResult(wpm,net_wpm,accuracy,errors,exam_type,language,duration_seconds){
+  try{
+    const{supabase}=await import('./supabase.js');
+    const{data:{session}}=await supabase.auth.getSession();
+    if(!session){console.log('Guest — not saving');return;}
+    const{error}=await supabase.from('test_results').insert({
+      user_id:session.user.id,wpm,net_wpm,accuracy,errors,exam_type,language,duration_seconds
+    });
+    if(error)console.error('Save failed:',error.message);
+    else console.log('Result saved ✓',wpm,'WPM');
+  }catch(e){console.error('Save error:',e);}
 }
 
 init();
