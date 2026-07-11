@@ -83,16 +83,22 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .exam-wrapper.show{display:block}
 .exam-header{background:#1a3a6b;color:white;border-radius:8px 8px 0 0;padding:12px 20px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:space-between;margin:-28px -28px 20px}
 .exam-timer-badge{background:rgba(255,255,255,0.15);border-radius:4px;padding:4px 10px;font-family:monospace;font-size:14px}
-.text-display{font-family:var(--font-mono);font-size:19px;line-height:2;letter-spacing:0.2px;margin-bottom:20px;min-height:130px;user-select:none;word-break:break-word}
+.text-display{font-family:var(--font-mono);font-size:19px;line-height:2.2;height:130px;overflow:hidden;user-select:none;word-break:break-word;position:relative;cursor:text}
+.typing-area-wrap{position:relative;margin-bottom:20px;cursor:text}
+.ch{position:relative;color:#5a5a7a}
+.ch.correct{color:#e0e0f0}
+.ch.wrong{color:var(--accent2);background:rgba(250,109,138,0.12);border-radius:2px}
+.ch.current::after{content:'';position:absolute;left:0;bottom:2px;width:2px;height:1.4em;background:var(--accent);animation:blink .6s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .exam-wrapper .text-display{font-family:'Courier New',monospace;color:#1a1a1a;font-size:18px;line-height:2}
-.ch{display:inline}
+
 .ch.correct{color:var(--green)}.ch.wrong{color:var(--accent2);background:rgba(250,109,138,0.12);border-radius:2px}
 .ch.current{border-left:2.5px solid var(--accent);margin-left:-2.5px;animation:blink 1s step-end infinite}
 @keyframes blink{0%,100%{border-color:var(--accent)}50%{border-color:transparent}}
 .exam-wrapper .ch.correct{color:#1a6b3a}.exam-wrapper .ch.wrong{color:#c0392b;background:rgba(192,57,43,0.1)}.exam-wrapper .ch.current{border-left-color:#1a3a6b}
-.type-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-family:var(--font-mono);font-size:16px;color:var(--text);outline:none;resize:none;transition:border-color .2s;line-height:1.5}
-.type-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,0.08)}
-.type-input::placeholder{color:var(--dimmed)}
+.type-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:text;resize:none;border:none;background:transparent;outline:none;z-index:10;font-size:19px;}
+
+
 .exam-wrapper .type-input{background:#f5f5f5;color:#1a1a1a;border-color:#ddd}
 .countdown-overlay{position:absolute;inset:0;background:rgba(8,8,16,0.92);display:flex;align-items:center;justify-content:center;border-radius:20px;z-index:10;backdrop-filter:blur(4px)}
 .countdown-num{font-family:var(--font-display);font-size:96px;font-weight:800;color:var(--accent);animation:countAnim 1s ease-out}
@@ -298,8 +304,11 @@ footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
       <div class="exam-header"><span>SSC CHSL — Typing Test Module</span><span class="exam-timer-badge" id="examTimerBadge">00:60</span></div>
       <div class="text-display" id="examTextDisplay"></div>
     </div>
-    <div class="text-display" id="speedTextDisplay"></div>
-    <textarea class="type-input" id="typingInput" rows="3" placeholder="Click here and start typing to begin the test..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    <div class="typing-area-wrap" onclick="document.getElementById('typingInput').focus()">
+          <div class="text-display" id="speedTextDisplay"></div>
+          <textarea class="type-input" id="typingInput"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        </div>
     <div class="btn-row">
       <button class="btn btn-outline" onclick="resetTest()">↺ Restart</button>
       <button class="btn btn-accent" onclick="resetTest()">New text</button>
@@ -473,7 +482,9 @@ const faqs=[{q:"Is the certificate valid for government job applications?",a:"Ty
 let currentText='',typed=0,correct=0,errors=0,timeLeft=60,totalTime=60,timer=null,started=false,finished=false,lang='english',mode='speed',exam='ssc_chsl',strictMode=false,finalWpm=0,finalAcc=0,finalNet=0,finalTime=0;
 function init(){currentText=getIndexText();typed=0;correct=0;errors=0;timeLeft=totalTime;started=false;finished=false;if(timer)clearInterval(timer);document.getElementById('typingInput').value='';document.getElementById('typingInput').disabled=false;['wpmVal','netVal'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('accVal').textContent='100%';document.getElementById('timerVal').textContent=timeLeft;document.getElementById('progressFill').style.width='0%';document.getElementById('charsTyped').textContent='0 chars';document.getElementById('errorsCount').textContent='0 errors';document.getElementById('typingCard').classList.remove('active');document.getElementById('resultsSection').classList.remove('show');document.getElementById('certFinal').classList.remove('show');document.getElementById('countdown').style.display='none';renderText();}
 function renderText(){['speedTextDisplay','examTextDisplay'].forEach(id=>{const el=document.getElementById(id);el.innerHTML='';for(let i=0;i<currentText.length;i++){const s=document.createElement('span');s.className='ch'+(i===0?' current':'');s.id=id[0]+i;s.textContent=currentText[i]===' '?'\u00a0':currentText[i];el.appendChild(s);}});document.getElementById('speedTextDisplay').style.display=mode==='exam'?'none':'block';document.getElementById('examWrapper').classList.toggle('show',mode==='exam');}
-document.getElementById('typingInput').addEventListener('input',function(){if(finished)return;if(!started){started=true;document.getElementById('typingCard').classList.add('active');startTimer();}const val=this.value;typed=val.length;correct=0;errors=0;for(let i=0;i<currentText.length;i++){['s','e'].forEach(p=>{const el=document.getElementById(p+i);if(!el)return;el.className='ch';if(i<val.length){if(val[i]===currentText[i]){if(p==='s')correct++;el.classList.add('correct');}else{if(p==='s')errors++;el.classList.add('wrong');}}else if(i===val.length)el.classList.add('current');});}const elapsed=(totalTime-timeLeft)/60;const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;const netWpm=Math.max(0,Math.round(wpm-(errors/(elapsed||0.01))));const acc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('wpmVal').textContent=wpm;document.getElementById('netVal').textContent=netWpm;document.getElementById('accVal').textContent=acc+'%';document.getElementById('progressFill').style.width=Math.min((typed/currentText.length)*100,100)+'%';document.getElementById('charsTyped').textContent=typed+' chars';document.getElementById('errorsCount').textContent=errors+' errors';if(typed>=currentText.length)endTest();});
+document.getElementById('typingInput').addEventListener('input',function(){if(finished)return;if(!started){started=true;document.getElementById('typingCard').classList.add('active');startTimer();}const val=this.value;typed=val.length;correct=0;errors=0;for(let i=0;i<currentText.length;i++){['s','e'].forEach(p=>{const el=document.getElementById(p+i);if(!el)return;el.className='ch';if(i<val.length){if(val[i]===currentText[i]){if(p==='s')correct++;el.classList.add('correct');}else{if(p==='s')errors++;el.classList.add('wrong');}}else if(i===val.length)el.classList.add('current');});}const elapsed=(totalTime-timeLeft)/60;const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;const netWpm=Math.max(0,Math.round(wpm-(errors/(elapsed||0.01))));const acc=typed>0?Math.round((correct/typed)*100):100;document.getElementById('wpmVal').textContent=wpm;document.getElementById('netVal').textContent=netWpm;document.getElementById('accVal').textContent=acc+'%';document.getElementById('progressFill').style.width=Math.min((typed/currentText.length)*100,100)+'%';document.getElementById('charsTyped').textContent=typed+' chars';document.getElementById('errorsCount').textContent=errors+' errors';
+  const curEl=document.getElementById('s'+typed);
+  if(curEl){const display=document.getElementById('speedTextDisplay');const lineH=parseFloat(getComputedStyle(display).lineHeight)||42;display.scrollTop=Math.max(0,curEl.offsetTop-lineH);}if(typed>=currentText.length)endTest();});
 document.getElementById('typingInput').addEventListener('keydown',function(e){if(strictMode&&e.key==='Backspace')e.preventDefault();});
 function startTimer(){timer=setInterval(()=>{timeLeft--;document.getElementById('timerVal').textContent=timeLeft;document.getElementById('examTimerBadge').textContent='00:'+(timeLeft<10?'0':'')+timeLeft;if(timeLeft<=0)endTest();},1000);}
 function updateStreak(){
