@@ -9,6 +9,7 @@
     href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=EB+Garamond:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <script src="nav.js" defer></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     * {
       margin: 0;
@@ -779,16 +780,14 @@
     document.getElementById('blurAcc').textContent = acc;
     document.getElementById('blurNet').textContent = net;
 
+    // Expose all onclick functions to window (required for module scripts)
     function updateBlurPreview() {
       const name = document.getElementById('certNameInput').value || 'Your Name';
       const el = document.getElementById('blurName');
       if (el) el.textContent = name;
     }
 
-    // Expose all onclick functions to window (required for module scripts)
-    function getDate() { return new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }); }
-
-    let certId = '', certDate = '', paymentDone = false;
+    let certId = '', certDate = '';
 
     function buildGoldCertSVG(name, wpm, acc, net, type, certId, date) {
       return `<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
