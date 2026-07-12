@@ -243,6 +243,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
       <div class="result-actions">
         <button class="btn-retry" onclick="retryExam()">↺ Try Again</button>
         <button class="btn-back" onclick="backToCards()">← Choose Another Exam</button>
+        <a id="certLinkExam" href="certificate.html" style="display:inline-block;background:linear-gradient(135deg,#c8a84b,#e8c86a);color:#1a1a00;border-radius:10px;padding:11px 22px;font-weight:700;font-size:14px;text-decoration:none;">🏆 Get Certificate</a>
       </div>
     </div>
   </div>
@@ -546,6 +547,13 @@ window.submitExam=function(){
 
   document.getElementById('examResults').classList.add('show');
   document.getElementById('examResults').scrollIntoView({behavior:'smooth',block:'start'});
+  // Save last test scores for certificate
+  localStorage.setItem('lastWpm', grossWpm);
+  localStorage.setItem('lastAcc', accuracy+'%');
+  localStorage.setItem('lastNet', netWpm);
+  // Update certificate link
+  const certLinkExam = document.getElementById('certLinkExam');
+  if(certLinkExam) certLinkExam.href=`certificate.html?wpm=${grossWpm}&acc=${accuracy}%&net=${netWpm}`;
 
   // Save to Supabase
   saveResult(grossWpm,netWpm,accuracy,fullMistakes,currentExam.exam_name,currentExam.language,Math.round(totalTime-timeLeft));

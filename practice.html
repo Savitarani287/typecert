@@ -108,22 +108,19 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .1s;width:0%}
 
 /* TEXT */
-.text-display{font-family:var(--font-mono);font-size:20px;line-height:2.2;height:132px;overflow:hidden;user-select:none;word-break:break-word;position:relative;cursor:text}
-.typing-area-wrap{position:relative;margin-bottom:20px;cursor:text}
-.ch{position:relative;color:#5a5a7a}
-.ch.correct{color:#e0e0f0}
-.ch.wrong{color:var(--accent2);background:rgba(250,109,138,0.12);border-radius:2px}
-.ch.current::after{content:'';position:absolute;left:0;bottom:2px;width:2px;height:1.4em;background:var(--accent);animation:blink .6s step-end infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.text-display{font-family:var(--font-mono);font-size:20px;line-height:2;min-height:140px;user-select:none;margin-bottom:20px;word-break:break-word;position:relative}
 .word{display:inline-block;margin-right:4px}
-
+.ch{display:inline}
+.ch.correct{color:var(--green)}
+.ch.wrong{color:var(--accent2);background:rgba(250,109,138,0.12);border-radius:2px}
+.ch.current{border-left:2.5px solid var(--accent);margin-left:-2.5px;animation:blink 1s step-end infinite}
 @keyframes blink{0%,100%{border-color:var(--accent)}50%{border-color:transparent}}
 
 /* INPUT */
-.type-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:text;font-size:20px;resize:none;border:none;background:transparent;outline:none;z-index:10;}
-
-
-
+.type-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-family:var(--font-mono);font-size:16px;color:var(--text);outline:none;resize:none;transition:border-color .2s;line-height:1.5}
+.type-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,109,250,0.08)}
+.type-input::placeholder{color:var(--dimmed)}
+.type-input:disabled{opacity:.5}
 
 /* BOTTOM BAR */
 .bottom-bar{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
@@ -294,11 +291,11 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
           <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
         </div>
 
-        <div class="typing-area-wrap" onclick="document.getElementById('typingInput').focus()">
-          <div class="text-display" id="textDisplay"></div>
-          <textarea class="type-input" id="typingInput"
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-        </div>
+        <div class="text-display" id="textDisplay"></div>
+
+        <textarea class="type-input" id="typingInput" rows="3"
+          placeholder="Click here and start typing..."
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
 
         <div class="bottom-bar">
           <div class="errors-display">Errors: <span id="errNum">0</span></div>
@@ -498,9 +495,6 @@ document.getElementById('typingInput').addEventListener('input',function(){
   document.getElementById('accNum').textContent=acc+'%';
   document.getElementById('errNum').textContent=errCount;
   document.getElementById('progFill').style.width=Math.min((typed/currentText.length)*100,100)+'%';
-  // Scroll text so current char stays visible
-  const curEl=document.getElementById('c'+typed);
-  if(curEl){const display=document.getElementById('textDisplay');const lineH=parseFloat(getComputedStyle(display).lineHeight)||44;display.scrollTop=Math.max(0,curEl.offsetTop-lineH);}
   if(typed>=currentText.length)endTest();
 });
 
@@ -538,7 +532,14 @@ function endTest(){
   document.getElementById('rNet').textContent=finalNet;
   document.getElementById('rAcc').textContent=finalAcc+'%';
   document.getElementById('rErr').textContent=errCount;
-  if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);document.getElementById('bestWpm').textContent=bestWpm;showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
+  if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
+  // Save last test scores so certificate.html can read them
+  localStorage.setItem('lastWpm', finalWpm);
+  localStorage.setItem('lastAcc', finalAcc+'%');
+  localStorage.setItem('lastNet', finalNet);
+  // Update certificate link with actual scores
+  const certBtn=document.getElementById('getCertBtn');
+  if(certBtn) certBtn.href=`certificate.html?wpm=${finalWpm}&acc=${finalAcc}%&net=${finalNet}`;
   testsToday++;localStorage.setItem('testsToday',testsToday);
   updateStreak();
   generateTips();
