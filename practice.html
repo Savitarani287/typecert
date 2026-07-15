@@ -40,27 +40,38 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .page-sub{font-size:15px;color:var(--muted);max-width:500px;line-height:1.6}
 
 /* LAYOUT */
-.practice-layout{display:grid;grid-template-columns:260px 1fr;gap:24px;padding-bottom:60px}
+.main-area{max-width:960px;margin:0 auto;padding:0 28px 60px;display:flex;flex-direction:column;gap:20px}
 
 /* SIDEBAR */
-.sidebar{display:flex;flex-direction:column;gap:16px}
-.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;overflow:hidden}
-.sidebar-title{font-size:11px;color:var(--dimmed);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin-bottom:14px}
+/* Toolbar — like index.html */
+.practice-toolbar{max-width:960px;margin:0 auto 20px;padding:0 28px}
+.ctrl-row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px 14px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;flex-wrap:nowrap}
+.ctrl-row::-webkit-scrollbar{display:none}
+.ctrl-divider{width:1px;height:20px;background:var(--border2);flex-shrink:0}
+.ctrl-group{display:inline-flex;background:var(--surface2);border-radius:8px;overflow:hidden;flex-shrink:0}
+.ctrl-btn{padding:7px 14px;font-size:13px;font-family:var(--font-body);background:transparent;border:none;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.ctrl-btn:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+.ctrl-btn.active{color:var(--accent);background:rgba(124,109,250,0.15);font-weight:600}
+.ctrl-label{font-size:11px;color:var(--dimmed);letter-spacing:1px;text-transform:uppercase;flex-shrink:0}
+/* Mini stats below toolbar */
+.mini-bar{max-width:960px;margin:0 auto 16px;padding:0 28px;display:flex;gap:16px;align-items:center}
+.mini-stat-pill{font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 14px}
+.mini-stat-pill span{color:var(--accent);font-weight:700;font-family:var(--font-mono)}
 
 /* OPTION GROUPS */
-.opt-group{display:flex;flex-direction:column;gap:6px}
-.opt-btn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--font-body);display:flex;align-items:center;gap:10px}
-.opt-btn:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
-.opt-btn.active{background:rgba(124,109,250,0.12);border-color:rgba(124,109,250,0.4);color:var(--accent)}
+
+
+
+
 .opt-icon{font-size:16px;width:20px;text-align:center}
-.opt-label{flex:1}
+
 .opt-badge{font-size:10px;background:rgba(0,229,160,0.1);color:var(--green);border-radius:4px;padding:2px 7px;font-family:var(--font-mono)}
 
 /* DIFFICULTY SLIDER */
 .diff-row{display:flex;gap:6px;margin-top:4px}
-.diff-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .15s;font-family:var(--font-mono)}
-.diff-btn:hover{border-color:var(--border2);color:var(--text)}
-.diff-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(124,109,250,0.1)}
+
+
+
 
 /* CUSTOM TEXT */
 .custom-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:13px;font-family:var(--font-mono);resize:vertical;min-height:80px;outline:none;transition:border-color .2s;line-height:1.6}
@@ -80,7 +91,7 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 .mini-stat-lbl{font-size:10px;color:var(--dimmed);text-transform:uppercase}
 
 /* MAIN AREA */
-.main-area{display:flex;flex-direction:column;gap:20px}
+
 
 /* TYPING CARD */
 .typing-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;position:relative;overflow:hidden}
@@ -200,73 +211,55 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
     <p class="page-sub">Choose your mode, difficulty and language. Track your weak keys and improve your speed every day.</p>
   </div>
 
-  <div class="practice-layout">
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-
-      <div class="sidebar-card">
-        <div class="sidebar-title">Practice type</div>
-        <div class="opt-group">
-          <button class="opt-btn active" onclick="setType('paragraph',this)"><span class="opt-icon">📄</span><span class="opt-label">Paragraph</span><span class="opt-badge">popular</span></button>
-          <button class="opt-btn" onclick="setType('words',this)"><span class="opt-icon">📝</span><span class="opt-label">Word mode</span></button>
-          <button class="opt-btn" onclick="setType('sentences',this)"><span class="opt-icon">💬</span><span class="opt-label">Sentences</span></button>
-          <button class="opt-btn" onclick="setType('numbers',this)"><span class="opt-icon">🔢</span><span class="opt-label">Numbers</span></button>
-          <button class="opt-btn" onclick="setType('custom',this)"><span class="opt-icon">✏️</span><span class="opt-label">Custom text</span></button>
-        </div>
+  <!-- TOOLBAR — like index.html -->
+  <div class="practice-toolbar">
+    <div class="ctrl-row">
+      <span class="ctrl-label">Type</span>
+      <div class="ctrl-group">
+        <button class="ctrl-btn active" onclick="setType('paragraph',this)" data-type="paragraph">📄 Paragraph</button>
+        <button class="ctrl-btn" onclick="setType('words',this)" data-type="words">📝 Words</button>
+        <button class="ctrl-btn" onclick="setType('sentences',this)" data-type="sentences">💬 Sentences</button>
+        <button class="ctrl-btn" onclick="setType('numbers',this)" data-type="numbers">🔢 Numbers</button>
+        <button class="ctrl-btn" onclick="setType('custom',this)" data-type="custom">✏️ Custom</button>
       </div>
-
-      <div class="sidebar-card">
-        <div class="sidebar-title">Language</div>
-        <div class="opt-group">
-          <button class="opt-btn active" onclick="setLang('english',this)"><span class="opt-icon">🇬🇧</span><span class="opt-label">English</span></button>
-          <button class="opt-btn" onclick="setLang('hindi',this)"><span class="opt-icon">🇮🇳</span><span class="opt-label">Hindi</span></button>
-          <button class="opt-btn" onclick="setLang('hinglish',this)"><span class="opt-icon">🔀</span><span class="opt-label">Hinglish</span></button>
-        </div>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Lang</span>
+      <div class="ctrl-group">
+        <button class="ctrl-btn active" onclick="setLang('english',this)" data-lang="english">EN</button>
+        <button class="ctrl-btn" onclick="setLang('hindi',this)" data-lang="hindi">HI</button>
+        <button class="ctrl-btn" onclick="setLang('hinglish',this)" data-lang="hinglish">HGL</button>
       </div>
-
-      <div class="sidebar-card">
-        <div class="sidebar-title">Difficulty</div>
-        <div class="diff-row">
-          <button class="diff-btn active" onclick="setDiff('easy',this)">Easy</button>
-          <button class="diff-btn" onclick="setDiff('medium',this)">Medium</button>
-          <button class="diff-btn" onclick="setDiff('hard',this)">Hard</button>
-        </div>
-        <div style="margin-top:12px;font-size:12px;color:var(--dimmed);line-height:1.5" id="diffDesc">Short common words. Great for building speed.</div>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Difficulty</span>
+      <div class="ctrl-group" id="diffGroup">
+        <button class="ctrl-btn active" onclick="setDiff('easy',this)" data-diff="easy">Easy</button>
+        <button class="ctrl-btn" onclick="setDiff('medium',this)" data-diff="medium">Medium</button>
+        <button class="ctrl-btn" onclick="setDiff('hard',this)" data-diff="hard">Hard</button>
       </div>
-
-      <div class="sidebar-card">
-        <div class="sidebar-title">Duration</div>
-        <div class="diff-row">
-          <button class="diff-btn active" onclick="setDuration(60,this)">1m</button>
-          <button class="diff-btn" onclick="setDuration(120,this)">2m</button>
-          <button class="diff-btn" onclick="setDuration(300,this)">5m</button>
-          <button class="diff-btn" onclick="setDuration(600,this)">10m</button>
-        </div>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Time</span>
+      <div class="ctrl-group">
+        <button class="ctrl-btn active" onclick="setDuration(60,this)" data-dur="60">1m</button>
+        <button class="ctrl-btn" onclick="setDuration(120,this)" data-dur="120">2m</button>
+        <button class="ctrl-btn" onclick="setDuration(300,this)" data-dur="300">5m</button>
+        <button class="ctrl-btn" onclick="setDuration(600,this)" data-dur="600">10m</button>
       </div>
-
-      <div class="sidebar-card" id="customCard" style="display:none">
-        <div class="sidebar-title">Your text</div>
-        <textarea class="custom-textarea" id="customText" placeholder="Paste your own text here to practice..."></textarea>
-        <button class="apply-btn" onclick="applyCustomText()">Apply text →</button>
-      </div>
-
-      <div class="sidebar-card">
-        <div class="sidebar-title">Today's progress</div>
-        <div class="streak-display">
-          <div class="streak-fire">🔥</div>
-          <div><div class="streak-num" id="streakNum">0</div><div class="streak-lbl">day streak</div></div>
-        </div>
-        <div class="mini-stats">
-          <div class="mini-stat"><div class="mini-stat-val" id="bestWpm">0</div><div class="mini-stat-lbl">Best WPM</div></div>
-          <div class="mini-stat"><div class="mini-stat-val" id="testsToday">0</div><div class="mini-stat-lbl">Tests today</div></div>
-        </div>
-      </div>
-
     </div>
+    <!-- Custom text panel -->
+    <div id="customCard" style="display:none;margin-top:10px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px">
+      <textarea class="custom-textarea" id="customText" placeholder="Paste your own text here..." style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:var(--font-mono);font-size:14px;resize:vertical;min-height:80px;outline:none"></textarea>
+      <button onclick="applyCustomText()" style="margin-top:8px;padding:8px 20px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-family:var(--font-body);font-size:13px">Apply →</button>
+    </div>
+  </div>
 
-    <!-- MAIN -->
-    <div class="main-area">
+  <!-- Mini stats bar -->
+  <div class="mini-bar">
+    <div class="mini-stat-pill">🔥 Streak: <span id="streakNum">0</span></div>
+    <div class="mini-stat-pill">🏆 Best: <span id="bestWpm">0</span> WPM</div>
+    <div class="mini-stat-pill">📝 Today: <span id="testsToday">0</span> tests</div>
+  </div>
+
+  <div class="main-area">
 
       <div class="typing-card" id="typingCard">
         <div class="top-bar">
@@ -301,6 +294,7 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
           <div class="errors-display">Errors: <span id="errNum">0</span></div>
           <div class="btn-row">
             <button class="btn btn-outline" onclick="resetTest()">↺ Reset</button>
+          <a id="getCertBtn" href="certificate.html" style="display:inline-block;background:linear-gradient(135deg,#c8a84b,#e8c86a);color:#1a1a00;border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;text-decoration:none;margin-left:8px;vertical-align:middle;">🏆 Get Certificate</a>
             <button class="btn btn-accent" onclick="resetTest()">New text</button>
           </div>
         </div>
@@ -351,34 +345,155 @@ nav{padding:20px 0;border-bottom:1px solid var(--border);backdrop-filter:blur(20
 <script>
 const textBanks={
   paragraph:{
-    easy:["the cat sat on the mat and looked at the dog the sun was hot and the day was long it was a good day to sit and rest in the shade near the old tree by the road","she went to the shop to buy some milk and bread and eggs she also got some fruit and some juice it was a short walk from her home to the shop on the corner","he liked to read books in the evening after work the lamp was on and the room was warm and quiet it was the best time of day for him to sit and read"],
-    medium:["Government jobs require candidates to have strong typing speed and accuracy. The SSC examination tests both speed and precision. Regular practice every day can help achieve the required target easily and effectively.","Technology has changed the way people work and communicate in the modern world. Computers and smartphones have made everything faster and more efficient. Students can now learn new skills from anywhere with just an internet connection.","India is a land of diverse cultures traditions and languages. Every state has its own unique food festivals and customs. Millions of tourists visit the historical monuments and natural landscapes every year from across the globe."],
-    hard:["The proliferation of artificial intelligence across various industries has necessitated a comprehensive reevaluation of workforce capabilities and organizational structures. Enterprises must strategically adapt their operational frameworks to accommodate technological advancements.","Contemporary governance frameworks increasingly emphasize transparency accountability and participatory democracy as fundamental prerequisites for sustainable institutional legitimacy. Administrative efficiency requires systematic implementation of evidence-based policy interventions.","Biochemical research consistently demonstrates the extraordinary complexity of cellular metabolism and its intricate regulatory mechanisms. Understanding enzymatic pathways requires sophisticated analytical methodologies and interdisciplinary scientific collaboration."]
+    easy:[
+      "the government has launched many new schemes to help people in rural areas the main goal is to make sure that every citizen of the country has a good life and all basic needs are met without difficulty",
+      "typing is a very important skill for those who want to work in government offices in india the staff selection commission conducts exams every year and candidates must type at a good speed to get selected",
+      "india is a country with a large population and many different languages cultures and traditions people from all parts of the country work together to make the nation strong and developed each day",
+      "the railway network in india is one of the largest in the world it connects all parts of the country and helps people travel from one place to another millions of people use the train every day",
+      "every day is a new chance to improve your skills and become better at what you do if you practice typing for at least thirty minutes each day you will see a big improvement in your speed",
+      "water is the most precious resource on earth without water no life is possible we must save water and use it wisely the government has taken many steps to provide clean drinking water to every village",
+      "trees are very important for our environment they give us oxygen clean air fruits wood and many other things we must plant more trees and protect forests so future generations can also enjoy nature",
+      "the post office plays a very important role in connecting people across the country letters parcels and money orders are delivered to even the most remote villages by dedicated postal department staff",
+      "agriculture is the backbone of the indian economy more than fifty percent of india population depends on agriculture for its livelihood the government has taken steps to improve the condition of farmers",
+      "education is the most powerful weapon which you can use to change the world every child deserves access to quality education regardless of where they live or what background they come from in life"
+    ],
+    medium:[
+      "The Staff Selection Commission conducts several examinations throughout the year for recruitment to various posts in central government departments. Candidates must demonstrate proficiency in typing with a minimum speed of thirty five words per minute with high accuracy.",
+      "Computer proficiency has become an essential requirement for most government jobs in India today. Candidates appearing for SSC Railway and State Public Service Commission examinations must be comfortable with basic computer operations and typing.",
+      "The Indian Railway Recruitment Board conducts examinations for filling thousands of vacancies in various departments every year. Typing speed and accuracy are among the key skills tested during the selection process for clerical posts.",
+      "Good typing speed requires consistent daily practice and a strong focus on accuracy before attempting to increase speed. Developing muscle memory for common letter combinations is the key to achieving high typing speeds consistently.",
+      "The Rajasthan Public Service Commission is responsible for conducting state-level competitive examinations for recruitment to various government posts. Candidates must pass a typing test as part of the selection process for clerical positions.",
+      "Banking sector jobs have become increasingly attractive for young graduates in India due to the job security and benefits they offer. Computer typing skills are tested as part of the skill assessment for clerical posts.",
+      "Data entry is one of the most common tasks performed in government and private offices across India. Operators are expected to type large volumes of information accurately and quickly into computer systems every single day.",
+      "The Union Public Service Commission is the premier central recruitment agency in India responsible for conducting examinations for senior government positions. Strong foundation in computer skills including typing is expected from all candidates.",
+      "Digital India is a campaign launched by the Government of India to ensure that government services are made available to citizens electronically by improving online infrastructure and by increasing internet connectivity across the nation.",
+      "The Right to Information Act was passed by the Parliament of India in two thousand and five. This act empowers citizens to request information from any public authority which is required to reply within thirty days."
+    ],
+    hard:[
+      "The proliferation of digital governance initiatives across India has fundamentally transformed the operational landscape of public administration requiring personnel with advanced computer proficiency at all levels of government service.",
+      "Contemporary administrative frameworks increasingly emphasize transparency accountability and participatory democracy as fundamental prerequisites for sustainable institutional legitimacy in the modern democratic state of India.",
+      "The implementation of comprehensive administrative reforms requires meticulous planning and systematic execution across all organizational levels to achieve meaningful and lasting improvements in public service delivery mechanisms throughout the country.",
+      "Biochemical research consistently demonstrates the extraordinary complexity of cellular metabolism and its intricate regulatory mechanisms that govern life at the molecular level requiring sophisticated interdisciplinary collaboration between researchers.",
+      "Constitutional jurisprudence in India has evolved considerably since the adoption of the Constitution in nineteen fifty reflecting the dynamic interplay between legislative intent and judicial interpretation across decades of landmark decisions.",
+      "The macroeconomic stabilization policies implemented during periods of fiscal stress typically involve careful balancing of inflationary pressures against employment generation objectives requiring calibrated monetary interventions by central banks.",
+      "Atmospheric science has made remarkable strides in understanding the complex interactions between terrestrial and oceanic systems that drive global climate patterns enabling meteorologists to predict weather phenomena with greater accuracy.",
+      "Pharmaceutical research and development involves extensive preclinical and clinical trials designed to rigorously evaluate the safety and efficacy of new therapeutic compounds before regulatory authorities grant approval for commercial distribution.",
+      "The implementation of the Goods and Services Tax represented a landmark reform in India indirect taxation system bringing together dozens of central and state levies under a unified framework requiring extensive administrative reorganization.",
+      "Panchayati Raj institutions are the backbone of rural local self-governance in India given constitutional status by the seventy-third Amendment Act of nineteen ninety-two establishing a three-tier democratic structure at the grassroots level."
+    ]
   },
   words:{
-    easy:["the and for was that with this from have but not are you they all been has its about who more when make like him into two him her way could will"],
-    medium:["government examination practice accuracy improvement efficiency knowledge professional development technical requirement qualification certification achievement performance"],
-    hard:["photosynthesis simultaneously approximately consequently infrastructure substantially acknowledgement misrepresentation perpendicular circumstances nevertheless"]
+    // Words mode: individual words picked randomly — no sentences
+    easy:"the and for was that with this have from they will each other about which their time into just two more when make like can year than back then do come its also some could over think well people",
+    medium:"government examination practice accuracy improvement efficiency knowledge professional development technical requirement qualification certification achievement performance administration",
+    hard:"acknowledgement photosynthesis simultaneously approximately consequently infrastructure substantially misrepresentation perpendicular circumstances nevertheless pharmaceutical biochemical jurisprudence"
   },
   sentences:{
-    easy:["Type the sentence carefully. Watch each letter. Do not make mistakes. Speed comes with practice. Keep your eyes on the screen.","Good typing is a skill. Practice every day. Start slow and then go fast. Accuracy is more important than speed."],
-    medium:["The candidate must achieve a minimum typing speed to qualify for the government examination held twice a year.","Regular daily practice of at least thirty minutes will significantly improve your typing speed and accuracy over time."],
-    hard:["The implementation of comprehensive administrative reforms requires meticulous planning and systematic execution across all organizational levels.","Sophisticated technological infrastructure necessitates continuous professional development and adaptive learning strategies for optimal performance outcomes."]
+    easy:[
+      "Type carefully and do not rush.",
+      "Focus on accuracy before speed.",
+      "Every key press matters in the exam.",
+      "Practice makes perfect every single day.",
+      "Keep your eyes on the text above.",
+      "Do not look at the keyboard while typing.",
+      "Speed comes naturally with daily practice.",
+      "Sit straight and relax your hands.",
+      "Take a deep breath before you start.",
+      "Accuracy is more important than raw speed.",
+      "Finish each word before moving to the next.",
+      "Good typists type with all ten fingers.",
+      "Never sacrifice accuracy for going faster."
+    ],
+    medium:[
+      "The candidate must achieve a minimum typing speed to qualify for the government examination.",
+      "Regular daily practice of at least thirty minutes will significantly improve your typing speed.",
+      "Accuracy is more important than speed in the early stages of learning to type professionally.",
+      "Government jobs in India require candidates to demonstrate strong typing skills during selection.",
+      "The railway recruitment board evaluates both speed and accuracy during the skill test round.",
+      "Developing muscle memory for common word patterns helps typists achieve higher speeds over time.",
+      "A calm and focused approach during the typing test can significantly improve your final score.",
+      "Technology has changed the nature of work and fast typing is now essential for office jobs.",
+      "Candidates who practice on realistic test interfaces perform better in the actual examination.",
+      "The minimum qualifying speed for most government clerical posts is thirty words per minute.",
+      "Consistent practice for three months is usually enough to achieve the required typing speed.",
+      "Touch typing means you type without looking at the keyboard using all ten fingers correctly."
+    ],
+    hard:[
+      "The implementation of comprehensive administrative reforms requires meticulous planning and systematic execution across all organizational levels.",
+      "Sophisticated technological infrastructure necessitates continuous professional development and adaptive learning strategies for optimal performance outcomes.",
+      "Constitutional jurisprudence in India has evolved considerably reflecting dynamic interplay between legislative intent and judicial interpretation.",
+      "Contemporary governance frameworks emphasize transparency and accountability as prerequisites for sustainable institutional legitimacy in democratic systems.",
+      "Pharmaceutical research involves extensive clinical trials designed to evaluate the safety and efficacy of new therapeutic compounds.",
+      "The macroeconomic stabilization policies typically involve careful balancing of inflationary pressures against employment generation objectives nationwide.",
+      "Digital transformation of public administration requires personnel with advanced technological proficiency across all levels of the government hierarchy.",
+      "The proliferation of artificial intelligence has necessitated comprehensive reevaluation of workforce capabilities and organizational structures across industries.",
+      "Biochemical research demonstrates the extraordinary complexity of cellular metabolism requiring sophisticated interdisciplinary collaboration between international researchers.",
+      "Administrative efficiency requires systematic implementation of evidence-based policy interventions addressing complex socioeconomic challenges facing developing nations.",
+      "The Goods and Services Tax reform brought together dozens of central and state levies under a unified framework requiring extensive reorganization.",
+      "Panchayati Raj institutions given constitutional status by the seventy-third Amendment established a three-tier democratic structure at the grassroots level."
+    ]
   },
   numbers:{
-    easy:["1234 5678 9012 3456 7890 1234 5678 9012 3456 7890 1234 5678 9012 3456 7890","0000 1111 2222 3333 4444 5555 6666 7777 8888 9999 0000 1111 2222 3333 4444"],
-    medium:["Phone: 9876543210 Amount: 12500 Date: 15-03-2025 Invoice: 987654 PAN: 456789 Code: 112233 Ref: 778899"],
-    hard:["Transaction ID: 9876543210123456 dated 15/03/2025 for amount Rs.125000.00 with reference number REF-2025-MARCH-987654321"]
+    easy:[
+      "1234 5678 9012 3456 7890 1234 5678 9012 3456 7890 1234 5678 9012 3456 7890",
+      "0000 1111 2222 3333 4444 5555 6666 7777 8888 9999 0000 1111 2222 3333 4444",
+      "1357 2468 3579 4680 5791 6802 7913 8024 9135 0246 1122 3344 5566 7788 9900",
+      "9876 5432 1098 7654 3210 9876 5432 1098 7654 3210 9876 5432 1098 7654 3210"
+    ],
+    medium:[
+      "Phone: 9876543210 Amount: 12500 Date: 15-03-2025 Invoice: 987654 PAN: 456789 Code: 112233 Ref: 778899",
+      "Roll: 2024001234 Marks: 385/500 Rank: 1247 DOB: 12-08-1999 Pincode: 302001 Aadhar: 1234 5678 9012",
+      "Account: 9876543210 IFSC: SBIN0001234 Amount: 50000 Date: 01-04-2025 Ref: TXN202504011234567890"
+    ],
+    hard:[
+      "Transaction ID: 9876543210123456 dated 15/03/2025 for Rs.125000.00 Ref: REF-2025-MARCH-987654321 IFSC: SBIN0012345",
+      "Candidate Roll: TC2025001234 Score: 142.50/200 Percentile: 98.76 Rank: 1234 Vacancy: 45678 Category: OBC-NCL",
+      "Invoice No: INV-2025-03-001234 GSTIN: 08ABCDE1234F1Z5 HSN: 9984 Taxable: 125000.00 CGST: 11250 Total: 147750.00"
+    ]
   },
   hindi:{
-    easy:["भारत एक महान देश है यहाँ अनेक भाषाएँ हैं लोग मिलकर रहते हैं","हमारा देश सुंदर है यहाँ पहाड़ नदियाँ और जंगल हैं प्रकृति अद्भुत है"],
-    medium:["सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में सुधार होगा।"],
-    hard:["मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से कठिन लक्ष्य भी प्राप्त किए जा सकते हैं।"]
+    easy:[
+      "भारत एक महान देश है यहाँ अनेक भाषाएँ बोली जाती हैं सभी लोग मिलकर रहते हैं",
+      "हमारा देश बहुत सुंदर है यहाँ ऊँचे पहाड़ बड़ी नदियाँ और घने जंगल हैं",
+      "पढ़ाई करना जीवन में बहुत जरूरी है ज्ञान से ही जीवन में आगे बढ़ा जा सकता है",
+      "आज के युग में कंप्यूटर का ज्ञान होना बहुत जरूरी है हर दफ्तर में काम होता है",
+      "स्वास्थ्य ही सबसे बड़ा धन है यदि हम स्वस्थ हैं तो हम सब कुछ कर सकते हैं",
+      "भारत की संस्कृति बहुत समृद्ध है यहाँ हर त्योहार बड़े उत्साह से मनाया जाता है",
+      "मेहनत करने वाले लोग जीवन में सफलता प्राप्त करते हैं आलस्य जीवन का शत्रु है",
+      "नदियाँ हमारे जीवन का आधार हैं इनका पानी खेतों को सींचता है और प्यास बुझाता है"
+    ],
+    medium:[
+      "सरकारी नौकरी पाने के लिए टाइपिंग स्पीड बहुत जरूरी है। हर रोज अभ्यास करने से आपकी गति में सुधार होगा।",
+      "भारत सरकार ने विभिन्न प्रतियोगी परीक्षाओं के लिए टाइपिंग मानक निर्धारित किए हैं। एसएससी और रेलवे परीक्षाओं में टाइपिंग का परीक्षण किया जाता है।",
+      "कंप्यूटर पर काम करने के लिए टाइपिंग का अच्छा ज्ञान होना आवश्यक है। आज के युग में हर सरकारी कार्यालय में कंप्यूटर का उपयोग किया जाता है।",
+      "राजस्थान लोक सेवा आयोग प्रतिवर्ष विभिन्न सरकारी पदों पर भर्ती के लिए परीक्षाएं आयोजित करता है।",
+      "हिंदी टाइपिंग के लिए मंगल फॉन्ट और इन्स्क्रिप्ट कीबोर्ड का उपयोग किया जाता है। नियमित अभ्यास से परीक्षा में अच्छा प्रदर्शन किया जा सकता है।",
+      "डिजिटल इंडिया कार्यक्रम के तहत सरकारी सेवाओं को ऑनलाइन उपलब्ध कराया जा रहा है। इससे नागरिकों को घर बैठे सेवाएं मिल रही हैं।",
+      "प्रधानमंत्री जन धन योजना के तहत देश के गरीब नागरिकों को बैंकिंग सुविधाएं प्रदान की जाती हैं।",
+      "उत्तर प्रदेश लोक सेवा आयोग द्वारा आयोजित परीक्षाओं में हिंदी टाइपिंग का विशेष महत्व है।",
+      "भारतीय रेलवे विश्व के सबसे बड़े रेल नेटवर्कों में से एक है जो लाखों यात्रियों को रोज सेवाएं प्रदान करता है।",
+      "सरकारी परीक्षाओं की तैयारी के लिए नियमित अभ्यास और सही रणनीति बहुत जरूरी होती है।"
+    ],
+    hard:[
+      "मेहनत और लगन से काम करने वाला व्यक्ति जीवन में हमेशा सफलता प्राप्त करता है। निरंतर प्रयास और दृढ़ संकल्प से बड़े से बड़ा लक्ष्य प्राप्त किया जा सकता है।",
+      "भारतीय संविधान में सभी नागरिकों को समान अधिकार दिए गए हैं। लोकतांत्रिक व्यवस्था में जनता की शक्ति सर्वोपरि होती है और प्रत्येक नागरिक का योगदान महत्वपूर्ण है।",
+      "भारत की अर्थव्यवस्था विश्व की सबसे तेजी से बढ़ती अर्थव्यवस्थाओं में से एक है। सरकार ने विभिन्न क्षेत्रों में सुधार के लिए अनेक महत्वपूर्ण नीतियां लागू की हैं।",
+      "वस्तु एवं सेवा कर यानी जीएसटी भारत की अप्रत्यक्ष कर प्रणाली में एक महत्वपूर्ण सुधार है। इसने केंद्र और राज्य के अनेक करों को एकीकृत करके सरल बनाया है।"
+    ]
   },
   hinglish:{
-    easy:["yeh ek acha din hai aaj mausam bahut sundar hai bahar jaana chahiye"],
-    medium:["Government exam ke liye typing practice bahut important hai. Daily practice karo aur apni speed badhao."],
-    hard:["Professional development ke liye consistently new skills seekhna bahut zaroori hai modern workplace mein success ke liye."]
+    easy:[
+      "yeh ek acha din hai aaj mausam bahut sundar hai bahar thandi hawa chal rahi hai",
+      "padhai mein mehnat karo aur apne sapne poore karo har roz kuch naya seekhne ki koshish karo"
+    ],
+    medium:[
+      "Government exam ke liye typing practice bahut important hai. Daily practice karo aur apni speed badhao. Accuracy pe dhyan do.",
+      "SSC aur Railway exams mein typing test qualify karna padta hai. Minimum speed thirty five words per minute honi chahiye."
+    ],
+    hard:[
+      "Professional development ke liye consistently new skills seekhna bahut zaroori hai modern workplace mein success ke liye. Government exams mein typing speed ek important criterion hai.",
+      "Competitive examinations mein success ke liye systematic preparation aur time management dono equally important hain. Typing test clear karne ke liye authentic exam interfaces par practice karni chahiye."
+    ]
   }
 };
 
@@ -405,25 +520,39 @@ document.getElementById('streakNum').textContent=streak;
 function getText(){
   const targetChars = Math.ceil((totalTime/60)*80*6);
 
-  if(lang==='hindi'){
-    return buildText(textBanks.hindi[difficulty]||textBanks.hindi.medium, targetChars);
-  }
-  if(lang==='hinglish'){
-    return buildText(textBanks.hinglish[difficulty]||textBanks.hinglish.medium, targetChars);
-  }
+  // Hindi / Hinglish
+  if(lang==='hindi')  return buildText(textBanks.hindi[difficulty]||textBanks.hindi.medium, targetChars);
+  if(lang==='hinglish') return buildText(textBanks.hinglish[difficulty]||textBanks.hinglish.medium, targetChars);
+
+  // Words mode — pick individual random words, repeat to fill time
   if(practiceType==='words'){
-    const wordList=(textBanks.words[difficulty]||textBanks.words.easy)[0].split(' ');
+    const wordStr = textBanks.words[difficulty] || textBanks.words.easy;
+    const wordList = (typeof wordStr==='string' ? wordStr : wordStr[0]).split(' ');
     let result='';
-    while(result.length<targetChars){
-      const w=wordList[Math.floor(Math.random()*wordList.length)];
-      result+=(result?' ':'')+w;
+    while(result.length < targetChars){
+      const w = wordList[Math.floor(Math.random()*wordList.length)];
+      result += (result?' ':'')+w;
     }
     return result.trim();
   }
-  if(practiceType==='numbers'){
-    return buildText(textBanks.numbers[difficulty]||textBanks.numbers.easy, targetChars);
+
+  // Sentences — pick individual sentences and join
+  if(practiceType==='sentences'){
+    const pool = textBanks.sentences[difficulty]||textBanks.sentences.easy;
+    const shuffled = [...pool].sort(()=>Math.random()-0.5);
+    let result='', i=0;
+    while(result.length < targetChars){
+      result += (result?' ':'')+shuffled[i%shuffled.length];
+      i++;
+    }
+    return result.trim();
   }
-  const pool=textBanks[practiceType]?.[difficulty]||textBanks.paragraph.easy;
+
+  // Numbers
+  if(practiceType==='numbers') return buildText(textBanks.numbers[difficulty]||textBanks.numbers.easy, targetChars);
+
+  // Paragraph (default)
+  const pool = textBanks.paragraph[difficulty]||textBanks.paragraph.easy;
   return buildText(pool, targetChars);
 }
 
@@ -532,18 +661,17 @@ function endTest(){
   document.getElementById('rNet').textContent=finalNet;
   document.getElementById('rAcc').textContent=finalAcc+'%';
   document.getElementById('rErr').textContent=errCount;
-  if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
-  // Save last test scores so certificate.html can read them
-  localStorage.setItem('lastWpm', finalWpm);
-  localStorage.setItem('lastAcc', finalAcc+'%');
-  localStorage.setItem('lastNet', finalNet);
-  // Update certificate link with actual scores
-  const certBtn=document.getElementById('getCertBtn');
-  if(certBtn) certBtn.href=`certificate.html?wpm=${finalWpm}&acc=${finalAcc}%&net=${finalNet}`;
+  if(finalWpm>bestWpm){bestWpm=finalWpm;localStorage.setItem('bestWpm',bestWpm);document.getElementById('bestWpm').textContent=bestWpm;showNotif('🎉 New personal best! '+finalWpm+' WPM','success');}
   testsToday++;localStorage.setItem('testsToday',testsToday);
   updateStreak();
   generateTips();
-  document.getElementById('resultsCard').classList.add('show');
+  document.getElementById('resultsCard').classList.add('show')
+  // Save scores for certificate page
+  localStorage.setItem('lastWpm', finalWpm);
+  localStorage.setItem('lastAcc', finalAcc+'%');
+  localStorage.setItem('lastNet', finalNet);
+  const certBtn=document.getElementById('getCertBtn');
+  if(certBtn) certBtn.href=`certificate.html?wpm=${finalWpm}&acc=${finalAcc}%&net=${finalNet}`;;
   buildHeatmap();
   document.getElementById('heatmapCard').classList.add('show');
   document.getElementById('resultsCard').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -604,31 +732,33 @@ function buildHeatmap(){
 
 function setType(t,btn){
   practiceType=t;
-  document.querySelectorAll('.opt-group .opt-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  const dg=document.getElementById('diffGroup');
+  if(dg) dg.style.opacity=t==='words'?'0.3':'1';
   document.getElementById('customCard').style.display=t==='custom'?'block':'none';
   if(t!=='custom')resetTest();
 }
 
 function setLang(l,btn){
   lang=l;
-  document.querySelectorAll('[onclick*="setLang"]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  const isHindi=l==='hindi';
+  document.getElementById('kdphPanel') && (document.getElementById('kdphPanel').style.display=isHindi?'flex':'none');
   resetTest();
 }
 
 function setDiff(d,btn){
   difficulty=d;
-  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[data-diff]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const descs={easy:'Short common words. Great for building speed.',medium:'Real sentences with varied vocabulary. Good for exam prep.',hard:'Complex technical language. For advanced typists only.'};
-  document.getElementById('diffDesc').textContent=descs[d];
   resetTest();
 }
 
-function setDuration(d,btn){
-  totalTime=d;
-  document.querySelectorAll('[onclick*="setDuration"]').forEach(b=>b.classList.remove('active'));
+function setDuration(t,btn){
+  totalTime=t;timeLeft=t;
+  document.querySelectorAll('[data-dur]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   resetTest();
 }
